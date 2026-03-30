@@ -1,0 +1,5 @@
+[     570ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://snippets.loopwork.co/bundle/bushbalm.myshopify.com/188634202482.json:0
+[     629ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://bushbalm.com/files/desktopx2_1.png:0
+[     681ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://kit.fontawesome.com/05c6fbd31e.js:0
+[     742ms] [WARNING] In a sandboxed environment, addEventListener may not behave as expected. @ https://bushbalm.com/cdn/wpm/scfa8229ew36b6053dp1e134caame9d83f21m.js:0
+[    1095ms] [WARNING] [Meta Pixel] - Duplicate Pixel ID: 1495151704119266. @ https://connect.facebook.net/en_US/fbevents.js:175

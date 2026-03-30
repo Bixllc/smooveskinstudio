@@ -1,0 +1,15 @@
+[     481ms] Invalid left-hand side in assignment
+[     500ms] [ERROR] Error: <g> attribute transform: Expected number, "matrix(Infinity NaN NaN…". @ https://tresswellness.com/:5761
+[     570ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://tresswellness.com/cdn/shop/t/28/assets/template-index.min.js?v=46224:0
+[     570ms] [ERROR] Refused to execute script from 'https://tresswellness.com/cdn/shop/t/28/assets/template-index.min.js?v=46224' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ https://tresswellness.com/:0
+[     607ms] [WARNING] System Error: Insufficient inputs found for click simulation. @ https://tresswellness.com/cdn/shop/t/28/assets/custom_mw.js?v=54035323972161060771770996705:0
+[     613ms] TypeError: Cannot read properties of undefined (reading 'children')
+    at https://tresswellness.com/cdn/shop/t/28/assets/main.min.js?v=118641585180167012881770995548:1:17187
+    at L (https://tresswellness.com/cdn/shop/t/28/assets/main.min.js?v=118641585180167012881770995548:1:17396)
+    at dots.setupSlideshow (https://tresswellness.com/cdn/shop/t/28/assets/main.min.js?v=118641585180167012881770995548:1:38530)
+    at o.onload (https://tresswellness.com/cdn/shop/t/28/assets/main.min.js?v=118641585180167012881770995548:1:37623)
+[   11067ms] [WARNING] [GORGIAS-CHAT] Another chat was detected. Check that you did not add Gorgias chat snippet twice. {chatSkipped: Object} @ https://config.gorgias.chat/bundle-loader/01H6QW6WBFV7ZEP2A880AF10K5?source=shopify1click&shop=2b04ec.myshopify.com:0
+[   11092ms] [WARNING] Ecom popup data element not found @ https://cdn.shopify.com/extensions/019d2305-1e3a-7a6b-8138-17ada459ecd1/ecomposer-114/assets/ecom_popup.js:0
+[   11445ms] [WARNING] In a sandboxed environment, addEventListener may not behave as expected. @ https://tresswellness.com/web-pixels@cfa8229ew36b6053dp1e134caame9d83f21/custom/web-pixel-75170069@1/sandbox/modern/:6
+[   11476ms] [WARNING] In a sandboxed environment, addEventListener may not behave as expected. @ https://tresswellness.com/web-pixels@cfa8229ew36b6053dp1e134caame9d83f21/custom/web-pixel-75137301@1/sandbox/modern/:6
+[   11480ms] [WARNING] In a sandboxed environment, addEventListener may not behave as expected. @ https://tresswellness.com/web-pixels@cfa8229ew36b6053dp1e134caame9d83f21/custom/web-pixel-75104533@2/sandbox/modern/:6
