@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Multi-Client ───────────────────────────────────────────────────────────
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  domain    String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  businessSettings BusinessSettings?
+  categories       Category[]
+  services         Service[]
+  customers        Customer[]
+  bookings         Booking[]
+  payments         Payment[]
+  availabilityRules AvailabilityRule[]
+  blockedTimes     BlockedTime[]
+}
+
+// ─── Business Settings ──────────────────────────────────────────────────────
+
+model BusinessSettings {
+  id       String @id @default(uuid())
+  clientId String @unique
+  client   Client @relation(fields: [clientId], references: [id])
+
+  businessName String
+  address      String?
+  phone        String?
+  email        String?
+  timezone     String @default("America/New_York")
+
+  cancellationPolicy String?
+  latePolicy         String?
+  noShowPolicy       String?
+  depositPolicy      String?
+
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Category ───────────────────────────────────────────────────────────────
+
+model Category {
+  id           String  @id @default(uuid())
+  clientId     String
+  client       Client  @relation(fields: [clientId], references: [id])
+  name         String
+  description  String?
+  displayOrder Int     @default(0)
+  active       Boolean @default(true)
+
+  services Service[]
+
+  @@index([clientId])
+}
+
+// ─── Service ────────────────────────────────────────────────────────────────
+
+model Service {
+  id               String  @id @default(uuid())
+  clientId         String
+  client           Client  @relation(fields: [clientId], references: [id])
+  categoryId       String
+  category         Category @relation(fields: [categoryId], references: [id])
+  name             String
+  description      String?
+  durationMinutes  Int
+  price            Decimal @db.Decimal(10, 2)
+  depositAmount    Decimal? @db.Decimal(10, 2)
+  paymentType      PaymentType @default(FULL)
+  bufferBeforeMinutes Int @default(0)
+  bufferAfterMinutes  Int @default(0)
+  active           Boolean @default(true)
+
+  bookings Booking[]
+
+  @@index([clientId])
+  @@index([categoryId])
+}
+
+enum PaymentType {
+  FULL
+  DEPOSIT
+}
+
+// ─── Customer ───────────────────────────────────────────────────────────────
+
+model Customer {
+  id       String  @id @default(uuid())
+  clientId String
+  client   Client  @relation(fields: [clientId], references: [id])
+  fullName String
+  email    String
+  phone    String?
+  notes    String?
+
+  bookings Booking[]
+
+  @@index([clientId])
+  @@index([clientId, email])
+}
+
+// ─── Booking ────────────────────────────────────────────────────────────────
+
+model Booking {
+  id         String @id @default(uuid())
+  clientId   String
+  client     Client @relation(fields: [clientId], references: [id])
+  serviceId  String
+  service    Service @relation(fields: [serviceId], references: [id])
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  startTimeUtc DateTime
+  endTimeUtc   DateTime
+
+  status        BookingStatus  @default(PENDING_PAYMENT)
+  paymentStatus PaymentStatus  @default(UNPAID)
+
+  paymentProvider String?
+  paymentId       String?
+
+  confirmationEmailSentAt DateTime?
+  reminderEmailSentAt     DateTime?
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments Payment[]
+
+  @@index([clientId])
+  @@index([clientId, status])
+  @@index([startTimeUtc, endTimeUtc])
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  CANCELLED
+  RESCHEDULED
+  COMPLETED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// ─── Payment ────────────────────────────────────────────────────────────────
+
+model Payment {
+  id                String  @id @default(uuid())
+  clientId          String
+  client            Client  @relation(fields: [clientId], references: [id])
+  bookingId         String
+  booking           Booking @relation(fields: [bookingId], references: [id])
+  provider          String
+  providerPaymentId String
+  amount            Decimal @db.Decimal(10, 2)
+  status            PaymentStatus @default(PENDING)
+  paidAt            DateTime?
+
+  @@index([clientId])
+  @@index([bookingId])
+}
+
+// ─── Availability Rule ──────────────────────────────────────────────────────
+
+model AvailabilityRule {
+  id        String  @id @default(uuid())
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id])
+  dayOfWeek Int     // 0 = Sunday, 6 = Saturday
+  startTime String  // HH:mm in client timezone
+  endTime   String  // HH:mm in client timezone
+  active    Boolean @default(true)
+
+  @@index([clientId])
+  @@index([clientId, dayOfWeek])
+}
+
+// ─── Blocked Time ───────────────────────────────────────────────────────────
+
+model BlockedTime {
+  id           String   @id @default(uuid())
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id])
+  startTimeUtc DateTime
+  endTimeUtc   DateTime
+  reason       String?
+
+  @@index([clientId])
+  @@index([startTimeUtc, endTimeUtc])
+}
