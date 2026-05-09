@@ -1,6 +1,8 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 interface BookingEmailData {
   customerName: string;
@@ -33,7 +35,7 @@ export async function sendConfirmationEmail(
 ): Promise<void> {
   const from = process.env.RESEND_FROM_EMAIL || "bookings@example.com";
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from,
     to: data.customerEmail,
     subject: `Booking Confirmed — ${data.serviceName}`,
@@ -46,7 +48,7 @@ export async function sendAdminNotificationEmail(
 ): Promise<void> {
   const from = process.env.RESEND_FROM_EMAIL || "bookings@example.com";
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from,
     to: data.adminEmail,
     subject: `New Booking — ${data.customerName} for ${data.serviceName}`,
