@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
@@ -116,6 +117,8 @@ export function ReviewPayStep({
         </div>
       </div>
 
+      <PromoCodeField />
+
       {error && (
         <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
           {error}
@@ -129,6 +132,53 @@ export function ReviewPayStep({
       >
         {isSubmitting ? "Processing..." : "Confirm & Pay"}
       </button>
+    </div>
+  );
+}
+
+function PromoCodeField() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [code, setCode] = useState("");
+  const [applied, setApplied] = useState(false);
+
+  function handleApply() {
+    if (!code.trim()) return;
+    // TODO: validate promo/gift card code via API
+    setApplied(true);
+  }
+
+  return (
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors"
+      >
+        {isOpen ? "Hide" : "Have a promo code or gift card?"}
+      </button>
+
+      {isOpen && (
+        <div className="mt-2 flex gap-2">
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value);
+              setApplied(false);
+            }}
+            placeholder="Enter code"
+            className="flex-1 rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-light)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+          />
+          <button
+            type="button"
+            onClick={handleApply}
+            disabled={!code.trim() || applied}
+            className="shrink-0 rounded-lg bg-[var(--color-text)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
+          >
+            {applied ? "Applied" : "Apply"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

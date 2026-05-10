@@ -30,12 +30,12 @@ export default async function ServiceSelectionPage({
     <div>
       <Link
         href={`/${clientSlug}`}
-        className="mb-4 inline-block text-sm text-[var(--color-text-light)] hover:text-[var(--color-primary)]"
+        className="mb-3 inline-flex items-center gap-1 text-sm text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors"
       >
         &larr; Back to Categories
       </Link>
 
-      <h2 className="mb-6 text-2xl font-semibold text-[var(--color-text)]">
+      <h2 className="mb-4 text-xl font-semibold uppercase tracking-wide text-[var(--color-text)]">
         {category.name}
       </h2>
 
@@ -44,42 +44,35 @@ export default async function ServiceSelectionPage({
           No services available in this category.
         </p>
       ) : (
-        <div className="grid gap-4">
+        <div className="divide-y divide-[var(--color-border)] rounded-xl border border-[var(--color-border)] bg-white overflow-hidden">
           {services.map((service) => (
-            <Link
+            <div
               key={service.id}
-              href={`/${clientSlug}/book/${service.id}`}
-              className="group rounded-xl border border-[var(--color-border)] bg-white p-6 transition-shadow hover:shadow-md"
+              className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-[var(--color-background-light)] transition-colors"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-[var(--color-text)] group-hover:text-[var(--color-primary)]">
-                    {service.name}
-                  </h3>
-                  {service.description && (
-                    <p className="mt-1 text-sm text-[var(--color-text-light)]">
-                      {service.description}
-                    </p>
-                  )}
-                  <p className="mt-2 text-sm text-[var(--color-text-light)]">
-                    {service.durationMinutes} min
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-[var(--color-text)]">
+                  {service.name}
+                </h3>
+                <p className="text-sm text-[var(--color-text-light)]">
+                  {service.durationMinutes >= 60
+                    ? `${Math.floor(service.durationMinutes / 60)} hr${service.durationMinutes % 60 > 0 ? ` ${service.durationMinutes % 60} min` : ""}`
+                    : `${service.durationMinutes} min`}
+                  {" "}@ ${Number(service.price).toFixed(2)}
+                </p>
+                {service.description && (
+                  <p className="mt-1 text-sm text-[var(--color-text-light)]">
+                    {service.description}
                   </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-semibold text-[var(--color-text)]">
-                    ${Number(service.price).toFixed(2)}
-                  </p>
-                  {service.paymentType === "DEPOSIT" && service.depositAmount && (
-                    <p className="text-xs text-[var(--color-text-light)]">
-                      ${Number(service.depositAmount).toFixed(2)} deposit
-                    </p>
-                  )}
-                </div>
+                )}
               </div>
-              <span className="mt-4 inline-block text-sm font-medium text-[var(--color-primary)]">
-                Book Now &rarr;
-              </span>
-            </Link>
+              <Link
+                href={`/${clientSlug}/book/${service.id}`}
+                className="shrink-0 rounded-md bg-[var(--color-text)] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-dark)]"
+              >
+                SELECT
+              </Link>
+            </div>
           ))}
         </div>
       )}
