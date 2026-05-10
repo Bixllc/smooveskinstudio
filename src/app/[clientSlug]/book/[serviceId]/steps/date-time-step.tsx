@@ -25,6 +25,7 @@ export function DateTimeStep({
   const [slots, setSlots] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hoveredSlot, setHoveredSlot] = useState<string | null>(null);
 
   const today = new Date();
 
@@ -67,60 +68,84 @@ export function DateTimeStep({
 
   return (
     <div>
-      <h3 className="mb-4 text-lg font-medium text-[var(--color-text)]">
-        Select a Date & Time
+      <h3 className="mb-6 text-center text-xl font-semibold text-[var(--color-text)]">
+        Select Date & Time
       </h3>
 
-      <div className="rounded-xl border border-[var(--color-border)] bg-white p-4">
-        <DayPicker
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleDateSelect}
-          disabled={{ before: today }}
-          className="mx-auto"
-        />
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Calendar */}
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <h4 className="mb-4 font-semibold text-[var(--color-text)]">
+            Choose a Date
+          </h4>
+          <div className="border-t border-[var(--color-border)] pt-4">
+            <DayPicker
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+              disabled={{ before: today }}
+              className="mx-auto"
+            />
+          </div>
+        </div>
+
+        {/* Time slots */}
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <h4 className="mb-4 font-semibold text-[var(--color-text)]">
+            Choose a Time
+          </h4>
+          <div className="border-t border-[var(--color-border)] pt-4">
+            {!selectedDate && (
+              <p className="py-8 text-center text-sm text-[var(--color-text-light)]">
+                Select a date to see available times
+              </p>
+            )}
+
+            {loading && (
+              <p className="py-8 text-center text-sm text-[var(--color-text-light)]">
+                Loading available times...
+              </p>
+            )}
+
+            {error && (
+              <p className="py-8 text-center text-sm text-red-600">{error}</p>
+            )}
+
+            {selectedDate && !loading && !error && slots.length === 0 && (
+              <p className="py-8 text-center text-sm text-[var(--color-text-light)]">
+                No available times on this date.
+              </p>
+            )}
+
+            {!loading && slots.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                {slots.map((slot) => (
+                  <button
+                    key={slot}
+                    onClick={() => onSelectSlot(slot)}
+                    onMouseEnter={() => setHoveredSlot(slot)}
+                    onMouseLeave={() => setHoveredSlot(null)}
+                    className={`rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                      selectedSlot === slot
+                        ? "bg-[var(--color-primary)] text-white shadow-md"
+                        : hoveredSlot === slot
+                          ? "bg-[var(--color-primary)] bg-opacity-10 text-[var(--color-primary)]"
+                          : "bg-[var(--color-background-light)] text-[var(--color-text)] hover:bg-[var(--color-primary)] hover:bg-opacity-10 hover:text-[var(--color-primary)]"
+                    }`}
+                  >
+                    {formatSlotTime(slot)}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {selectedDate && (
-        <div className="mt-6">
-          <h4 className="mb-3 text-sm font-medium text-[var(--color-text)]">
-            Available times for {format(selectedDate, "MMMM d, yyyy")}
-          </h4>
-
-          {loading && (
-            <p className="text-sm text-[var(--color-text-light)]">
-              Loading available times...
-            </p>
-          )}
-
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
-
-          {!loading && !error && slots.length === 0 && (
-            <p className="text-sm text-[var(--color-text-light)]">
-              No available times on this date. Please select another date.
-            </p>
-          )}
-
-          {!loading && slots.length > 0 && (
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-              {slots.map((slot) => (
-                <button
-                  key={slot}
-                  onClick={() => onSelectSlot(slot)}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                    selectedSlot === slot
-                      ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
-                      : "border-[var(--color-border)] bg-white text-[var(--color-text)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-                  }`}
-                >
-                  {formatSlotTime(slot)}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      {selectedDate && slots.length > 0 && (
+        <p className="mt-4 text-center text-xs text-[var(--color-text-light)]">
+          Select a time slot to continue
+        </p>
       )}
     </div>
   );

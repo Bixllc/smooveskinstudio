@@ -31,6 +31,15 @@ interface BookingFlowProps {
   service: ServiceInfo;
 }
 
+function formatDuration(minutes: number): string {
+  if (minutes >= 60) {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hrs} hr ${mins} min` : `${hrs} hr`;
+  }
+  return `${minutes} min`;
+}
+
 export function BookingFlow({
   clientSlug,
   clientId,
@@ -44,7 +53,7 @@ export function BookingFlow({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const steps = ["Date & Time", "Your Info", "Review & Pay"];
+  const steps = ["Date & Time", "Your Details", "Confirm"];
 
   async function handleSubmitBooking() {
     if (!selectedSlot || !customerInfo) return;
@@ -77,11 +86,9 @@ export function BookingFlow({
         return;
       }
 
-      // Redirect to Square checkout
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        // Fallback: go to confirmation
         router.push(`/${clientSlug}/confirmation/${data.bookingId}`);
       }
     } catch {
@@ -92,57 +99,64 @@ export function BookingFlow({
 
   return (
     <div>
-      {/* Back link */}
+      {/* Step indicator */}
+      <div className="mb-8 flex items-center justify-center gap-2">
+        {steps.map((label, i) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                  i + 1 <= step
+                    ? "bg-[var(--color-primary)] text-white"
+                    : "bg-[var(--color-border)] text-[var(--color-text-light)]"
+                }`}
+              >
+                {i + 1}
+              </div>
+              <span
+                className={`text-sm ${
+                  i + 1 === step
+                    ? "font-semibold text-[var(--color-text)]"
+                    : "text-[var(--color-text-light)]"
+                }`}
+              >
+                {label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className="mx-2 h-px w-8 bg-[var(--color-border)]" />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Service summary pill */}
+      <div className="mb-8 flex justify-center">
+        <div className="inline-flex items-center gap-3 rounded-full bg-white px-6 py-2.5 shadow-sm">
+          <span className="font-medium text-[var(--color-text)]">
+            {service.name}
+          </span>
+          <span className="text-[var(--color-text-light)]">&middot;</span>
+          <span className="text-sm text-[var(--color-text-light)]">
+            {formatDuration(service.durationMinutes)}
+          </span>
+          <span className="text-[var(--color-text-light)]">&middot;</span>
+          <span className="font-semibold text-[var(--color-primary)]">
+            ${service.price.toFixed(2)}
+          </span>
+        </div>
+      </div>
+
+      {/* Back button */}
       <button
         onClick={() => {
           if (step === 1) router.back();
           else setStep((s) => (s - 1) as 1 | 2 | 3);
         }}
-        className="mb-4 text-sm text-[var(--color-text-light)] hover:text-[var(--color-primary)]"
+        className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors"
       >
-        &larr; {step === 1 ? "Back to Services" : "Back"}
+        &lsaquo; {step === 1 ? "Back to Services" : "Back"}
       </button>
-
-      {/* Service header */}
-      <div className="mb-6">
-        <p className="text-sm text-[var(--color-text-light)]">
-          {service.categoryName}
-        </p>
-        <h2 className="text-2xl font-semibold text-[var(--color-text)]">
-          {service.name}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--color-text-light)]">
-          {service.durationMinutes} min &middot; $
-          {service.price.toFixed(2)}
-          {service.paymentType === "DEPOSIT" && service.depositAmount && (
-            <span> (${service.depositAmount.toFixed(2)} deposit required)</span>
-          )}
-        </p>
-      </div>
-
-      {/* Step indicator */}
-      <div className="mb-8 flex gap-1">
-        {steps.map((label, i) => (
-          <div key={label} className="flex-1">
-            <div
-              className={`h-1 rounded-full ${
-                i + 1 <= step
-                  ? "bg-[var(--color-primary)]"
-                  : "bg-[var(--color-border)]"
-              }`}
-            />
-            <p
-              className={`mt-1 text-xs ${
-                i + 1 === step
-                  ? "font-medium text-[var(--color-text)]"
-                  : "text-[var(--color-text-light)]"
-              }`}
-            >
-              {label}
-            </p>
-          </div>
-        ))}
-      </div>
 
       {/* Steps */}
       {step === 1 && (
@@ -158,8 +172,11 @@ export function BookingFlow({
         />
       )}
 
-      {step === 2 && (
+      {step === 2 && selectedSlot && (
         <CustomerInfoStep
+          service={service}
+          selectedSlot={selectedSlot}
+          timezone={timezone}
           initialValues={customerInfo}
           onSubmit={(info) => {
             setCustomerInfo(info);

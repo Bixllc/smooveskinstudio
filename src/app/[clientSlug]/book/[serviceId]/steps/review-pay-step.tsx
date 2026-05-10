@@ -29,6 +29,15 @@ interface ReviewPayStepProps {
   onConfirm: () => void;
 }
 
+function formatDuration(minutes: number): string {
+  if (minutes >= 60) {
+    const hrs = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hrs} hr ${mins} min` : `${hrs} hr`;
+  }
+  return `${minutes} minutes`;
+}
+
 export function ReviewPayStep({
   service,
   selectedSlot,
@@ -49,89 +58,77 @@ export function ReviewPayStep({
 
   return (
     <div>
-      <h3 className="mb-4 text-lg font-medium text-[var(--color-text)]">
-        Review & Pay
+      <h3 className="mb-2 text-center text-xl font-semibold text-[var(--color-text)]">
+        Review & Confirm
       </h3>
+      <p className="mb-8 text-center text-sm text-[var(--color-text-light)]">
+        Please review your booking details before confirming
+      </p>
 
-      <div className="space-y-4 rounded-xl border border-[var(--color-border)] bg-white p-6">
-        {/* Service */}
-        <div>
-          <p className="text-xs font-medium uppercase text-[var(--color-text-light)]">
-            Service
-          </p>
-          <p className="text-sm font-medium text-[var(--color-text)]">
-            {service.name}
-          </p>
-          <p className="text-xs text-[var(--color-text-light)]">
-            {service.durationMinutes} minutes
-          </p>
-        </div>
-
-        {/* Date & Time */}
-        <div>
-          <p className="text-xs font-medium uppercase text-[var(--color-text-light)]">
-            Date & Time
-          </p>
-          <p className="text-sm font-medium text-[var(--color-text)]">
-            {dateStr}
-          </p>
-          <p className="text-sm text-[var(--color-text)]">{timeStr}</p>
-        </div>
-
-        {/* Customer */}
-        <div>
-          <p className="text-xs font-medium uppercase text-[var(--color-text-light)]">
-            Contact
-          </p>
-          <p className="text-sm text-[var(--color-text)]">
-            {customerInfo.fullName}
-          </p>
-          <p className="text-sm text-[var(--color-text)]">
-            {customerInfo.email}
-          </p>
-          <p className="text-sm text-[var(--color-text)]">
-            {customerInfo.phone}
-          </p>
-          {customerInfo.notes && (
-            <p className="mt-1 text-xs text-[var(--color-text-light)]">
-              Note: {customerInfo.notes}
-            </p>
-          )}
-        </div>
-
-        {/* Price */}
-        <div className="border-t border-[var(--color-border)] pt-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-[var(--color-text)]">
-              {service.paymentType === "DEPOSIT" ? "Deposit Due" : "Total"}
-            </p>
-            <p className="text-lg font-semibold text-[var(--color-text)]">
-              ${chargeAmount.toFixed(2)}
-            </p>
+      <div className="mx-auto max-w-2xl">
+        {/* Booking details card */}
+        <div className="rounded-2xl bg-white p-6 shadow-sm">
+          <div className="space-y-4">
+            <div className="flex justify-between border-b border-[var(--color-border)] pb-3">
+              <span className="text-sm text-[var(--color-text-light)]">Service</span>
+              <span className="font-medium text-[var(--color-text)]">{service.name}</span>
+            </div>
+            <div className="flex justify-between border-b border-[var(--color-border)] pb-3">
+              <span className="text-sm text-[var(--color-text-light)]">Duration</span>
+              <span className="font-medium text-[var(--color-text)]">{formatDuration(service.durationMinutes)}</span>
+            </div>
+            <div className="flex justify-between border-b border-[var(--color-border)] pb-3">
+              <span className="text-sm text-[var(--color-text-light)]">Date</span>
+              <span className="font-medium text-[var(--color-text)]">{dateStr}</span>
+            </div>
+            <div className="flex justify-between border-b border-[var(--color-border)] pb-3">
+              <span className="text-sm text-[var(--color-text-light)]">Time</span>
+              <span className="font-medium text-[var(--color-text)]">{timeStr}</span>
+            </div>
+            <div className="flex justify-between border-b border-[var(--color-border)] pb-3">
+              <span className="text-sm text-[var(--color-text-light)]">Name</span>
+              <span className="font-medium text-[var(--color-text)]">{customerInfo.fullName}</span>
+            </div>
+            <div className="flex justify-between border-b border-[var(--color-border)] pb-3">
+              <span className="text-sm text-[var(--color-text-light)]">Email</span>
+              <span className="font-medium text-[var(--color-text)]">{customerInfo.email}</span>
+            </div>
+            <div className="flex justify-between border-b border-[var(--color-border)] pb-3">
+              <span className="text-sm text-[var(--color-text-light)]">Phone</span>
+              <span className="font-medium text-[var(--color-text)]">{customerInfo.phone}</span>
+            </div>
+            <div className="flex justify-between pt-1">
+              <span className="font-semibold text-[var(--color-text)]">
+                {service.paymentType === "DEPOSIT" ? "Deposit Due" : "Total Amount"}
+              </span>
+              <span className="text-xl font-bold text-[var(--color-primary)]">
+                ${chargeAmount.toFixed(2)}
+              </span>
+            </div>
+            {service.paymentType === "DEPOSIT" && (
+              <p className="text-right text-xs text-[var(--color-text-light)]">
+                Full service price: ${service.price.toFixed(2)}
+              </p>
+            )}
           </div>
-          {service.paymentType === "DEPOSIT" && (
-            <p className="mt-1 text-xs text-[var(--color-text-light)]">
-              Full service price: ${service.price.toFixed(2)}
-            </p>
-          )}
         </div>
+
+        <PromoCodeField />
+
+        {error && (
+          <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-600">
+            {error}
+          </p>
+        )}
+
+        <button
+          onClick={onConfirm}
+          disabled={isSubmitting}
+          className="mt-6 w-full rounded-xl bg-[var(--color-primary)] px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
+        >
+          {isSubmitting ? "Processing..." : "Confirm & Pay"}
+        </button>
       </div>
-
-      <PromoCodeField />
-
-      {error && (
-        <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-
-      <button
-        onClick={onConfirm}
-        disabled={isSubmitting}
-        className="mt-6 w-full rounded-lg bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
-      >
-        {isSubmitting ? "Processing..." : "Confirm & Pay"}
-      </button>
     </div>
   );
 }
@@ -143,7 +140,6 @@ function PromoCodeField() {
 
   function handleApply() {
     if (!code.trim()) return;
-    // TODO: validate promo/gift card code via API
     setApplied(true);
   }
 
@@ -167,13 +163,13 @@ function PromoCodeField() {
               setApplied(false);
             }}
             placeholder="Enter code"
-            className="flex-1 rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-light)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            className="flex-1 rounded-xl border border-[var(--color-border)] bg-white px-4 py-2.5 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-light)] focus:border-[var(--color-primary)] focus:outline-none"
           />
           <button
             type="button"
             onClick={handleApply}
             disabled={!code.trim() || applied}
-            className="shrink-0 rounded-lg bg-[var(--color-text)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
+            className="shrink-0 rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
           >
             {applied ? "Applied" : "Apply"}
           </button>
