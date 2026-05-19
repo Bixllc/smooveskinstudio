@@ -1,5 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" width="80" height="80">
-  <circle cx="40" cy="40" r="36" fill="none" stroke="#2D2A26" stroke-width="1.5"/>
-  <text x="40" y="38" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-style="italic" fill="#2D2A26" dy=".1em">S</text>
-  <text x="40" y="62" text-anchor="middle" font-family="sans-serif" font-size="6" letter-spacing="3" fill="#2D2A26">SMOOVE</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Circular beige background -->
+  <circle cx="50" cy="50" r="50" fill="#C4A882"/>
+
+  <!-- Pill / capsule outline (the SS monogram outer shape) -->
+  <rect x="31" y="14" width="38" height="58" rx="19" ry="19"
+        fill="none" stroke="#2D2A26" stroke-width="2.8"/>
+
+  <!-- Two dots top and bottom of pill -->
+  <circle cx="50" cy="18.5" r="1.6" fill="#2D2A26"/>
+  <circle cx="50" cy="67.5" r="1.6" fill="#2D2A26"/>
+
+  <!-- Vertical tick marks at mid sides of pill -->
+  <line x1="31" y1="39" x2="31" y2="47" stroke="#2D2A26" stroke-width="2.8" stroke-linecap="round"/>
+  <line x1="69" y1="39" x2="69" y2="47" stroke="#2D2A26" stroke-width="2.8" stroke-linecap="round"/>
+
+  <!-- Upper S arc — opens right -->
+  <path d="M 42 24 C 60 24, 64 36, 50 43"
+        fill="none" stroke="#2D2A26" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- Lower S arc — opens left -->
+  <path d="M 50 43 C 36 50, 40 62, 58 62"
+        fill="none" stroke="#2D2A26" stroke-width="2.6" stroke-linecap="round"/>
 </svg>
