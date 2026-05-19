@@ -9,8 +9,8 @@ export default function Hero() {
           <Image
             src="/images/logo-transparent.avif"
             alt="Smoove Skin Studio logo"
-            width={180}
-            height={200}
+            width={240}
+            height={270}
             className="mb-8 max-lg:mx-auto"
             priority
           />

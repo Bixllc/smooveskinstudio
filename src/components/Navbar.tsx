@@ -14,11 +14,11 @@ export default function Navbar() {
       <div className="max-w-[1320px] mx-auto px-10 h-full flex items-center justify-between">
         <Link href="/">
           <Image
-            src="/images/logo.avif"
+            src="/images/logo-transparent.avif"
             alt="Smoove Skin Studio"
-            width={120}
-            height={48}
-            className="h-12 w-auto"
+            width={160}
+            height={64}
+            className="h-16 w-auto"
             priority
           />
         </Link>
