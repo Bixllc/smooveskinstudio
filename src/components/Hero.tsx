@@ -6,14 +6,6 @@ export default function Hero() {
       <div className="max-w-[1320px] mx-auto px-10 py-15 grid grid-cols-1 lg:grid-cols-2 gap-15 items-center max-lg:text-center">
         {/* Content */}
         <div>
-          <Image
-            src="/images/logo-transparent.avif"
-            alt="Smoove Skin Studio logo"
-            width={240}
-            height={270}
-            className="mb-8 max-lg:mx-auto"
-            priority
-          />
           <h1 className="font-light text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight text-[var(--color-text)]">
             <span className="block">Smoove</span>
             <span className="block text-[var(--color-primary)] italic">Skin</span>
