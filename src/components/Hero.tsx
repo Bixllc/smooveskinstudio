@@ -20,7 +20,7 @@ export default function Hero() {
           </p>
 
           <p className="mt-5 text-sm font-medium tracking-wider text-[var(--color-primary-dark)] uppercase">
-            Brazilian &amp; full-body waxing in Fort Worth, Dallas &amp; the DFW area
+            Full Body Brazilian Waxing in the DFW Area
           </p>
 
           <div className="mt-10 flex gap-4 flex-wrap max-lg:justify-center">
