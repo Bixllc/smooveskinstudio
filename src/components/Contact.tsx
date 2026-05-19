@@ -45,9 +45,9 @@ export default function Contact() {
                   <circle cx="12" cy="10" r="3" />
                 </svg>
               </div>
-              <h4 className="text-base font-medium text-[var(--color-text)]">
+              <h3 className="text-base font-medium text-[var(--color-text)]">
                 Visit Us
-              </h4>
+              </h3>
               <p className="mt-2 text-sm text-[var(--color-text-light)] leading-relaxed">
                 7600 Denton Hwy, Suite #139
                 <br />
@@ -77,9 +77,9 @@ export default function Contact() {
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" />
                 </svg>
               </div>
-              <h4 className="text-base font-medium text-[var(--color-text)]">
+              <h3 className="text-base font-medium text-[var(--color-text)]">
                 Email Us
-              </h4>
+              </h3>
               <a
                 href="mailto:info@smooveskinstudio.com"
                 className="mt-2 inline-block text-sm text-[var(--color-text-light)] underline hover:text-[var(--color-primary)] transition-colors"
@@ -105,9 +105,9 @@ export default function Contact() {
                   <polyline points="12 6 12 12 16 14" />
                 </svg>
               </div>
-              <h4 className="text-base font-medium text-[var(--color-text)]">
+              <h3 className="text-base font-medium text-[var(--color-text)]">
                 Hours
-              </h4>
+              </h3>
               <p className="mt-2 text-sm text-[var(--color-text-light)] leading-relaxed">
                 Mon - Fri: 9:00 AM - 7:00 PM
                 <br />
@@ -129,7 +129,9 @@ export default function Contact() {
             We look forward to welcoming you to our studio.
           </p>
           <a
-            href="/smooveskinstudio"
+            href="https://app.acuityscheduling.com/schedule/64a2c692"
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-8 inline-flex items-center justify-center px-10 py-4 rounded-full bg-[var(--color-primary)] text-white text-base font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
           >
             Book Online Now

@@ -20,7 +20,7 @@ export default function Hero() {
           </p>
 
           <p className="mt-5 text-sm font-medium tracking-wider text-[var(--color-primary-dark)] uppercase">
-            Specializing in Brazilian &amp; full-body waxing in the DFW area
+            Brazilian &amp; full-body waxing in Fort Worth, Dallas &amp; the DFW area
           </p>
 
           <div className="mt-10 flex gap-4 flex-wrap max-lg:justify-center">
@@ -38,7 +38,7 @@ export default function Hero() {
           <div className="relative rounded-2xl">
             <Image
               src="/images/hero-image.webp"
-              alt="Smoove Skin Studio ambiance"
+              alt="Smoove Skin Studio — professional waxing salon in Watauga, Fort Worth TX"
               width={600}
               height={500}
               className="w-full h-[500px] object-cover rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
