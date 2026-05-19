@@ -12,7 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://smooveskinstudio.com"),
   title: {
-    default: "Smoove Skin Studio | Waxing in Fort Worth & DFW",
+    default: "Smoove Skin Studio | Brazilian Wax Specialist | DFW",
     template: "%s | Smoove Skin Studio",
   },
   description:
@@ -33,6 +33,8 @@ export const metadata: Metadata = {
     "professional waxing DFW",
     "vajacial Fort Worth",
     "skin care Fort Worth",
+    "Brazilian wax specialist DFW",
+    "Brazilian wax specialist Fort Worth",
   ],
   authors: [{ name: "Smoove Skin Studio" }],
   creator: "Smoove Skin Studio",
@@ -45,7 +47,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://smooveskinstudio.com",
     siteName: "Smoove Skin Studio",
-    title: "Smoove Skin Studio | Waxing in Fort Worth & DFW",
+    title: "Smoove Skin Studio | Brazilian Wax Specialist | DFW",
     description:
       "Award-winning waxing studio in Watauga, TX — serving Fort Worth, Dallas & the DFW area. Book your Brazilian wax, full-body wax, or brow service today.",
     images: [
@@ -59,7 +61,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Smoove Skin Studio | Waxing in Fort Worth & DFW",
+    title: "Smoove Skin Studio | Brazilian Wax Specialist | DFW",
     description:
       "Award-winning waxing studio in Watauga, TX — serving Fort Worth, Dallas & the DFW area. Book online today.",
     images: ["/images/hero-image.webp"],
