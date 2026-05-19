@@ -27,7 +27,7 @@ export default function Contact() {
             questions, or consultations.
           </p>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-10">
             {/* Visit Us */}
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-[var(--color-border)] flex items-center justify-center mx-auto mb-4">
@@ -58,6 +58,24 @@ export default function Contact() {
                 <br />
                 Salon Suites &amp; Spa
               </p>
+            </div>
+
+            {/* Phone */}
+            <div className="text-center">
+              <div className="w-14 h-14 rounded-full bg-[var(--color-border)] flex items-center justify-center mx-auto mb-4">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dark)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.73h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 5.7 5.7l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.07 17.5l-.15-.58z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-medium text-[var(--color-text)]">
+                Call Us
+              </h3>
+              <a
+                href="tel:+16822412984"
+                className="mt-2 inline-block text-sm text-[var(--color-text-light)] underline hover:text-[var(--color-primary)] transition-colors"
+              >
+                (682) 241-2984
+              </a>
             </div>
 
             {/* Email Us */}

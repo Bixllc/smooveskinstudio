@@ -127,6 +127,17 @@ export default function Footer() {
               </div>
               <div className="flex gap-3">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dark)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.73h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 5.7 5.7l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.07 17.5l-.15-.58z" />
+                </svg>
+                <a
+                  href="tel:+16822412984"
+                  className="text-sm text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors"
+                >
+                  (682) 241-2984
+                </a>
+              </div>
+              <div className="flex gap-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dark)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
                   <rect width="20" height="16" x="2" y="4" rx="2" />
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" />
                 </svg>
