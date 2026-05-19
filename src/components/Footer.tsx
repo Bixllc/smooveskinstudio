@@ -150,7 +150,7 @@ export default function Footer() {
             <p className="text-xs text-[var(--color-text-light)] mt-1">
               Designed &amp; developed by{" "}
               <a
-                href="https://github.com/Bixllc"
+                href="https://bixllc.net"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors"
