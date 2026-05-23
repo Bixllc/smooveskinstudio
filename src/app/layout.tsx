@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +7,12 @@ const inter = Inter({
   subsets: ["latin"],
   weight: ["200", "300", "400", "500", "600"],
   variable: "--font-inter",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -85,8 +91,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("scroll-smooth", inter.variable, "font-sans")}>
-      <body className="font-[family-name:var(--font-inter)] font-normal leading-relaxed">
+    <html lang="en" className={cn("scroll-smooth", inter.variable, montserrat.variable, "font-sans")}>
+      <body className="font-[family-name:var(--font-body)] font-normal leading-relaxed">
         {children}
       </body>
     </html>

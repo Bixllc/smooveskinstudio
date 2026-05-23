@@ -1,4 +1,12 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: 'Averes Title';
+  src: url('/fonts/averes-title-roman.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
@@ -13,8 +21,8 @@
   --color-bg-light: #F5F1EC;
   --color-border: #E8E2DA;
 
-  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Averes Title', 'Cormorant Garamond', Georgia, serif;
+  --font-body: var(--font-body), 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
@@ -95,24 +103,24 @@ body {
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #FAF8F5;
+  --foreground: #2D2A26;
+  --card: #FFFFFF;
+  --card-foreground: #2D2A26;
+  --popover: #FFFFFF;
+  --popover-foreground: #2D2A26;
+  --primary: #C4A882;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F5F1EC;
+  --secondary-foreground: #2D2A26;
+  --muted: #F5F1EC;
+  --muted-foreground: #7A7670;
+  --accent: #F5F1EC;
+  --accent-foreground: #2D2A26;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #E8E2DA;
+  --input: #E8E2DA;
+  --ring: #C4A882;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -161,6 +169,19 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* React Day Picker brand overrides */
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: var(--color-primary) !important;
+}
+.rdp-selected .rdp-day_button {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  border-color: var(--color-primary) !important;
+}
+.rdp-chevron {
+  fill: var(--color-primary) !important;
 }
 
 @layer base {
