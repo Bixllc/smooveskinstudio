@@ -56,6 +56,7 @@ const emptyForm: ServiceForm = {
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [allForms, setAllForms] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -63,12 +64,17 @@ export default function ServicesPage() {
   const [error, setError] = useState<string | null>(null);
 
   async function fetchData() {
-    const [servicesRes, categoriesRes] = await Promise.all([
+    const [servicesRes, categoriesRes, formsRes] = await Promise.all([
       fetch("/api/admin/services"),
       fetch("/api/admin/categories"),
+      fetch("/api/admin/forms"),
     ]);
     if (servicesRes.ok) setServices(await servicesRes.json());
     if (categoriesRes.ok) setCategories(await categoriesRes.json());
+    if (formsRes.ok) {
+      const data = await formsRes.json();
+      setAllForms(data.filter((f: any) => f.active));
+    }
     setLoading(false);
   }
 
@@ -324,6 +330,10 @@ export default function ServicesPage() {
               Cancel
             </Button>
           </div>
+
+          {editingId && (
+            <AssignedForms serviceId={editingId} allForms={allForms} />
+          )}
         </form>
       )}
 
@@ -369,6 +379,129 @@ export default function ServicesPage() {
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+// ─── Assigned Forms Component ────────────────────────────────────────────────
+
+interface AssignedForm {
+  id: string;
+  formTemplateId: string;
+  displayOrder: number;
+  formTemplate: { id: string; name: string; type: string };
+}
+
+function AssignedForms({
+  serviceId,
+  allForms,
+}: {
+  serviceId: string;
+  allForms: { id: string; name: string }[];
+}) {
+  const [assignments, setAssignments] = useState<AssignedForm[]>([]);
+  const [selectedFormId, setSelectedFormId] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAssignments() {
+    const res = await fetch(`/api/admin/services/${serviceId}/forms`);
+    if (res.ok) setAssignments(await res.json());
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [serviceId]);
+
+  async function handleAssign() {
+    if (!selectedFormId) return;
+    await fetch(`/api/admin/services/${serviceId}/forms`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        formTemplateId: selectedFormId,
+        displayOrder: assignments.length,
+      }),
+    });
+    setSelectedFormId("");
+    fetchAssignments();
+  }
+
+  async function handleUnassign(formTemplateId: string) {
+    await fetch(`/api/admin/services/${serviceId}/forms/${formTemplateId}`, {
+      method: "DELETE",
+    });
+    fetchAssignments();
+  }
+
+  const assignedIds = new Set(assignments.map((a) => a.formTemplateId));
+  const available = allForms.filter((f) => !assignedIds.has(f.id));
+
+  if (loading)
+    return (
+      <p className="text-xs text-[var(--color-text-light)]">Loading forms...</p>
+    );
+
+  return (
+    <div className="mt-6 border-t border-[var(--color-border)] pt-4">
+      <p className="mb-2 text-sm font-medium text-[var(--color-text)]">
+        Assigned Forms
+      </p>
+
+      {assignments.length === 0 && (
+        <p className="mb-3 text-xs text-[var(--color-text-light)]">
+          No forms assigned.
+        </p>
+      )}
+
+      <div className="mb-3 space-y-1">
+        {assignments.map((a) => (
+          <div
+            key={a.id}
+            className="flex items-center justify-between rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm"
+          >
+            <span className="text-[var(--color-text)]">{a.formTemplate.name}</span>
+            <button
+              type="button"
+              onClick={() => handleUnassign(a.formTemplateId)}
+              className="text-xs text-red-500 hover:text-red-700"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {available.length > 0 && (
+        <div className="flex gap-2">
+          <select
+            value={selectedFormId}
+            onChange={(e) => setSelectedFormId(e.target.value)}
+            className="flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+          >
+            <option value="">Select a form to assign…</option>
+            {available.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleAssign}
+            disabled={!selectedFormId}
+          >
+            Assign
+          </Button>
+        </div>
+      )}
+
+      {available.length === 0 && assignments.length > 0 && (
+        <p className="text-xs text-[var(--color-text-light)]">
+          All active forms are assigned.
+        </p>
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { BookingActions } from "./booking-actions";
+import { parseFields, parseAnswers } from "@/lib/forms";
 
 export default async function BookingDetailPage({
   params,
@@ -26,10 +27,19 @@ export default async function BookingDetailPage({
 
   if (!booking) notFound();
 
-  const settings = await prisma.businessSettings.findUnique({
-    where: { clientId: session.clientId },
-    select: { timezone: true },
-  });
+  const [settings, formSubmissions] = await Promise.all([
+    prisma.businessSettings.findUnique({
+      where: { clientId: session.clientId },
+      select: { timezone: true },
+    }),
+    prisma.formSubmission.findMany({
+      where: { bookingId },
+      include: {
+        formTemplate: { select: { name: true, type: true, fields: true } },
+      },
+      orderBy: { submittedAt: "asc" },
+    }),
+  ]);
 
   const timezone = settings?.timezone ?? "America/New_York";
   const zonedStart = toZonedTime(booking.startTimeUtc, timezone);
@@ -137,6 +147,66 @@ export default async function BookingDetailPage({
               Notes
             </p>
             <p className="text-sm text-[var(--color-text)]">{booking.notes}</p>
+          </div>
+        )}
+
+        {/* Form Submissions */}
+        {formSubmissions.length > 0 && (
+          <div>
+            <p className="text-xs font-medium uppercase text-[var(--color-text-light)]">
+              Form Submissions
+            </p>
+            <div className="mt-2 space-y-4">
+              {formSubmissions.map((sub) => {
+                const fields = parseFields(sub.formTemplate.fields);
+                const answers = parseAnswers(sub.answers);
+                return (
+                  <div
+                    key={sub.id}
+                    className="rounded-lg border border-[var(--color-border)] p-4"
+                  >
+                    <p className="mb-3 text-sm font-medium text-[var(--color-text)]">
+                      {sub.formTemplate.name}
+                    </p>
+                    <div className="space-y-3">
+                      {fields.map((field) => {
+                        const answer = answers[field.id];
+                        return (
+                          <div key={field.id}>
+                            <p className="text-xs font-medium text-[var(--color-text-light)]">
+                              {field.label}
+                            </p>
+                            {field.type === "signature" ? (
+                              answer ? (
+                                <img
+                                  src={String(answer)}
+                                  alt="Signature"
+                                  className="mt-1 max-h-24 rounded border border-[var(--color-border)]"
+                                />
+                              ) : (
+                                <p className="text-sm text-[var(--color-text-light)]">
+                                  No signature
+                                </p>
+                              )
+                            ) : field.type === "checkbox" ? (
+                              <p className="text-sm text-[var(--color-text)]">
+                                {answer === true ? "Yes" : "No"}
+                              </p>
+                            ) : (
+                              <p className="text-sm text-[var(--color-text)]">
+                                {answer !== undefined && answer !== null
+                                  ? String(answer)
+                                  : "—"}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
