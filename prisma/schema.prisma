@@ -22,6 +22,8 @@ model Client {
   customers         Customer[]
   payments          Payment[]
   services          Service[]
+  formTemplates     FormTemplate[]
+  formSubmissions   FormSubmission[]
 }
 
 model BusinessSettings {
@@ -69,6 +71,7 @@ model Service {
   bookings            Booking[]
   category            Category    @relation(fields: [categoryId], references: [id])
   client              Client      @relation(fields: [clientId], references: [id])
+  formAssignments     ServiceFormAssignment[]
 
   @@index([clientId])
   @@index([categoryId])
@@ -80,9 +83,10 @@ model Customer {
   fullName String
   email    String
   phone    String?
-  notes    String?
-  bookings Booking[]
-  client   Client    @relation(fields: [clientId], references: [id])
+  notes           String?
+  bookings        Booking[]
+  client          Client           @relation(fields: [clientId], references: [id])
+  formSubmissions FormSubmission[]
 
   @@index([clientId])
   @@index([clientId, email])
@@ -104,10 +108,11 @@ model Booking {
   notes                   String?
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
-  client                  Client        @relation(fields: [clientId], references: [id])
-  customer                Customer      @relation(fields: [customerId], references: [id])
-  service                 Service       @relation(fields: [serviceId], references: [id])
+  client                  Client           @relation(fields: [clientId], references: [id])
+  customer                Customer         @relation(fields: [customerId], references: [id])
+  service                 Service          @relation(fields: [serviceId], references: [id])
   payments                Payment[]
+  formSubmissions         FormSubmission[]
 
   @@index([clientId])
   @@index([clientId, status])
@@ -175,4 +180,66 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+}
+
+enum FormType {
+  INTAKE
+  CONSENT
+  WAIVER
+  CUSTOM
+}
+
+model FormTemplate {
+  id          String    @id @default(uuid())
+  clientId    String
+  name        String
+  description String?
+  type        FormType  @default(INTAKE)
+  fields      Json      @default("[]")
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  client             Client                  @relation(fields: [clientId], references: [id])
+  serviceAssignments ServiceFormAssignment[]
+  submissions        FormSubmission[]
+
+  @@index([clientId])
+}
+
+model ServiceFormAssignment {
+  id             String   @id @default(uuid())
+  serviceId      String
+  formTemplateId String
+  required       Boolean  @default(true)
+  displayOrder   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  service      Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  formTemplate FormTemplate @relation(fields: [formTemplateId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, formTemplateId])
+  @@index([serviceId])
+}
+
+model FormSubmission {
+  id             String   @id @default(uuid())
+  clientId       String
+  bookingId      String
+  customerId     String
+  formTemplateId String
+  answers        Json     @default("{}")
+  submittedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  client       Client       @relation(fields: [clientId], references: [id])
+  booking      Booking      @relation(fields: [bookingId], references: [id])
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  formTemplate FormTemplate @relation(fields: [formTemplateId], references: [id])
+
+  @@index([bookingId])
+  @@index([clientId])
+  @@index([formTemplateId])
 }
