@@ -29,7 +29,7 @@ export default async function ClientLayout({
     <>
       <Navbar />
       <div className="min-h-screen bg-[var(--color-background)] pt-20">
-        <main className="mx-auto max-w-5xl px-4 py-10">{children}</main>
+        <main className="mx-auto max-w-5xl">{children}</main>
       </div>
       <Footer />
     </>

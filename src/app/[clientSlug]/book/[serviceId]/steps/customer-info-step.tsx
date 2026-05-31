@@ -165,7 +165,7 @@ export function CustomerInfoStep({
               {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
             </div>
 
-            <div className="rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-800">
+            <div className="rounded-xl bg-[var(--color-bg-light)] px-4 py-3 text-sm text-[var(--color-text)]">
               <strong>Note:</strong> You&apos;ll receive a confirmation email with your booking details.
             </div>
 

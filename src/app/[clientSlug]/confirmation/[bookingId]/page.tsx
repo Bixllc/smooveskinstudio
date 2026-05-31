@@ -38,7 +38,7 @@ export default async function ConfirmationPage({
   const isConfirmed = booking.status === "CONFIRMED";
 
   return (
-    <div className="mx-auto max-w-2xl text-center">
+    <div className="mx-auto max-w-2xl px-4 py-10 text-center">
       {/* Status icon */}
       {isConfirmed && (
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-3xl text-white">

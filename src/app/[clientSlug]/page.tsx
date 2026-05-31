@@ -32,7 +32,7 @@ export default async function CategorySelectionPage({
   });
 
   return (
-    <div className="text-center">
+    <div className="px-4 py-10 text-center">
       {/* Hero */}
       <div className="mb-10">
         <Image

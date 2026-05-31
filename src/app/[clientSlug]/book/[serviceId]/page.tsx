@@ -24,22 +24,24 @@ export default async function BookingPage({
   if (!service) notFound();
 
   return (
-    <BookingFlow
-      clientSlug={clientSlug}
-      clientId={client.id}
-      timezone={client.businessSettings?.timezone ?? "America/New_York"}
-      service={{
-        id: service.id,
-        name: service.name,
-        description: service.description,
-        durationMinutes: service.durationMinutes,
-        price: Number(service.price),
-        depositAmount: service.depositAmount
-          ? Number(service.depositAmount)
-          : null,
-        paymentType: service.paymentType,
-        categoryName: service.category.name,
-      }}
-    />
+    <div className="px-4 py-10">
+      <BookingFlow
+        clientSlug={clientSlug}
+        clientId={client.id}
+        timezone={client.businessSettings?.timezone ?? "America/New_York"}
+        service={{
+          id: service.id,
+          name: service.name,
+          description: service.description,
+          durationMinutes: service.durationMinutes,
+          price: Number(service.price),
+          depositAmount: service.depositAmount
+            ? Number(service.depositAmount)
+            : null,
+          paymentType: service.paymentType,
+          categoryName: service.category.name,
+        }}
+      />
+    </div>
   );
 }
