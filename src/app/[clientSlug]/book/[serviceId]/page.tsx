@@ -18,7 +18,18 @@ export default async function BookingPage({
 
   const service = await prisma.service.findFirst({
     where: { id: serviceId, clientId: client.id, active: true },
-    include: { category: { select: { name: true } } },
+    include: {
+      category: { select: { name: true } },
+      formAssignments: {
+        where: { formTemplate: { active: true } },
+        include: {
+          formTemplate: {
+            select: { id: true, name: true, description: true, type: true, fields: true },
+          },
+        },
+        orderBy: { displayOrder: "asc" },
+      },
+    },
   });
 
   if (!service) notFound();
@@ -41,6 +52,14 @@ export default async function BookingPage({
           paymentType: service.paymentType,
           categoryName: service.category.name,
         }}
+        forms={service.formAssignments.map((a) => ({
+          id: a.formTemplate.id,
+          name: a.formTemplate.name,
+          description: a.formTemplate.description,
+          type: a.formTemplate.type,
+          fields: a.formTemplate.fields as any,
+          required: a.required,
+        }))}
       />
     </div>
   );

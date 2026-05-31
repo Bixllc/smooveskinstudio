@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { DateTimeStep } from "./steps/date-time-step";
 import { CustomerInfoStep } from "./steps/customer-info-step";
 import { ReviewPayStep } from "./steps/review-pay-step";
+import { FormsStep, type FormTemplateForStep } from "./steps/forms-step";
+import type { FormAnswers } from "@/lib/forms";
 
 interface ServiceInfo {
   id: string;
@@ -29,6 +31,7 @@ interface BookingFlowProps {
   clientId: string;
   timezone: string;
   service: ServiceInfo;
+  forms: FormTemplateForStep[];
 }
 
 function formatDuration(minutes: number): string {
@@ -45,15 +48,41 @@ export function BookingFlow({
   clientId,
   timezone,
   service,
+  forms,
 }: BookingFlowProps) {
   const router = useRouter();
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+
+  // Step 1: Date/Time  2: Customer Info  3: Forms (skipped if no forms)  4: Review/Pay
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
+  const [formAnswers, setFormAnswers] = useState<
+    Array<{ formTemplateId: string; answers: FormAnswers }>
+  >([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const steps = ["Date & Time", "Your Details", "Confirm"];
+  const hasForms = forms.length > 0;
+
+  const stepLabels = hasForms
+    ? ["Date & Time", "Your Details", "Forms & Consent", "Confirm"]
+    : ["Date & Time", "Your Details", "Confirm"];
+
+  // Map internal step number (1-4) to display index (0-based)
+  function displayIndex(s: number) {
+    if (!hasForms) return s === 4 ? 2 : s - 1;
+    return s - 1;
+  }
+
+  function goForwardFromCustomerInfo() {
+    if (hasForms) setStep(3);
+    else setStep(4);
+  }
+
+  function goBackFromReviewPay() {
+    if (hasForms) setStep(3);
+    else setStep(2);
+  }
 
   async function handleSubmitBooking() {
     if (!selectedSlot || !customerInfo) return;
@@ -75,6 +104,7 @@ export function BookingFlow({
             phone: customerInfo.phone,
             notes: customerInfo.notes || undefined,
           },
+          formAnswers: hasForms ? formAnswers : [],
         }),
       });
 
@@ -97,16 +127,18 @@ export function BookingFlow({
     }
   }
 
+  const di = displayIndex(step);
+
   return (
     <div>
       {/* Step indicator */}
       <div className="mb-8 flex items-center justify-center gap-2">
-        {steps.map((label, i) => (
+        {stepLabels.map((label, i) => (
           <div key={label} className="flex items-center gap-2">
             <div className="flex items-center gap-2">
               <div
                 className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
-                  i + 1 <= step
+                  i <= di
                     ? "bg-[var(--color-primary)] text-white"
                     : "bg-[var(--color-border)] text-[var(--color-text-light)]"
                 }`}
@@ -115,7 +147,7 @@ export function BookingFlow({
               </div>
               <span
                 className={`text-sm ${
-                  i + 1 === step
+                  i === di
                     ? "font-semibold text-[var(--color-text)]"
                     : "text-[var(--color-text-light)]"
                 }`}
@@ -123,7 +155,7 @@ export function BookingFlow({
                 {label}
               </span>
             </div>
-            {i < steps.length - 1 && (
+            {i < stepLabels.length - 1 && (
               <div className="mx-2 h-px w-8 bg-[var(--color-border)]" />
             )}
           </div>
@@ -151,7 +183,9 @@ export function BookingFlow({
       <button
         onClick={() => {
           if (step === 1) router.back();
-          else setStep((s) => (s - 1) as 1 | 2 | 3);
+          else if (step === 2) setStep(1);
+          else if (step === 3) setStep(2);
+          else goBackFromReviewPay();
         }}
         className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors"
       >
@@ -180,12 +214,23 @@ export function BookingFlow({
           initialValues={customerInfo}
           onSubmit={(info) => {
             setCustomerInfo(info);
-            setStep(3);
+            goForwardFromCustomerInfo();
           }}
         />
       )}
 
-      {step === 3 && selectedSlot && customerInfo && (
+      {step === 3 && hasForms && (
+        <FormsStep
+          forms={forms}
+          initialAnswers={formAnswers}
+          onSubmit={(answers) => {
+            setFormAnswers(answers);
+            setStep(4);
+          }}
+        />
+      )}
+
+      {step === 4 && selectedSlot && customerInfo && (
         <ReviewPayStep
           service={service}
           selectedSlot={selectedSlot}
