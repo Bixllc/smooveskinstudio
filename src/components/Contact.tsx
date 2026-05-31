@@ -147,9 +147,7 @@ export default function Contact() {
             We look forward to welcoming you to our studio.
           </p>
           <a
-            href="https://app.acuityscheduling.com/schedule/64a2c692"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/smooveskinstudio/book"
             className="mt-8 inline-flex items-center justify-center px-10 py-4 rounded-full bg-[var(--color-primary)] text-white text-base font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
           >
             Book Online Now

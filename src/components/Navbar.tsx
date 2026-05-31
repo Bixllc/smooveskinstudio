@@ -67,9 +67,7 @@ export default function Navbar() {
         </ul>
 
         <a
-          href="https://app.acuityscheduling.com/schedule/64a2c692"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/smooveskinstudio/book"
           className="hidden md:inline-flex items-center justify-center px-7 py-3 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
         >
           Book Now

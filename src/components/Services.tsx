@@ -66,9 +66,7 @@ export default function Services() {
                   {service.description}
                 </p>
                 <a
-                  href="https://app.acuityscheduling.com/schedule/64a2c692"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/smooveskinstudio/book"
                   className="mt-8 block w-full text-center py-3.5 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
                 >
                   Book Now
