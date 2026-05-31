@@ -3,6 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { isSlotAvailable } from "@/lib/availability";
 import { createCheckoutSession } from "@/lib/square";
 import { addMinutes } from "date-fns";
+import { parseFields, validateFormAnswers, type FormAnswers } from "@/lib/forms";
+
+interface FormAnswerEntry {
+  formTemplateId: string;
+  answers: FormAnswers;
+}
 
 interface BookingRequestBody {
   clientId: string;
@@ -14,6 +20,7 @@ interface BookingRequestBody {
     phone: string;
     notes?: string;
   };
+  formAnswers?: FormAnswerEntry[];
 }
 
 export async function POST(request: NextRequest) {
@@ -25,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    const { clientId, serviceId, startTimeUtc: startTimeStr, customer } = body;
+    const { clientId, serviceId, startTimeUtc: startTimeStr, customer, formAnswers = [] } = body;
     const startTimeUtc = new Date(startTimeStr);
 
     if (isNaN(startTimeUtc.getTime())) {
@@ -33,6 +40,12 @@ export async function POST(request: NextRequest) {
         { error: "startTimeUtc must be a valid ISO date string" },
         { status: 400 }
       );
+    }
+
+    // Validate form submissions before entering the transaction
+    const formError = await validateFormSubmissions(serviceId, formAnswers);
+    if (formError) {
+      return NextResponse.json({ error: formError }, { status: 400 });
     }
 
     const result = await prisma.$transaction(async (tx: any) => {
@@ -91,6 +104,19 @@ export async function POST(request: NextRequest) {
           paymentStatus: "UNPAID",
         },
       });
+
+      // Create form submissions inside the transaction
+      for (const entry of formAnswers) {
+        await tx.formSubmission.create({
+          data: {
+            clientId,
+            bookingId: booking.id,
+            customerId: existingCustomer.id,
+            formTemplateId: entry.formTemplateId,
+            answers: entry.answers,
+          },
+        });
+      }
 
       // Create Square checkout
       const depositAmount = service.depositAmount
@@ -154,6 +180,43 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Validates that all required forms for the service have been answered correctly.
+ * Returns an error string or null if valid.
+ */
+async function validateFormSubmissions(
+  serviceId: string,
+  formAnswers: FormAnswerEntry[]
+): Promise<string | null> {
+  const assignments = await prisma.serviceFormAssignment.findMany({
+    where: {
+      serviceId,
+      required: true,
+      formTemplate: { active: true },
+    },
+    include: {
+      formTemplate: { select: { id: true, name: true, fields: true } },
+    },
+  });
+
+  const answersMap = new Map(formAnswers.map((e) => [e.formTemplateId, e.answers]));
+
+  for (const assignment of assignments) {
+    const answers = answersMap.get(assignment.formTemplateId);
+    if (!answers) {
+      return `Form "${assignment.formTemplate.name}" is required and must be completed`;
+    }
+
+    const fields = parseFields(assignment.formTemplate.fields);
+    const fieldError = validateFormAnswers(fields, answers);
+    if (fieldError) {
+      return `${assignment.formTemplate.name}: ${fieldError}`;
+    }
+  }
+
+  return null;
 }
 
 function validateBookingInput(body: any): string | null {
