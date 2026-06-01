@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 interface SettingsForm {
   businessName: string;
@@ -34,7 +31,7 @@ export default function SettingsPage() {
     address: "",
     phone: "",
     email: "",
-    timezone: "America/New_York",
+    timezone: "America/Chicago",
     cancellationPolicy: "",
     latePolicy: "",
     noShowPolicy: "",
@@ -42,194 +39,226 @@ export default function SettingsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchSettings() {
-      const res = await fetch("/api/admin/settings");
-      if (res.ok) {
-        const data = await res.json();
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((data) => {
         setForm({
           businessName: data.businessName ?? "",
           address: data.address ?? "",
           phone: data.phone ?? "",
           email: data.email ?? "",
-          timezone: data.timezone ?? "America/New_York",
+          timezone: data.timezone ?? "America/Chicago",
           cancellationPolicy: data.cancellationPolicy ?? "",
           latePolicy: data.latePolicy ?? "",
           noShowPolicy: data.noShowPolicy ?? "",
           depositPolicy: data.depositPolicy ?? "",
         });
-      }
-      setLoading(false);
-    }
-    fetchSettings();
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   function updateField(field: keyof SettingsForm, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
-    setSuccess(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    setError(null);
-    setSuccess(false);
-
     const res = await fetch("/api/admin/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-
     if (res.ok) {
-      setSuccess(true);
+      toast.success("Settings saved");
     } else {
       const data = await res.json();
-      setError(data.error ?? "Failed to save settings");
+      toast.error(data.error ?? "Failed to save settings");
     }
     setSaving(false);
   }
 
-  if (loading) {
-    return <p className="text-sm text-[var(--color-text-light)]">Loading...</p>;
-  }
-
   return (
-    <div className="max-w-2xl">
-      <h2 className="mb-6 text-2xl font-semibold text-[var(--color-text)]">
-        Business Settings
-      </h2>
+    <div className="flex h-screen flex-col overflow-hidden">
+      {/* Topbar */}
+      <div className="flex h-11 flex-shrink-0 items-center border-b border-[#e8e6e1] bg-white px-4">
+        <span className="text-sm font-medium text-[#1a1814]">Settings</span>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Business Info */}
-        <div className="rounded-xl border border-[var(--color-border)] bg-white p-6">
-          <p className="mb-4 text-sm font-medium text-[var(--color-text)]">
-            Business Information
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <Label htmlFor="businessName">Business Name</Label>
-              <Input
-                id="businessName"
-                value={form.businessName}
-                onChange={(e) => updateField("businessName", e.target.value)}
-                className="mt-1"
+      {/* Content */}
+      <div className="flex-1 overflow-auto p-4 pb-20 md:pb-4">
+        {loading ? (
+          <div className="max-w-2xl space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-32 animate-pulse rounded-xl bg-[#f5f4f2]"
               />
-            </div>
-            <div className="sm:col-span-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                value={form.address}
-                onChange={(e) => updateField("address", e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={form.phone}
-                onChange={(e) => updateField("phone", e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(e) => updateField("email", e.target.value)}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="timezone">Timezone</Label>
-              <select
-                id="timezone"
-                value={form.timezone}
-                onChange={(e) => updateField("timezone", e.target.value)}
-                className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-              >
-                {TIMEZONES.map((tz) => (
-                  <option key={tz} value={tz}>
-                    {tz.replace("_", " ")}
-                  </option>
-                ))}
-              </select>
-            </div>
+            ))}
           </div>
-        </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
+            {/* Business info */}
+            <Section title="Business Information">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Field label="Business name">
+                    <Input
+                      value={form.businessName}
+                      onChange={(v) => updateField("businessName", v)}
+                    />
+                  </Field>
+                </div>
+                <div className="sm:col-span-2">
+                  <Field label="Address">
+                    <Input
+                      value={form.address}
+                      onChange={(v) => updateField("address", v)}
+                    />
+                  </Field>
+                </div>
+                <Field label="Phone">
+                  <Input
+                    value={form.phone}
+                    onChange={(v) => updateField("phone", v)}
+                    type="tel"
+                  />
+                </Field>
+                <Field label="Email">
+                  <Input
+                    value={form.email}
+                    onChange={(v) => updateField("email", v)}
+                    type="email"
+                  />
+                </Field>
+                <Field label="Timezone">
+                  <select
+                    value={form.timezone}
+                    onChange={(e) => updateField("timezone", e.target.value)}
+                    className="w-full rounded-lg border border-[#e8e6e1] px-3 py-2 text-[12px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
+                  >
+                    {TIMEZONES.map((tz) => (
+                      <option key={tz} value={tz}>
+                        {tz.replace(/_/g, " ")}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+            </Section>
 
-        {/* Policies */}
-        <div className="rounded-xl border border-[var(--color-border)] bg-white p-6">
-          <p className="mb-4 text-sm font-medium text-[var(--color-text)]">
-            Policies
-          </p>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="cancellationPolicy">Cancellation Policy</Label>
-              <Textarea
-                id="cancellationPolicy"
-                value={form.cancellationPolicy}
-                onChange={(e) => updateField("cancellationPolicy", e.target.value)}
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="latePolicy">Late Arrival Policy</Label>
-              <Textarea
-                id="latePolicy"
-                value={form.latePolicy}
-                onChange={(e) => updateField("latePolicy", e.target.value)}
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="noShowPolicy">No-Show Policy</Label>
-              <Textarea
-                id="noShowPolicy"
-                value={form.noShowPolicy}
-                onChange={(e) => updateField("noShowPolicy", e.target.value)}
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="depositPolicy">Deposit Policy</Label>
-              <Textarea
-                id="depositPolicy"
-                value={form.depositPolicy}
-                onChange={(e) => updateField("depositPolicy", e.target.value)}
-                rows={3}
-                className="mt-1"
-              />
-            </div>
-          </div>
-        </div>
+            {/* Policies */}
+            <Section title="Policies">
+              <div className="space-y-3">
+                <Field label="Cancellation policy">
+                  <Textarea
+                    value={form.cancellationPolicy}
+                    onChange={(v) => updateField("cancellationPolicy", v)}
+                  />
+                </Field>
+                <Field label="Late arrival policy">
+                  <Textarea
+                    value={form.latePolicy}
+                    onChange={(v) => updateField("latePolicy", v)}
+                  />
+                </Field>
+                <Field label="No-show policy">
+                  <Textarea
+                    value={form.noShowPolicy}
+                    onChange={(v) => updateField("noShowPolicy", v)}
+                  />
+                </Field>
+                <Field label="Deposit policy">
+                  <Textarea
+                    value={form.depositPolicy}
+                    onChange={(v) => updateField("depositPolicy", v)}
+                  />
+                </Field>
+              </div>
+            </Section>
 
-        {/* Submit */}
-        {error && (
-          <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-            {error}
-          </p>
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-lg bg-[#C9A96E] px-5 py-2 text-[12px] font-medium text-[#1a1814] hover:bg-[#b8954f] transition-colors disabled:opacity-60"
+            >
+              {saving ? "Saving…" : "Save settings"}
+            </button>
+          </form>
         )}
-        {success && (
-          <p className="rounded-lg bg-green-50 p-3 text-sm text-green-600">
-            Settings saved successfully.
-          </p>
-        )}
-
-        <Button type="submit" disabled={saving}>
-          {saving ? "Saving..." : "Save Settings"}
-        </Button>
-      </form>
+      </div>
     </div>
+  );
+}
+
+// ── Sub-components ──────────────────────────────────────────────────────────
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-[#e8e6e1] bg-white p-5">
+      <p className="mb-4 text-[12px] font-medium text-[#1a1814]">{title}</p>
+      {children}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="mb-1 block text-[11px] font-medium text-[#9a9890]">
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function Input({
+  value,
+  onChange,
+  type = "text",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+}) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full rounded-lg border border-[#e8e6e1] px-3 py-2 text-[12px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
+    />
+  );
+}
+
+function Textarea({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      rows={3}
+      className="w-full resize-none rounded-lg border border-[#e8e6e1] px-3 py-2 text-[12px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
+    />
   );
 }
