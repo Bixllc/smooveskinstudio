@@ -84,6 +84,8 @@ model Customer {
   email    String
   phone    String?
   notes           String?
+  isVip           Boolean   @default(false)
+  adminNotes      String?
   bookings        Booking[]
   client          Client           @relation(fields: [clientId], references: [id])
   formSubmissions FormSubmission[]
