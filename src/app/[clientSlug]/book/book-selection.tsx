@@ -246,8 +246,8 @@ function Step1Service({
             onClick={() => setActiveCat(cat.id)}
             className={`shrink-0 rounded-full px-4 py-1.5 text-[12px] font-medium transition-colors ${
               activeCat === cat.id
-                ? "bg-[#1a1814] text-[#C9A96E]"
-                : "bg-[#f5f4f2] text-[#6b6860] hover:bg-[#e8e6e1]"
+                ? "bg-[#C9A96E] text-white"
+                : "bg-[#f5f4f2] text-[#6b6860] hover:bg-[#C9A96E] hover:text-white"
             }`}
           >
             {cat.name}
