@@ -236,7 +236,7 @@ async function main() {
     await prisma.customer.upsert({
       where: { id: c.id },
       update: { isVip: c.isVip },
-      create: { id: c.id, clientId: client.id, ...c },
+      create: { clientId: client.id, ...c },
     });
   }
   console.log(`Mock customers: ${mockCustomers.length}`);
