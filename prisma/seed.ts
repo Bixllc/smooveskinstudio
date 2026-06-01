@@ -196,7 +196,109 @@ async function main() {
     },
   });
 
-  console.log("\nSeed complete! Total services:", bodyFaceServices.length + browServices.length);
+  // Vajacial & Hydrojelly Masks category
+  const vajacial = await prisma.category.upsert({
+    where: { id: "cat-vajacial" },
+    update: { name: "Vajacial & Hydrojelly Masks" },
+    create: {
+      id: "cat-vajacial",
+      clientId: client.id,
+      name: "Vajacial & Hydrojelly Masks",
+      displayOrder: 2,
+    },
+  });
+
+  const vajacialServices: ServiceData[] = [
+    { id: "svc-vajacial", name: "Vajacial", durationMinutes: 45, price: 75 },
+    { id: "svc-hydrojelly", name: "Hydrojelly Mask", durationMinutes: 30, price: 55 },
+    { id: "svc-vajacial-hydrojelly", name: "Vajacial + Hydrojelly Combo", durationMinutes: 60, price: 115 },
+  ];
+  for (const svc of vajacialServices) {
+    await upsertService(svc, client.id, vajacial.id);
+  }
+  console.log(`Vajacial & Hydrojelly: ${vajacialServices.length} services`);
+
+  // Mock customers
+  const mockCustomers = [
+    { id: "cust-001", fullName: "Khloe Langston", email: "khloe@example.com", phone: "214-555-0101", isVip: true },
+    { id: "cust-002", fullName: "Nakeisha Sealey", email: "nakeisha@example.com", phone: "817-555-0102", isVip: true },
+    { id: "cust-003", fullName: "Tammy Rhodes", email: "tammy@example.com", phone: "214-555-0103", isVip: false },
+    { id: "cust-004", fullName: "Lyndsey Barnes", email: "lyndsey@example.com", phone: "972-555-0104", isVip: false },
+    { id: "cust-005", fullName: "Sarah Mitchell", email: "sarah@example.com", phone: "817-555-0105", isVip: false },
+    { id: "cust-006", fullName: "Mikala Johnson", email: "mikala@example.com", phone: "214-555-0106", isVip: false },
+    { id: "cust-007", fullName: "Ebony Pierce", email: "ebony@example.com", phone: "972-555-0107", isVip: false },
+    { id: "cust-008", fullName: "Phylicia Davis", email: "phylicia@example.com", phone: "817-555-0108", isVip: false },
+    { id: "cust-009", fullName: "Lashonda Turner", email: "lashonda@example.com", phone: "214-555-0109", isVip: false },
+    { id: "cust-010", fullName: "Briana Wells", email: "briana@example.com", phone: "972-555-0110", isVip: false },
+  ];
+
+  for (const c of mockCustomers) {
+    await prisma.customer.upsert({
+      where: { id: c.id },
+      update: { isVip: c.isVip },
+      create: { id: c.id, clientId: client.id, ...c },
+    });
+  }
+  console.log(`Mock customers: ${mockCustomers.length}`);
+
+  // Mock bookings
+  const now = new Date();
+  function daysAgo(d: number, hour: number) {
+    const dt = new Date(now);
+    dt.setDate(dt.getDate() - d);
+    dt.setHours(hour, 0, 0, 0);
+    return dt;
+  }
+  function daysAhead(d: number, hour: number) {
+    const dt = new Date(now);
+    dt.setDate(dt.getDate() + d);
+    dt.setHours(hour, 0, 0, 0);
+    return dt;
+  }
+
+  const mockBookings = [
+    { id: "bk-001", customerId: "cust-001", serviceId: "svc-brazilian-butt", start: daysAgo(14, 10), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-002", customerId: "cust-002", serviceId: "svc-full-leg", start: daysAgo(13, 11), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-003", customerId: "cust-003", serviceId: "svc-brow-combo", start: daysAgo(12, 14), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-004", customerId: "cust-004", serviceId: "svc-vajacial", start: daysAgo(10, 9), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-005", customerId: "cust-005", serviceId: "svc-underarm", start: daysAgo(9, 15), status: "NO_SHOW", paymentStatus: "UNPAID" },
+    { id: "bk-006", customerId: "cust-001", serviceId: "svc-brazilian-butt", start: daysAgo(7, 10), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-007", customerId: "cust-006", serviceId: "svc-hydrojelly", start: daysAgo(7, 13), status: "CANCELLED", paymentStatus: "REFUNDED" },
+    { id: "bk-008", customerId: "cust-007", serviceId: "svc-brow-wax", start: daysAgo(5, 11), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-009", customerId: "cust-008", serviceId: "svc-half-leg-lower", start: daysAgo(4, 14), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-010", customerId: "cust-002", serviceId: "svc-brazilian-butt", start: daysAgo(3, 10), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-011", customerId: "cust-009", serviceId: "svc-full-face", start: daysAgo(2, 15), status: "CANCELLED", paymentStatus: "UNPAID" },
+    { id: "bk-012", customerId: "cust-003", serviceId: "svc-brow-tint", start: daysAgo(1, 11), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-013", customerId: "cust-001", serviceId: "svc-brazilian-butt", start: daysAhead(1, 10), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-014", customerId: "cust-004", serviceId: "svc-vajacial-hydrojelly", start: daysAhead(1, 13), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-015", customerId: "cust-005", serviceId: "svc-full-leg", start: daysAhead(2, 11), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-016", customerId: "cust-010", serviceId: "svc-brow-combo", start: daysAhead(3, 14), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-017", customerId: "cust-006", serviceId: "svc-hydrojelly", start: daysAhead(4, 9), status: "CONFIRMED", paymentStatus: "PAID" },
+    { id: "bk-018", customerId: "cust-002", serviceId: "svc-underarm", start: daysAhead(5, 15), status: "CONFIRMED", paymentStatus: "PAID" },
+  ];
+
+  for (const bk of mockBookings) {
+    const svc = await prisma.service.findUnique({ where: { id: bk.serviceId } });
+    if (!svc) { console.warn(`Service not found: ${bk.serviceId}`); continue; }
+    const end = new Date(bk.start.getTime() + svc.durationMinutes * 60000);
+    await prisma.booking.upsert({
+      where: { id: bk.id },
+      update: {},
+      create: {
+        id: bk.id,
+        clientId: client.id,
+        serviceId: bk.serviceId,
+        customerId: bk.customerId,
+        startTimeUtc: bk.start,
+        endTimeUtc: end,
+        status: bk.status as any,
+        paymentStatus: bk.paymentStatus as any,
+      },
+    });
+  }
+  console.log(`Mock bookings: ${mockBookings.length}`);
+
+  console.log("\nSeed complete! Total services:", bodyFaceServices.length + browServices.length + vajacialServices.length);
 }
 
 main()
