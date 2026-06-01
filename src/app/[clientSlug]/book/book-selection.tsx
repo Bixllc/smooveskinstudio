@@ -669,11 +669,12 @@ export function BookSelection({
 
   return (
     <div>
-      {/* Step indicator */}
-      <div className="border-b border-[#e8e6e1] bg-white px-6 py-3">
-        <div className="mx-auto max-w-5xl">
-          <StepIndicator current={step} />
-        </div>
+      {/* Step indicator — full bleed */}
+      <div
+        className="border-b border-[#e8e6e1] bg-white py-3"
+        style={{ width: "100vw", marginLeft: "calc(50% - 50vw)" }}
+      >
+        <StepIndicator current={step} />
       </div>
 
       {/* Main content */}
