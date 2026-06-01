@@ -11,6 +11,7 @@ export default async function BookPage({
 
   const client = await prisma.client.findUnique({
     where: { slug: clientSlug, active: true },
+    include: { businessSettings: true },
   });
 
   if (!client) notFound();
@@ -46,5 +47,16 @@ export default async function BookPage({
     })),
   }));
 
-  return <BookSelection clientSlug={clientSlug} categories={data} />;
+  return (
+    <BookSelection
+      clientSlug={clientSlug}
+      clientId={client.id}
+      categories={data}
+      businessSettings={{
+        phone: client.businessSettings?.phone ?? null,
+        address: client.businessSettings?.address ?? null,
+        timezone: client.businessSettings?.timezone ?? "America/Chicago",
+      }}
+    />
+  );
 }
