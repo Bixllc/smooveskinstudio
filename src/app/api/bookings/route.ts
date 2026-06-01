@@ -130,9 +130,10 @@ export async function POST(request: NextRequest) {
       { bookingId: result.bookingId, manageToken: result.manageToken, chargeAmount },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating booking:", error);
-    return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
+    const msg = error?.message ?? String(error);
+    return NextResponse.json({ error: `Failed to create booking: ${msg}` }, { status: 500 });
   }
 }
 

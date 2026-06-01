@@ -66,6 +66,29 @@ interface CustomerInfo {
   notes: string;
 }
 
+type FieldType = "text" | "textarea" | "checkbox" | "select" | "date" | "signature";
+
+interface FormField {
+  id: string;
+  label: string;
+  type: FieldType;
+  required: boolean;
+  placeholder?: string;
+  options?: string[];
+}
+
+interface ServiceForm {
+  id: string;
+  name: string;
+  description: string | null;
+  type: string;
+  fields: FormField[];
+  required: boolean;
+}
+
+// formAnswers: { formTemplateId → { fieldId → value } }
+type FormAnswers = Record<string, Record<string, string | boolean>>;
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDuration(minutes: number): string {
@@ -80,6 +103,20 @@ function formatDuration(minutes: number): string {
 function formatSlotTime(slotUtc: string, timezone: string): string {
   const zoned = toZonedTime(new Date(slotUtc), timezone);
   return format(zoned, "h:mm a");
+}
+
+function isFormComplete(form: ServiceForm, answers: Record<string, string | boolean> = {}): boolean {
+  for (const field of form.fields) {
+    if (!field.required) continue;
+    const val = answers[field.id];
+    if (field.type === "checkbox" && val !== true) return false;
+    if (field.type === "signature" && (!val || String(val).trim() === "")) return false;
+    if (field.type !== "checkbox" && field.type !== "signature") {
+      if (val === undefined || val === null || String(val).trim() === "") return false;
+    }
+  }
+  // If form has no fields but is required, it's complete (no fields to fill)
+  return true;
 }
 
 // ─── Step Indicator ──────────────────────────────────────────────────────────
@@ -352,41 +389,41 @@ function Step2Calendar({ selectedDate, onDateSelect, slots, slotsLoading, timezo
   );
 }
 
-// ─── Consent Accordion ────────────────────────────────────────────────────────
+// ─── Dynamic Form Accordion ───────────────────────────────────────────────────
 
-function ConsentAccordion({ businessSettings, signed, onSign, error }: {
-  businessSettings: BusinessSettings; signed: boolean;
-  onSign: (name: string) => void; error?: string;
+function DynamicFormAccordion({
+  form,
+  answers,
+  onUpdateAnswers,
+  showError,
+}: {
+  form: ServiceForm;
+  answers: Record<string, string | boolean>;
+  onUpdateAnswers: (fieldId: string, value: string | boolean) => void;
+  showError: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const [typedName, setTypedName] = useState("");
-  const [appliedName, setAppliedName] = useState("");
+  const [signatureTyped, setSignatureTyped] = useState("");
+  const completed = isFormComplete(form, answers);
 
-  const policies = [
-    businessSettings.cancellationPolicy && { title: "Cancellation Policy", text: businessSettings.cancellationPolicy },
-    businessSettings.latePolicy && { title: "Late Arrival Policy", text: businessSettings.latePolicy },
-    businessSettings.noShowPolicy && { title: "No-Show Policy", text: businessSettings.noShowPolicy },
-    businessSettings.depositPolicy && { title: "Deposit Policy", text: businessSettings.depositPolicy },
-  ].filter(Boolean) as { title: string; text: string }[];
+  // Find signature fields
+  const signatureFields = form.fields.filter((f) => f.type === "signature");
+  const nonSignatureFields = form.fields.filter((f) => f.type !== "signature");
 
-  function handleApply() {
-    if (!typedName.trim()) return;
-    setAppliedName(typedName.trim());
-    onSign(typedName.trim());
+  function handleApplySignature(fieldId: string) {
+    if (!signatureTyped.trim()) return;
+    onUpdateAnswers(fieldId, signatureTyped.trim());
     setOpen(false);
   }
 
   return (
     <div>
-      <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
-        Consent Form <span className="text-red-400">*</span>
-      </label>
-      <div className={`overflow-hidden rounded-xl border transition-colors ${error ? "border-red-400" : "border-[#e8e6e1]"}`}>
+      <div className={`overflow-hidden rounded-xl border transition-colors ${showError && !completed ? "border-red-400" : "border-[#e8e6e1]"}`}>
         {/* Header */}
         <button type="button" onClick={() => setOpen((o) => !o)}
           className="flex w-full items-center justify-between bg-[#faf9f7] px-4 py-3 text-left transition-colors hover:bg-[#f5f4f2]">
           <div className="flex items-center gap-2.5">
-            {signed ? (
+            {completed ? (
               <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#C9A96E]">
                 <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
                   <polyline points="2,6 5,9 10,3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -396,16 +433,18 @@ function ConsentAccordion({ businessSettings, signed, onSign, error }: {
               <div className="h-5 w-5 shrink-0 rounded-full border-2 border-[#e8e6e1]" />
             )}
             <div>
-              <p className="text-[13px] font-medium text-[#1a1814]">Studio Policies & Consent</p>
-              {signed ? (
+              <p className="text-[13px] font-medium text-[#1a1814]">{form.name}</p>
+              {completed && signatureFields.length > 0 ? (
                 <p className="text-[11px] text-[#9a9890]">
                   Signed as{" "}
                   <span style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontStyle: "italic", fontSize: "14px", color: "#1a1814" }}>
-                    {appliedName}
+                    {String(answers[signatureFields[0].id] ?? "")}
                   </span>
                 </p>
+              ) : completed ? (
+                <p className="text-[11px] text-[#9a9890]">Completed</p>
               ) : (
-                <p className="text-[11px] text-[#9a9890]">Click to review and sign</p>
+                <p className="text-[11px] text-[#9a9890]">Click to review{form.required ? " and sign" : ""}</p>
               )}
             </div>
           </div>
@@ -417,73 +456,194 @@ function ConsentAccordion({ businessSettings, signed, onSign, error }: {
 
         {open && (
           <div className="border-t border-[#e8e6e1]">
-            {/* Policy text */}
-            <div className="max-h-48 overflow-y-auto px-4 py-4 text-[12px] leading-relaxed text-[#6b6860]">
-              {policies.length > 0 ? (
-                policies.map((p) => (
-                  <div key={p.title} className="mb-4 last:mb-0">
-                    <p className="mb-1 font-semibold text-[#1a1814]">{p.title}</p>
-                    <p>{p.text}</p>
-                  </div>
-                ))
-              ) : (
-                <div>
-                  <p className="mb-2 font-semibold text-[#1a1814]">Appointment Policies</p>
-                  <p className="mb-2">Please arrive on time for your appointment. Late arrivals may result in a shortened service or rescheduling.</p>
-                  <p className="mb-2">Cancellations must be made at least 24 hours in advance. Late cancellations or no-shows may be subject to a fee.</p>
-                  <p>By booking, you confirm you understand and agree to our studio policies.</p>
-                </div>
-              )}
-            </div>
+            {/* Description */}
+            {form.description && (
+              <div className="px-4 pt-4 text-[12px] leading-relaxed text-[#6b6860]">
+                <p>{form.description}</p>
+              </div>
+            )}
 
-            {/* Signature */}
-            <div className="border-t border-dashed border-[#e8e6e1] bg-white px-4 py-4">
-              <p className="mb-3 text-[12px] font-medium text-[#1a1814]">
-                Type your full name to sign
-              </p>
-              <input
-                type="text"
-                value={typedName}
-                onChange={(e) => setTypedName(e.target.value)}
-                placeholder="Your full name"
-                className="w-full rounded-xl border border-[#e8e6e1] px-4 py-2.5 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]"
-              />
-              {typedName.trim() && (
-                <div className="mt-3 rounded-xl border border-dashed border-[#e8e6e1] bg-[#faf9f7] px-4 py-3">
-                  <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[#9a9890]">Signature Preview</p>
-                  <p className="text-[30px] leading-tight text-[#1a1814]"
-                    style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontStyle: "italic" }}>
-                    {typedName}
-                  </p>
-                  <div className="mt-2 border-t border-[#c0bdb8]" />
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={handleApply}
-                disabled={!typedName.trim()}
-                className="mt-3 w-full rounded-xl bg-[#1a1814] py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#2d2925] disabled:opacity-40"
-              >
-                Apply Signature
-              </button>
-            </div>
+            {/* Non-signature fields */}
+            {nonSignatureFields.length > 0 && (
+              <div className="space-y-3 px-4 py-4">
+                {nonSignatureFields.map((field) => (
+                  <div key={field.id}>
+                    <label className="mb-1 block text-[12px] font-medium text-[#1a1814]">
+                      {field.label}
+                      {field.required && <span className="ml-1 text-red-400">*</span>}
+                    </label>
+                    {field.type === "checkbox" ? (
+                      <label className="flex cursor-pointer items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={answers[field.id] === true}
+                          onChange={(e) => onUpdateAnswers(field.id, e.target.checked)}
+                          className="h-4 w-4 rounded border-[#e8e6e1] accent-[#C9A96E]"
+                        />
+                        <span className="text-[12px] text-[#6b6860]">I agree</span>
+                      </label>
+                    ) : field.type === "select" ? (
+                      <select
+                        value={String(answers[field.id] ?? "")}
+                        onChange={(e) => onUpdateAnswers(field.id, e.target.value)}
+                        className="w-full rounded-xl border border-[#e8e6e1] px-3 py-2.5 text-[13px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
+                      >
+                        <option value="">Select…</option>
+                        {(field.options ?? []).map((opt) => (
+                          <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    ) : field.type === "textarea" ? (
+                      <textarea
+                        value={String(answers[field.id] ?? "")}
+                        onChange={(e) => onUpdateAnswers(field.id, e.target.value)}
+                        placeholder={field.placeholder}
+                        rows={3}
+                        className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-2.5 text-[13px] text-[#1a1814] outline-none placeholder:text-[#c0bdb8] focus:border-[#C9A96E]"
+                      />
+                    ) : field.type === "date" ? (
+                      <input
+                        type="date"
+                        value={String(answers[field.id] ?? "")}
+                        onChange={(e) => onUpdateAnswers(field.id, e.target.value)}
+                        className="w-full rounded-xl border border-[#e8e6e1] px-4 py-2.5 text-[13px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value={String(answers[field.id] ?? "")}
+                        onChange={(e) => onUpdateAnswers(field.id, e.target.value)}
+                        placeholder={field.placeholder}
+                        className="w-full rounded-xl border border-[#e8e6e1] px-4 py-2.5 text-[13px] text-[#1a1814] outline-none placeholder:text-[#c0bdb8] focus:border-[#C9A96E]"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Signature fields */}
+            {signatureFields.map((field) => (
+              <div key={field.id} className="border-t border-dashed border-[#e8e6e1] bg-white px-4 py-4">
+                <p className="mb-3 text-[12px] font-medium text-[#1a1814]">
+                  {field.label}
+                  {field.required && <span className="ml-1 text-red-400">*</span>}
+                </p>
+                <input
+                  type="text"
+                  value={answers[field.id] ? "" : signatureTyped}
+                  onChange={(e) => setSignatureTyped(e.target.value)}
+                  placeholder="Type your full name"
+                  readOnly={!!answers[field.id]}
+                  className="w-full rounded-xl border border-[#e8e6e1] px-4 py-2.5 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E] read-only:bg-[#f9f8f6]"
+                />
+                {!answers[field.id] && signatureTyped.trim() && (
+                  <div className="mt-3 rounded-xl border border-dashed border-[#e8e6e1] bg-[#faf9f7] px-4 py-3">
+                    <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[#9a9890]">Signature Preview</p>
+                    <p className="text-[30px] leading-tight text-[#1a1814]"
+                      style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontStyle: "italic" }}>
+                      {signatureTyped}
+                    </p>
+                    <div className="mt-2 border-t border-[#c0bdb8]" />
+                  </div>
+                )}
+                {answers[field.id] && (
+                  <div className="mt-3 rounded-xl border border-dashed border-[#e8e6e1] bg-[#faf9f7] px-4 py-3">
+                    <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[#9a9890]">Signed</p>
+                    <p className="text-[30px] leading-tight text-[#1a1814]"
+                      style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontStyle: "italic" }}>
+                      {String(answers[field.id])}
+                    </p>
+                    <div className="mt-2 border-t border-[#c0bdb8]" />
+                  </div>
+                )}
+                {!answers[field.id] && (
+                  <button
+                    type="button"
+                    onClick={() => handleApplySignature(field.id)}
+                    disabled={!signatureTyped.trim()}
+                    className="mt-3 w-full rounded-xl bg-[#1a1814] py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#2d2925] disabled:opacity-40"
+                  >
+                    Apply Signature
+                  </button>
+                )}
+                {answers[field.id] && (
+                  <button
+                    type="button"
+                    onClick={() => { onUpdateAnswers(field.id, ""); setSignatureTyped(""); setOpen(true); }}
+                    className="mt-2 text-[11px] text-[#9a9890] underline hover:text-[#1a1814]"
+                  >
+                    Clear signature
+                  </button>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
-      {error && <p className="mt-1 text-[11px] text-red-500">{error}</p>}
     </div>
   );
 }
 
-// ─── Step 3 — Your Info + Consent ─────────────────────────────────────────────
+// ─── Business Policies Accordion ─────────────────────────────────────────────
 
-function Step3YourInfo({ onSubmit, isSubmitting, error, businessSettings }: {
-  onSubmit: (info: CustomerInfo) => void; isSubmitting: boolean;
-  error: string | null; businessSettings: BusinessSettings;
+function PoliciesAccordion({ businessSettings }: { businessSettings: BusinessSettings }) {
+  const [open, setOpen] = useState(false);
+
+  const policies = [
+    businessSettings.cancellationPolicy && { title: "Cancellation Policy", text: businessSettings.cancellationPolicy },
+    businessSettings.latePolicy && { title: "Late Arrival Policy", text: businessSettings.latePolicy },
+    businessSettings.noShowPolicy && { title: "No-Show Policy", text: businessSettings.noShowPolicy },
+    businessSettings.depositPolicy && { title: "Deposit Policy", text: businessSettings.depositPolicy },
+  ].filter(Boolean) as { title: string; text: string }[];
+
+  if (policies.length === 0) return null;
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-[#e8e6e1]">
+      <button type="button" onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between bg-[#faf9f7] px-4 py-3 text-left transition-colors hover:bg-[#f5f4f2]">
+        <div className="flex items-center gap-2.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p className="text-[13px] font-medium text-[#1a1814]">Studio Policies</p>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9890" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}>
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {open && (
+        <div className="max-h-48 overflow-y-auto border-t border-[#e8e6e1] px-4 py-4 text-[12px] leading-relaxed text-[#6b6860]">
+          {policies.map((p) => (
+            <div key={p.title} className="mb-4 last:mb-0">
+              <p className="mb-1 font-semibold text-[#1a1814]">{p.title}</p>
+              <p>{p.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Step 3 — Your Info + Forms ───────────────────────────────────────────────
+
+function Step3YourInfo({
+  onSubmit, isSubmitting, error, businessSettings, serviceForms, formAnswers, onUpdateFormAnswer,
+}: {
+  onSubmit: (info: CustomerInfo) => void;
+  isSubmitting: boolean;
+  error: string | null;
+  businessSettings: BusinessSettings;
+  serviceForms: ServiceForm[];
+  formAnswers: FormAnswers;
+  onUpdateFormAnswer: (formId: string, fieldId: string, value: string | boolean) => void;
 }) {
   const [form, setForm] = useState<CustomerInfo>({ fullName: "", email: "", phone: "", notes: "" });
-  const [signed, setSigned] = useState(false);
-  const [errors, setErrors] = useState<Partial<Record<keyof CustomerInfo | "consent", string>>>({});
+  const [showFormErrors, setShowFormErrors] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof CustomerInfo | "forms", string>>>({});
 
   function set<K extends keyof CustomerInfo>(key: K, val: CustomerInfo[K]) {
     setForm((prev) => ({ ...prev, [key]: val }));
@@ -491,12 +651,20 @@ function Step3YourInfo({ onSubmit, isSubmitting, error, businessSettings }: {
   }
 
   function validate() {
-    const errs: Partial<Record<keyof CustomerInfo | "consent", string>> = {};
+    const errs: Partial<Record<keyof CustomerInfo | "forms", string>> = {};
     if (!form.fullName.trim()) errs.fullName = "Name is required";
     if (!form.email.trim()) { errs.email = "Email is required"; }
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { errs.email = "Enter a valid email"; }
     if (!form.phone.trim()) errs.phone = "Phone number is required";
-    if (!signed) errs.consent = "Please sign the consent form to continue";
+
+    const incompleteForms = serviceForms.filter(
+      (f) => f.required && !isFormComplete(f, formAnswers[f.id] ?? {})
+    );
+    if (incompleteForms.length > 0) {
+      errs.forms = `Please complete: ${incompleteForms.map((f) => f.name).join(", ")}`;
+      setShowFormErrors(true);
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -513,7 +681,7 @@ function Step3YourInfo({ onSubmit, isSubmitting, error, businessSettings }: {
   return (
     <div>
       <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Almost there!</h2>
-      <p className="mb-6 text-[13px] text-[#9a9890]">Fill in your details and sign the consent form to continue to payment</p>
+      <p className="mb-6 text-[13px] text-[#9a9890]">Fill in your details and complete any required forms to continue</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -537,12 +705,32 @@ function Step3YourInfo({ onSubmit, isSubmitting, error, businessSettings }: {
             className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]" />
         </div>
 
-        <ConsentAccordion
-          businessSettings={businessSettings}
-          signed={signed}
-          onSign={() => { setSigned(true); setErrors((prev) => ({ ...prev, consent: undefined })); }}
-          error={errors.consent}
-        />
+        {/* Studio policies (informational) */}
+        <PoliciesAccordion businessSettings={businessSettings} />
+
+        {/* Dynamic consent/intake forms */}
+        {serviceForms.length > 0 && (
+          <div className="space-y-3">
+            {serviceForms.map((svcForm) => (
+              <div key={svcForm.id}>
+                <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
+                  {svcForm.name}
+                  {svcForm.required && <span className="ml-1 text-red-400">*</span>}
+                </label>
+                <DynamicFormAccordion
+                  form={svcForm}
+                  answers={formAnswers[svcForm.id] ?? {}}
+                  onUpdateAnswers={(fieldId, value) => onUpdateFormAnswer(svcForm.id, fieldId, value)}
+                  showError={showFormErrors}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {errors.forms && (
+          <p className="text-[11px] text-red-500">{errors.forms}</p>
+        )}
 
         {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">{error}</div>}
 
@@ -611,7 +799,7 @@ function Step4Payment({ bookingId, clientSlug, chargeAmount }: {
         await card.attach("#square-card-container");
         cardRef.current = card;
         setCardMounted(true);
-      } catch (e) {
+      } catch {
         setError("Could not load card form. Please refresh and try again.");
       }
     }
@@ -654,7 +842,6 @@ function Step4Payment({ bookingId, clientSlug, chargeAmount }: {
       <p className="mb-6 text-[13px] text-[#9a9890]">Enter your card details to confirm your appointment</p>
 
       <form onSubmit={handlePay} className="space-y-5">
-        {/* Square card container */}
         <div>
           <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Card Details</label>
           <div
@@ -706,6 +893,8 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
   const [chargeAmount, setChargeAmount] = useState<number>(0);
+  const [serviceForms, setServiceForms] = useState<ServiceForm[]>([]);
+  const [formAnswers, setFormAnswers] = useState<FormAnswers>({});
 
   useEffect(() => {
     if (!selectedDate || !service || step !== 2) return;
@@ -728,11 +917,26 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function handleSelectService(s: Service) {
+  async function handleSelectService(s: Service) {
     setService(s);
     setSlot(null);
     setSelectedDate(null);
     setSlots([]);
+    setFormAnswers({});
+
+    // Fetch forms for this service
+    try {
+      const res = await fetch(`/api/services/${s.id}/forms`);
+      if (res.ok) {
+        const forms: ServiceForm[] = await res.json();
+        setServiceForms(forms);
+      } else {
+        setServiceForms([]);
+      }
+    } catch {
+      setServiceForms([]);
+    }
+
     setStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -743,10 +947,24 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function handleUpdateFormAnswer(formId: string, fieldId: string, value: string | boolean) {
+    setFormAnswers((prev) => ({
+      ...prev,
+      [formId]: { ...(prev[formId] ?? {}), [fieldId]: value },
+    }));
+  }
+
   async function handleStep3Submit(info: CustomerInfo) {
     if (!service || !slot) return;
     setIsSubmitting(true);
     setSubmitError(null);
+
+    // Build formAnswers payload
+    const formAnswersPayload = serviceForms.map((f) => ({
+      formTemplateId: f.id,
+      answers: formAnswers[f.id] ?? {},
+    }));
+
     try {
       const res = await fetch("/api/bookings", {
         method: "POST",
@@ -755,8 +973,13 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
           clientId,
           serviceId: service.id,
           startTimeUtc: slot,
-          customer: { fullName: info.fullName, email: info.email, phone: info.phone, notes: info.notes || undefined },
-          formAnswers: [],
+          customer: {
+            fullName: info.fullName,
+            email: info.email,
+            phone: info.phone,
+            notes: info.notes || undefined,
+          },
+          formAnswers: formAnswersPayload,
         }),
       });
       const data = await res.json();
@@ -823,7 +1046,15 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                       </>
                     )}
                   </div>
-                  <Step3YourInfo onSubmit={handleStep3Submit} isSubmitting={isSubmitting} error={submitError} businessSettings={businessSettings} />
+                  <Step3YourInfo
+                    onSubmit={handleStep3Submit}
+                    isSubmitting={isSubmitting}
+                    error={submitError}
+                    businessSettings={businessSettings}
+                    serviceForms={serviceForms}
+                    formAnswers={formAnswers}
+                    onUpdateFormAnswer={handleUpdateFormAnswer}
+                  />
                 </>
               )}
 
