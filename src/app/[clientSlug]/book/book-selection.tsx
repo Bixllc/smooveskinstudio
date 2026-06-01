@@ -365,17 +365,17 @@ function Step2DateTime({
               onClick={() => setSelectedDate(date)}
               className={`flex shrink-0 flex-col items-center rounded-xl border px-3 py-2.5 transition-all ${
                 isSelected
-                  ? "border-[#C9A96E] bg-[#1a1814] text-white"
-                  : "border-[#e8e6e1] bg-white text-[#1a1814] hover:border-[#C9A96E]"
+                  ? "border-[#C9A96E] bg-[#C9A96E] text-white"
+                  : "border-[#e8e6e1] bg-white text-[#1a1814] hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
               }`}
             >
-              <span className={`text-[10px] uppercase font-medium ${isSelected ? "text-[#C9A96E]" : "text-[#9a9890]"}`}>
+              <span className={`text-[10px] uppercase font-medium ${isSelected ? "text-white" : "text-[#9a9890] group-hover:text-white"}`}>
                 {format(date, "EEE")}
               </span>
               <span className="mt-0.5 text-[16px] font-bold leading-none">
                 {format(date, "d")}
               </span>
-              <span className={`text-[10px] ${isSelected ? "text-[#C9A96E]" : "text-[#9a9890]"}`}>
+              <span className={`text-[10px] ${isSelected ? "text-white" : "text-[#9a9890]"}`}>
                 {format(date, "MMM")}
               </span>
             </button>
@@ -415,12 +415,12 @@ function Step2DateTime({
             {slots.length} time{slots.length !== 1 ? "s" : ""} available on{" "}
             {selectedDate ? format(selectedDate, "EEEE, MMMM d") : ""}
           </p>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
             {slots.map((slot) => (
               <button
                 key={slot}
                 onClick={() => onSelect(slot)}
-                className="rounded-xl border border-[#e8e6e1] bg-white py-2.5 text-[13px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#1a1814] hover:text-[#C9A96E]"
+                className="rounded-xl border border-[#e8e6e1] bg-white py-2.5 text-[13px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
               >
                 {formatSlotTime(slot, timezone)}
               </button>

@@ -27,13 +27,13 @@ const services = [
 export default function Services() {
   return (
     <section id="services" className="py-24 bg-[var(--color-bg)]">
-      <div className="max-w-[1320px] mx-auto px-10">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10">
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]">
             Services
           </span>
-          <h2 className="mt-6 font-light text-4xl md:text-5xl tracking-tight text-[var(--color-text)]">
+          <h2 className="mt-6 font-light text-2xl sm:text-3xl md:text-5xl tracking-tight text-[var(--color-text)]">
             Our <span className="text-[var(--color-primary)] italic">Signature</span> Treatments
           </h2>
           <p className="mt-5 text-base text-[var(--color-text-light)] max-w-2xl mx-auto leading-relaxed">
@@ -54,11 +54,11 @@ export default function Services() {
                   alt={service.alt}
                   width={600}
                   height={400}
-                  className="w-full h-[280px] object-cover"
+                  className="w-full h-[200px] sm:h-[280px] object-cover"
                 />
               </div>
 
-              <div className="p-8 flex flex-col flex-1">
+              <div className="p-5 sm:p-8 flex flex-col flex-1">
                 <h3 className="text-xl font-medium text-[var(--color-text)] tracking-tight">
                   {service.title}
                 </h3>

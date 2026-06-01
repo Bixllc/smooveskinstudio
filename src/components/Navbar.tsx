@@ -10,15 +10,15 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[var(--color-border)] h-20">
-      <div className="max-w-[1320px] mx-auto px-10 h-full flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-[var(--color-border)] h-16 md:h-20">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10 h-full flex items-center justify-between">
         <Link href="/">
           <Image
             src="/images/logo-transparent.avif"
             alt="Smoove Skin Studio"
             width={160}
             height={64}
-            className="h-16 w-auto"
+            className="h-10 w-auto md:h-14"
             priority
           />
         </Link>
@@ -68,7 +68,7 @@ export default function Navbar() {
 
         <a
           href="/smooveskinstudio/book"
-          className="hidden md:inline-flex items-center justify-center px-7 py-3 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
+          className="hidden md:inline-flex items-center justify-center px-5 py-2.5 md:px-7 md:py-3 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
         >
           Book Now
         </a>

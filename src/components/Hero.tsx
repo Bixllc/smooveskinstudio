@@ -2,17 +2,17 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="pt-20 min-h-screen flex items-center">
-      <div className="max-w-[1320px] mx-auto px-10 py-15 grid grid-cols-1 lg:grid-cols-2 gap-15 items-center max-lg:text-center">
+    <section className="pt-16 md:pt-20 min-h-screen flex items-center">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10 py-10 md:py-15 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-15 items-center max-lg:text-center">
         {/* Content */}
         <div>
-          <h1 className="font-light text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight text-[var(--color-text)]">
+          <h1 className="font-light text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight text-[var(--color-text)]">
             <span className="block">Smoove</span>
             <span className="block text-[var(--color-primary)] italic">Skin</span>
             <span className="block">Studio</span>
           </h1>
 
-          <p className="mt-7 text-[1.05rem] font-light leading-[1.7] text-[var(--color-text-light)] max-w-[460px] max-lg:mx-auto">
+          <p className="mt-5 md:mt-7 text-[0.95rem] md:text-[1.05rem] font-light leading-[1.7] text-[var(--color-text-light)] max-w-[460px] max-lg:mx-auto">
             Get waxed by an award-winning specialist with precision, care, and
             results you can feel. At Smoove Skin Studio, every service is
             designed to leave your skin smoother, cleaner, and more confident
@@ -34,20 +34,20 @@ export default function Hero() {
         </div>
 
         {/* Visual */}
-        <div className="relative max-lg:max-w-[500px] max-lg:mx-auto max-lg:pb-20">
+        <div className="relative max-lg:max-w-[500px] max-lg:mx-auto max-lg:pb-24">
           <div className="relative rounded-2xl">
             <Image
               src="/images/hero-image.webp"
               alt="Smoove Skin Studio — professional waxing salon in Watauga, Fort Worth TX"
               width={600}
               height={500}
-              className="w-full h-[500px] object-cover rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
+              className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
               priority
             />
           </div>
 
           {/* Testimonial Card */}
-          <div className="absolute -bottom-15 left-1/2 -translate-x-1/2 bg-white rounded-xl px-7 py-6 shadow-[0_8px_40px_rgba(0,0,0,0.08)] max-w-[320px] w-full">
+          <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 bg-white rounded-xl px-5 py-5 sm:px-7 sm:py-6 shadow-[0_8px_40px_rgba(0,0,0,0.08)] max-w-[300px] sm:max-w-[320px] w-[90%]">
             <div className="flex gap-1.5 mb-3">
               {[...Array(6)].map((_, i) => (
                 <span

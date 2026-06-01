@@ -28,7 +28,7 @@ export default async function ClientLayout({
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-[var(--color-background)] pt-20">
+      <div className="min-h-screen bg-[var(--color-background)] pt-16 md:pt-20">
         <main className="mx-auto max-w-5xl">{children}</main>
       </div>
       <Footer />

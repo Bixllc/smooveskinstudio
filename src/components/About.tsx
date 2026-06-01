@@ -10,8 +10,8 @@ const stats = [
 export default function About() {
   return (
     <section id="about" className="py-24 bg-[var(--color-bg)]">
-      <div className="max-w-[1320px] mx-auto px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Image Side */}
           <div className="relative">
             <div className="rounded-2xl overflow-hidden">
@@ -20,7 +20,7 @@ export default function About() {
                 alt="Anisha, licensed esthetician and wax specialist"
                 width={600}
                 height={750}
-                className="w-full h-[650px] object-cover object-top rounded-2xl"
+                className="w-full h-[400px] sm:h-[550px] lg:h-[650px] object-cover object-top rounded-2xl"
               />
             </div>
 
@@ -49,7 +49,7 @@ export default function About() {
               About Me
             </span>
 
-            <h2 className="mt-6 font-light text-4xl md:text-5xl tracking-tight text-[var(--color-text)]">
+            <h2 className="mt-6 font-light text-2xl sm:text-3xl md:text-5xl tracking-tight text-[var(--color-text)]">
               Where <span className="text-[var(--color-primary)] italic">Expertise</span>
               <br />
               Meets Elegance

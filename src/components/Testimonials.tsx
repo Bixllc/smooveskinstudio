@@ -43,7 +43,7 @@ function TestimonialCard({
   rating: number;
 }) {
   return (
-    <div className="flex-shrink-0 w-[340px] bg-white rounded-2xl p-8 shadow-sm flex flex-col">
+    <div className="flex-shrink-0 w-[280px] sm:w-[320px] md:w-[340px] bg-white rounded-2xl p-6 md:p-8 shadow-sm flex flex-col">
       <div className="flex gap-1.5 mb-5">
         {[...Array(rating)].map((_, i) => (
           <span
@@ -71,13 +71,13 @@ export default function Testimonials() {
 
   return (
     <section id="reviews" className="py-24 bg-[var(--color-bg)] overflow-hidden">
-      <div className="max-w-[1320px] mx-auto px-10">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10">
         {/* Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]">
             Testimonials
           </span>
-          <h2 className="mt-6 font-light text-4xl md:text-5xl tracking-tight text-[var(--color-text)]">
+          <h2 className="mt-6 font-light text-2xl sm:text-3xl md:text-5xl tracking-tight text-[var(--color-text)]">
             What Our{" "}
             <span className="text-[var(--color-primary)] italic">Clients</span>{" "}
             Say
@@ -106,7 +106,7 @@ export default function Testimonials() {
         </p>
         <a
           href="#book"
-          className="inline-flex items-center justify-center px-10 py-4 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
+          className="inline-flex items-center justify-center px-6 sm:px-10 py-3 sm:py-4 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
         >
           Book Your Appointment
         </a>

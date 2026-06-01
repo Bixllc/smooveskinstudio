@@ -1,13 +1,13 @@
 export default function Contact() {
   return (
     <section id="contact" className="py-24 bg-[var(--color-bg)]">
-      <div className="max-w-[1320px] mx-auto px-10">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10">
         {/* Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]">
             Contact
           </span>
-          <h2 className="mt-6 font-light text-4xl md:text-5xl tracking-tight text-[var(--color-text)]">
+          <h2 className="mt-6 font-light text-2xl sm:text-3xl md:text-5xl tracking-tight text-[var(--color-text)]">
             Visit Our{" "}
             <span className="text-[var(--color-primary)] italic">Studio</span>
           </h2>
@@ -18,8 +18,8 @@ export default function Contact() {
         </div>
 
         {/* Get in Touch Card */}
-        <div className="bg-[var(--color-bg-light)] rounded-3xl py-14 px-10 mb-10">
-          <h3 className="text-2xl font-medium text-[var(--color-text)] tracking-tight text-center">
+        <div className="bg-[var(--color-bg-light)] rounded-3xl py-10 px-5 sm:py-14 sm:px-10 mb-10">
+          <h3 className="text-xl sm:text-2xl font-medium text-[var(--color-text)] tracking-tight text-center">
             Get in Touch
           </h3>
           <p className="mt-3 text-base text-[var(--color-text-light)] text-center">
@@ -27,7 +27,7 @@ export default function Contact() {
             questions, or consultations.
           </p>
 
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
             {/* Visit Us */}
             <div className="text-center">
               <div className="w-14 h-14 rounded-full bg-[var(--color-border)] flex items-center justify-center mx-auto mb-4">
@@ -138,8 +138,8 @@ export default function Contact() {
         </div>
 
         {/* Book Online CTA */}
-        <div id="book" className="bg-white rounded-3xl shadow-sm py-14 px-10 text-center">
-          <h3 className="text-2xl font-medium text-[var(--color-text)] tracking-tight">
+        <div id="book" className="bg-white rounded-3xl shadow-sm py-10 px-5 sm:py-14 sm:px-10 text-center">
+          <h3 className="text-xl sm:text-2xl font-medium text-[var(--color-text)] tracking-tight">
             Ready to Book Your Experience?
           </h3>
           <p className="mt-4 text-base text-[var(--color-text-light)] leading-relaxed max-w-xl mx-auto">
@@ -148,7 +148,7 @@ export default function Contact() {
           </p>
           <a
             href="/smooveskinstudio/book"
-            className="mt-8 inline-flex items-center justify-center px-10 py-4 rounded-full bg-[var(--color-primary)] text-white text-base font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
+            className="mt-8 inline-flex items-center justify-center px-6 sm:px-10 py-3 sm:py-4 rounded-full bg-[var(--color-primary)] text-white text-sm sm:text-base font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
           >
             Book Online Now
           </a>

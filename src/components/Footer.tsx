@@ -1,9 +1,9 @@
 export default function Footer() {
   return (
     <footer className="bg-[var(--color-bg-light)] pt-16 pb-8">
-      <div className="max-w-[1320px] mx-auto px-10">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10">
         {/* Top Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-12 border-b border-[var(--color-border)]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 pb-12 border-b border-[var(--color-border)]">
           {/* Brand */}
           <div>
             <h3 className="text-xl font-medium text-[var(--color-text)] tracking-tight">
