@@ -108,6 +108,7 @@ model Booking {
   confirmationEmailSentAt DateTime?
   reminderEmailSentAt     DateTime?
   notes                   String?
+  manageToken             String?       @unique
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
   client                  Client           @relation(fields: [clientId], references: [id])

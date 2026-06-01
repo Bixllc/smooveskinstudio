@@ -56,6 +56,10 @@ export default async function BookPage({
         phone: client.businessSettings?.phone ?? null,
         address: client.businessSettings?.address ?? null,
         timezone: client.businessSettings?.timezone ?? "America/Chicago",
+        cancellationPolicy: client.businessSettings?.cancellationPolicy ?? null,
+        latePolicy: client.businessSettings?.latePolicy ?? null,
+        noShowPolicy: client.businessSettings?.noShowPolicy ?? null,
+        depositPolicy: client.businessSettings?.depositPolicy ?? null,
       }}
     />
   );

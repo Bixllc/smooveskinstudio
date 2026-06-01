@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import {
   format,
   startOfToday,
@@ -18,6 +19,8 @@ import {
   isSameMonth,
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -40,6 +43,10 @@ interface BusinessSettings {
   phone: string | null;
   address: string | null;
   timezone: string;
+  cancellationPolicy: string | null;
+  latePolicy: string | null;
+  noShowPolicy: string | null;
+  depositPolicy: string | null;
 }
 
 interface BookSelectionProps {
@@ -54,7 +61,6 @@ interface CustomerInfo {
   email: string;
   phone: string;
   notes: string;
-  isNewClient: boolean;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -75,9 +81,9 @@ function formatSlotTime(slotUtc: string, timezone: string): string {
 
 // ─── Step Indicator ──────────────────────────────────────────────────────────
 
-const STEPS = ["Service", "Date & Time", "Your Info"];
+const STEPS = ["Service", "Date & Time", "Your Info", "Payment"];
 
-function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
+function StepIndicator({ current }: { current: 1 | 2 | 3 | 4 }) {
   return (
     <div className="flex items-center justify-center gap-0">
       {STEPS.map((label, i) => {
@@ -86,7 +92,7 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
         const active = current === n;
         return (
           <div key={label} className="flex items-center">
-            <div className="flex items-center gap-2 px-3 py-2">
+            <div className="flex items-center gap-1.5 px-2 py-2 sm:gap-2 sm:px-3">
               <div
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all ${
                   done
@@ -105,7 +111,7 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
                 )}
               </div>
               <span
-                className={`text-[12px] font-medium ${
+                className={`hidden text-[11px] font-medium sm:inline sm:text-[12px] ${
                   active ? "text-[#1a1814]" : done ? "text-[#C9A96E]" : "text-[#9a9890]"
                 }`}
               >
@@ -113,7 +119,7 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`h-px w-8 ${current > n ? "bg-[#C9A96E]" : "bg-[#e8e6e1]"}`} />
+              <div className={`h-px w-4 sm:w-8 ${current > n ? "bg-[#C9A96E]" : "bg-[#e8e6e1]"}`} />
             )}
           </div>
         );
@@ -221,11 +227,9 @@ function Sidebar({
   selectedDate,
   onChangeService,
   onChangeSlot,
-  onBook,
   onSelectSlot,
-  isSubmitting,
 }: {
-  step: 1 | 2 | 3;
+  step: 1 | 2 | 3 | 4;
   service: Service | null;
   slot: string | null;
   timezone: string;
@@ -234,12 +238,8 @@ function Sidebar({
   selectedDate: Date | null;
   onChangeService: () => void;
   onChangeSlot: () => void;
-  onBook: () => void;
   onSelectSlot: (s: string) => void;
-  isSubmitting: boolean;
 }) {
-  const canBook = step === 3;
-
   return (
     <aside className="flex flex-col gap-4">
       {/* Booking summary */}
@@ -329,17 +329,6 @@ function Sidebar({
           )}
         </div>
       )}
-
-      {/* CTA */}
-      {canBook && (
-        <button
-          onClick={onBook}
-          disabled={isSubmitting}
-          className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[13px] font-semibold text-[#1a1814] transition-colors hover:bg-[#b8954f] disabled:opacity-60"
-        >
-          {isSubmitting ? "Booking…" : "Book Appointment"}
-        </button>
-      )}
     </aside>
   );
 }
@@ -392,7 +381,7 @@ function Step1Service({ categories, onSelect }: { categories: Category[]; onSele
   );
 }
 
-// ─── Step 2 — Calendar (main panel) ──────────────────────────────────────────
+// ─── Step 2 — Calendar ────────────────────────────────────────────────────────
 
 function Step2Calendar({
   selectedDate,
@@ -458,11 +447,22 @@ function Step2Calendar({
   );
 }
 
-// ─── Step 3 — Your Info ───────────────────────────────────────────────────────
+// ─── Step 3 — Your Info + Consent ─────────────────────────────────────────────
 
-function Step3YourInfo({ onSubmit, isSubmitting, error }: { onSubmit: (info: CustomerInfo) => void; isSubmitting: boolean; error: string | null }) {
-  const [form, setForm] = useState<CustomerInfo>({ fullName: "", email: "", phone: "", notes: "", isNewClient: false });
-  const [errors, setErrors] = useState<Partial<Record<keyof CustomerInfo, string>>>({});
+function Step3YourInfo({
+  onSubmit,
+  isSubmitting,
+  error,
+  businessSettings,
+}: {
+  onSubmit: (info: CustomerInfo) => void;
+  isSubmitting: boolean;
+  error: string | null;
+  businessSettings: BusinessSettings;
+}) {
+  const [form, setForm] = useState<CustomerInfo>({ fullName: "", email: "", phone: "", notes: "" });
+  const [consentGiven, setConsentGiven] = useState(false);
+  const [errors, setErrors] = useState<Partial<Record<keyof CustomerInfo | "consent", string>>>({});
 
   function set<K extends keyof CustomerInfo>(key: K, val: CustomerInfo[K]) {
     setForm((prev) => ({ ...prev, [key]: val }));
@@ -470,11 +470,12 @@ function Step3YourInfo({ onSubmit, isSubmitting, error }: { onSubmit: (info: Cus
   }
 
   function validate() {
-    const errs: Partial<Record<keyof CustomerInfo, string>> = {};
+    const errs: Partial<Record<keyof CustomerInfo | "consent", string>> = {};
     if (!form.fullName.trim()) errs.fullName = "Name is required";
     if (!form.email.trim()) { errs.email = "Email is required"; }
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { errs.email = "Enter a valid email"; }
     if (!form.phone.trim()) errs.phone = "Phone number is required";
+    if (!consentGiven) errs.consent = "You must agree to the policies to continue";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -487,6 +488,13 @@ function Step3YourInfo({ onSubmit, isSubmitting, error }: { onSubmit: (info: Cus
 
   const inputCls = (field: keyof CustomerInfo) =>
     `w-full rounded-xl border px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E] ${errors[field] ? "border-red-400" : "border-[#e8e6e1]"}`;
+
+  const policies = [
+    businessSettings.cancellationPolicy && { title: "Cancellation Policy", text: businessSettings.cancellationPolicy },
+    businessSettings.latePolicy && { title: "Late Arrival Policy", text: businessSettings.latePolicy },
+    businessSettings.noShowPolicy && { title: "No-Show Policy", text: businessSettings.noShowPolicy },
+    businessSettings.depositPolicy && { title: "Deposit Policy", text: businessSettings.depositPolicy },
+  ].filter(Boolean) as { title: string; text: string }[];
 
   return (
     <div>
@@ -514,22 +522,183 @@ function Step3YourInfo({ onSubmit, isSubmitting, error }: { onSubmit: (info: Cus
 
         <div>
           <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Notes <span className="font-normal text-[#c0bdb8]">(optional)</span></label>
-          <textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any skin sensitivities, preferences, or questions for Anisha…" rows={3} className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]" />
+          <textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any skin sensitivities, preferences, or questions…" rows={3} className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]" />
         </div>
 
-        <label className="flex cursor-pointer items-center gap-3">
-          <input type="checkbox" checked={form.isNewClient} onChange={(e) => set("isNewClient", e.target.checked)} className="h-4 w-4 rounded accent-[#C9A96E]" />
-          <span className="text-[13px] text-[#6b6860]">This is my first time at Smoove Skin Studio</span>
-        </label>
+        {/* Consent form */}
+        <div>
+          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
+            Studio Policies <span className="text-red-400">*</span>
+          </label>
+          <div className="max-h-40 overflow-y-auto rounded-xl border border-[#e8e6e1] bg-[#faf9f7] px-4 py-3 text-[12px] leading-relaxed text-[#6b6860]">
+            {policies.length > 0 ? (
+              policies.map((p) => (
+                <div key={p.title} className="mb-3 last:mb-0">
+                  <p className="mb-1 font-semibold text-[#1a1814]">{p.title}</p>
+                  <p>{p.text}</p>
+                </div>
+              ))
+            ) : (
+              <div>
+                <p className="mb-2 font-semibold text-[#1a1814]">Appointment Policies</p>
+                <p className="mb-2">Please arrive on time for your appointment. Late arrivals may result in a shortened service or rescheduling.</p>
+                <p className="mb-2">Cancellations must be made at least 24 hours in advance. Late cancellations or no-shows may be subject to a fee.</p>
+                <p>By booking, you confirm you understand and agree to our studio policies.</p>
+              </div>
+            )}
+          </div>
+          <label className={`mt-2.5 flex cursor-pointer items-start gap-3 ${errors.consent ? "text-red-500" : ""}`}>
+            <input
+              type="checkbox"
+              checked={consentGiven}
+              onChange={(e) => { setConsentGiven(e.target.checked); setErrors((prev) => ({ ...prev, consent: undefined })); }}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded accent-[#C9A96E]"
+            />
+            <span className="text-[12px] text-[#6b6860]">
+              I have read and agree to the studio policies above
+            </span>
+          </label>
+          {errors.consent && <p className="mt-1 text-[11px] text-red-500">{errors.consent}</p>}
+        </div>
 
         {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">{error}</div>}
 
-        <button type="submit" disabled={isSubmitting} className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-[#1a1814] transition-colors hover:bg-[#b8954f] disabled:opacity-60">
-          {isSubmitting ? "Booking your appointment…" : "Book Appointment →"}
+        <button type="submit" disabled={isSubmitting} className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f] disabled:opacity-60">
+          {isSubmitting ? "Preparing payment…" : "Continue to Payment →"}
         </button>
 
-        <p className="text-center text-[11px] text-[#9a9890]">You&apos;ll receive a confirmation email right away</p>
+        <p className="text-center text-[11px] text-[#9a9890]">You&apos;ll receive a confirmation email once payment is complete</p>
       </form>
+    </div>
+  );
+}
+
+// ─── Step 4 — Payment ─────────────────────────────────────────────────────────
+
+function PaymentForm({
+  amount,
+  bookingId,
+  clientSlug,
+  isSubmitting,
+  setIsSubmitting,
+  submitError,
+  setSubmitError,
+}: {
+  amount: number;
+  bookingId: string;
+  clientSlug: string;
+  isSubmitting: boolean;
+  setIsSubmitting: (v: boolean) => void;
+  submitError: string | null;
+  setSubmitError: (v: string | null) => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+
+  async function handlePay(e: React.FormEvent) {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/${clientSlug}/confirmation/${bookingId}`,
+      },
+    });
+
+    // Only reaches here on error (otherwise Stripe redirects)
+    if (error) {
+      setSubmitError(error.message ?? "Payment failed. Please try again.");
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handlePay} className="space-y-5">
+      <div className="rounded-xl border border-[#e8e6e1] p-4">
+        <PaymentElement
+          options={{
+            layout: "tabs",
+          }}
+        />
+      </div>
+
+      {submitError && (
+        <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">{submitError}</div>
+      )}
+
+      <button
+        type="submit"
+        disabled={!stripe || isSubmitting}
+        className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f] disabled:opacity-60"
+      >
+        {isSubmitting ? "Processing…" : `Pay $${amount.toFixed(2)} →`}
+      </button>
+
+      <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-[#9a9890]">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        Secured by Stripe
+      </p>
+    </form>
+  );
+}
+
+function Step4Payment({
+  clientSecret,
+  service,
+  bookingId,
+  clientSlug,
+  isSubmitting,
+  setIsSubmitting,
+  submitError,
+  setSubmitError,
+}: {
+  clientSecret: string;
+  service: Service;
+  bookingId: string;
+  clientSlug: string;
+  isSubmitting: boolean;
+  setIsSubmitting: (v: boolean) => void;
+  submitError: string | null;
+  setSubmitError: (v: string | null) => void;
+}) {
+  return (
+    <div>
+      <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Complete your booking</h2>
+      <p className="mb-6 text-[13px] text-[#9a9890]">Enter your card details to confirm your appointment</p>
+
+      <Elements
+        stripe={stripePromise}
+        options={{
+          clientSecret,
+          appearance: {
+            theme: "stripe",
+            variables: {
+              colorPrimary: "#C9A96E",
+              colorBackground: "#ffffff",
+              colorText: "#1a1814",
+              colorDanger: "#ef4444",
+              fontFamily: "inherit",
+              borderRadius: "12px",
+            },
+          },
+        }}
+      >
+        <PaymentForm
+          amount={service.price}
+          bookingId={bookingId}
+          clientSlug={clientSlug}
+          isSubmitting={isSubmitting}
+          setIsSubmitting={setIsSubmitting}
+          submitError={submitError}
+          setSubmitError={setSubmitError}
+        />
+      </Elements>
     </div>
   );
 }
@@ -537,10 +706,9 @@ function Step3YourInfo({ onSubmit, isSubmitting, error }: { onSubmit: (info: Cus
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function BookSelection({ clientSlug, clientId, categories, businessSettings }: BookSelectionProps) {
-  const router = useRouter();
   const { timezone } = businessSettings;
 
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [service, setService] = useState<Service | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -548,6 +716,8 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
+  const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
 
   // Load slots whenever selectedDate or service changes (step 2 only)
   useEffect(() => {
@@ -581,7 +751,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function handleSubmit(info: CustomerInfo) {
+  async function handleStep3Submit(info: CustomerInfo) {
     if (!service || !slot) return;
     setIsSubmitting(true);
     setSubmitError(null);
@@ -603,11 +773,11 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
         setIsSubmitting(false);
         return;
       }
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        router.push(`/${clientSlug}/confirmation/${data.bookingId}`);
-      }
+      setPaymentClientSecret(data.clientSecret);
+      setPendingBookingId(data.bookingId);
+      setIsSubmitting(false);
+      setStep(4);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setSubmitError("Something went wrong. Please try again.");
       setIsSubmitting(false);
@@ -684,7 +854,46 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                       </>
                     )}
                   </div>
-                  <Step3YourInfo onSubmit={handleSubmit} isSubmitting={isSubmitting} error={submitError} />
+                  <Step3YourInfo
+                    onSubmit={handleStep3Submit}
+                    isSubmitting={isSubmitting}
+                    error={submitError}
+                    businessSettings={businessSettings}
+                  />
+                </>
+              )}
+
+              {step === 4 && paymentClientSecret && pendingBookingId && service && (
+                <>
+                  <div className="mb-5 flex items-center gap-2">
+                    <button
+                      onClick={() => { setStep(3); setSubmitError(null); }}
+                      className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                      </svg>
+                      Back
+                    </button>
+                    {slot && (
+                      <>
+                        <span className="text-[#e8e6e1]">·</span>
+                        <span className="text-[12px] text-[#6b6860]">
+                          {format(toZonedTime(new Date(slot), timezone), "EEE, MMM d")} at {formatSlotTime(slot, timezone)}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <Step4Payment
+                    clientSecret={paymentClientSecret}
+                    service={service}
+                    bookingId={pendingBookingId}
+                    clientSlug={clientSlug}
+                    isSubmitting={isSubmitting}
+                    setIsSubmitting={setIsSubmitting}
+                    submitError={submitError}
+                    setSubmitError={setSubmitError}
+                  />
                 </>
               )}
             </div>
@@ -701,16 +910,14 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                 selectedDate={selectedDate}
                 onChangeService={() => { setStep(1); setSlot(null); setSelectedDate(null); setSlots([]); }}
                 onChangeSlot={() => { setStep(2); setSlot(null); }}
-                onBook={() => { document.querySelector<HTMLFormElement>("form")?.requestSubmit(); }}
                 onSelectSlot={handleSelectSlot}
-                isSubmitting={isSubmitting}
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile: sticky bottom bar */}
+      {/* Mobile: sticky bottom bar (steps 1 & 2) */}
       {service && step < 3 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#e8e6e1] bg-white px-4 py-3 lg:hidden">
           <div className="flex items-center justify-between">

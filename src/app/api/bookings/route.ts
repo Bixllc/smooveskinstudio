@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe";
 import { isSlotAvailable } from "@/lib/availability";
-import { createCheckoutSession } from "@/lib/square";
 import { addMinutes } from "date-fns";
 import { parseFields, validateFormAnswers, type FormAnswers } from "@/lib/forms";
 
@@ -92,6 +92,9 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      // Generate unique manage token
+      const manageToken = crypto.randomUUID();
+
       // Create booking
       const booking = await tx.booking.create({
         data: {
@@ -102,6 +105,7 @@ export async function POST(request: NextRequest) {
           endTimeUtc,
           status: "PENDING_PAYMENT",
           paymentStatus: "UNPAID",
+          manageToken,
         },
       });
 
@@ -118,47 +122,17 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Create Square checkout
-      const depositAmount = service.depositAmount
-        ? Number(service.depositAmount)
-        : null;
-      const chargeAmount =
-        service.paymentType === "DEPOSIT" && depositAmount
-          ? depositAmount
-          : Number(service.price);
-
-      const checkout = await createCheckoutSession({
-        bookingId: booking.id,
-        serviceName: service.name,
-        amount: Math.round(chargeAmount * 100), // convert to cents
-        customerEmail: customer.email,
-      });
-
-      // Store the payment reference on booking
-      await tx.booking.update({
-        where: { id: booking.id },
-        data: {
-          paymentProvider: "square",
-          paymentId: checkout.paymentId,
-        },
-      });
-
-      // Create payment record
-      await tx.payment.create({
-        data: {
-          clientId,
-          bookingId: booking.id,
-          provider: "square",
-          providerPaymentId: checkout.paymentId,
-          amount: chargeAmount,
-          status: "PENDING",
-        },
-      });
-
       return {
         conflict: false,
-        bookingId: booking.id,
-        checkoutUrl: checkout.checkoutUrl,
+        booking,
+        service,
+        chargeAmount:
+          service.paymentType === "DEPOSIT" && service.depositAmount
+            ? Number(service.depositAmount)
+            : Number(service.price),
+        manageToken,
+        customerEmail: customer.email,
+        customerName: customer.fullName,
       } as const;
     });
 
@@ -169,8 +143,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create Stripe PaymentIntent outside transaction (Stripe is external)
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(result.chargeAmount * 100),
+      currency: "usd",
+      receipt_email: result.customerEmail,
+      metadata: {
+        bookingId: result.booking.id,
+        clientId,
+        customerName: result.customerName,
+        serviceName: result.service.name,
+      },
+    });
+
+    // Store Stripe payment reference on booking
+    await prisma.booking.update({
+      where: { id: result.booking.id },
+      data: {
+        paymentProvider: "stripe",
+        paymentId: paymentIntent.id,
+      },
+    });
+
+    // Create payment record
+    await prisma.payment.create({
+      data: {
+        clientId,
+        bookingId: result.booking.id,
+        provider: "stripe",
+        providerPaymentId: paymentIntent.id,
+        amount: result.chargeAmount,
+        status: "PENDING",
+      },
+    });
+
     return NextResponse.json(
-      { bookingId: result.bookingId, checkoutUrl: result.checkoutUrl },
+      {
+        bookingId: result.booking.id,
+        clientSecret: paymentIntent.client_secret,
+        manageToken: result.manageToken,
+      },
       { status: 201 }
     );
   } catch (error) {
@@ -182,10 +194,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-/**
- * Validates that all required forms for the service have been answered correctly.
- * Returns an error string or null if valid.
- */
 async function validateFormSubmissions(
   serviceId: string,
   formAnswers: FormAnswerEntry[]
@@ -241,7 +249,6 @@ function validateBookingInput(body: any): string | null {
   if (!body.customer.phone || typeof body.customer.phone !== "string") {
     return "customer.phone is required";
   }
-  // Basic email check
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.customer.email)) {
     return "customer.email must be a valid email address";
   }
