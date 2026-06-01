@@ -1,8 +1,22 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { format, addDays, startOfToday, isSameDay } from "date-fns";
+import {
+  format,
+  startOfToday,
+  isSameDay,
+  isBefore,
+  isToday,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  startOfWeek,
+  endOfWeek,
+  addMonths,
+  subMonths,
+  isSameMonth,
+} from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -35,6 +49,14 @@ interface BookSelectionProps {
   businessSettings: BusinessSettings;
 }
 
+interface CustomerInfo {
+  fullName: string;
+  email: string;
+  phone: string;
+  notes: string;
+  isNewClient: boolean;
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDuration(minutes: number): string {
@@ -49,16 +71,6 @@ function formatDuration(minutes: number): string {
 function formatSlotTime(slotUtc: string, timezone: string): string {
   const zoned = toZonedTime(new Date(slotUtc), timezone);
   return format(zoned, "h:mm a");
-}
-
-function isMostPopular(_serviceName: string): boolean {
-  return false;
-}
-
-// Generate next N days starting from today
-function getDateStrip(n = 14): Date[] {
-  const today = startOfToday();
-  return Array.from({ length: n }, (_, i) => addDays(today, i));
 }
 
 // ─── Step Indicator ──────────────────────────────────────────────────────────
@@ -110,6 +122,93 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   );
 }
 
+// ─── Calendar Widget ──────────────────────────────────────────────────────────
+
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function CalendarWidget({
+  selectedDate,
+  onSelect,
+}: {
+  selectedDate: Date | null;
+  onSelect: (d: Date) => void;
+}) {
+  const today = startOfToday();
+  const [viewMonth, setViewMonth] = useState(today);
+
+  const monthStart = startOfMonth(viewMonth);
+  const monthEnd = endOfMonth(viewMonth);
+  const calStart = startOfWeek(monthStart);
+  const calEnd = endOfWeek(monthEnd);
+  const days = eachDayOfInterval({ start: calStart, end: calEnd });
+
+  return (
+    <div>
+      {/* Month navigation */}
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          onClick={() => setViewMonth((m) => subMonths(m, 1))}
+          disabled={isSameMonth(viewMonth, today)}
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e8e6e1] bg-white text-[#9a9890] transition-colors hover:border-[#C9A96E] hover:text-[#C9A96E] disabled:cursor-not-allowed disabled:opacity-30"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <span className="text-[14px] font-semibold text-[#1a1814]">
+          {format(viewMonth, "MMMM yyyy")}
+        </span>
+        <button
+          onClick={() => setViewMonth((m) => addMonths(m, 1))}
+          className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e8e6e1] bg-white text-[#9a9890] transition-colors hover:border-[#C9A96E] hover:text-[#C9A96E]"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Day-of-week headers */}
+      <div className="mb-1 grid grid-cols-7">
+        {DOW.map((d) => (
+          <div key={d} className="py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-[#9a9890]">
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Day grid */}
+      <div className="grid grid-cols-7 gap-y-1">
+        {days.map((day) => {
+          const isPast = isBefore(day, today);
+          const isCurrentMonth = isSameMonth(day, viewMonth);
+          const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
+          const isTodayDay = isToday(day);
+
+          return (
+            <button
+              key={day.toISOString()}
+              onClick={() => !isPast && onSelect(day)}
+              disabled={isPast}
+              className={`relative mx-auto flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-medium transition-all
+                ${isPast ? "cursor-not-allowed text-[#d0cec9]" : ""}
+                ${!isPast && !isSelected && isCurrentMonth ? "text-[#1a1814] hover:bg-[#C9A96E] hover:text-white" : ""}
+                ${!isCurrentMonth && !isPast ? "text-[#c0bdb8]" : ""}
+                ${isSelected ? "bg-[#C9A96E] text-white shadow-sm" : ""}
+              `}
+            >
+              {format(day, "d")}
+              {isTodayDay && !isSelected && (
+                <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-[#C9A96E]" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 
 function Sidebar({
@@ -117,51 +216,54 @@ function Sidebar({
   service,
   slot,
   timezone,
+  slots,
+  slotsLoading,
+  selectedDate,
   onChangeService,
   onChangeSlot,
   onBook,
+  onSelectSlot,
   isSubmitting,
 }: {
   step: 1 | 2 | 3;
   service: Service | null;
   slot: string | null;
   timezone: string;
+  slots: string[];
+  slotsLoading: boolean;
+  selectedDate: Date | null;
   onChangeService: () => void;
   onChangeSlot: () => void;
   onBook: () => void;
+  onSelectSlot: (s: string) => void;
   isSubmitting: boolean;
 }) {
   const canBook = step === 3;
 
   return (
     <aside className="flex flex-col gap-4">
-      {/* Live booking summary */}
+      {/* Booking summary */}
       <div className="rounded-2xl border border-[#e8e6e1] bg-white p-5 shadow-sm">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#9a9890]">
           Your Booking
         </p>
 
-        {/* Service row */}
         <div className="flex items-start justify-between gap-2 border-b border-dashed border-[#e8e6e1] pb-3">
           <div>
             <p className="text-[11px] text-[#9a9890]">Service</p>
             {service ? (
               <p className="text-[13px] font-medium text-[#1a1814]">{service.name}</p>
             ) : (
-              <p className="text-[13px] text-[#c0bdb8] italic">Not selected</p>
+              <p className="text-[13px] italic text-[#c0bdb8]">Not selected</p>
             )}
           </div>
           {service && step > 1 && (
-            <button
-              onClick={onChangeService}
-              className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]"
-            >
+            <button onClick={onChangeService} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">
               Change
             </button>
           )}
         </div>
 
-        {/* Date/time row */}
         <div className="flex items-start justify-between gap-2 border-b border-dashed border-[#e8e6e1] py-3">
           <div>
             <p className="text-[11px] text-[#9a9890]">Date & Time</p>
@@ -170,38 +272,63 @@ function Sidebar({
                 <p className="text-[13px] font-medium text-[#1a1814]">
                   {format(toZonedTime(new Date(slot), timezone), "EEEE, MMM d")}
                 </p>
-                <p className="text-[12px] text-[#6b6860]">
-                  {formatSlotTime(slot, timezone)}
-                </p>
+                <p className="text-[12px] text-[#6b6860]">{formatSlotTime(slot, timezone)}</p>
               </>
             ) : (
-              <p className="text-[13px] text-[#c0bdb8] italic">Not selected</p>
+              <p className="text-[13px] italic text-[#c0bdb8]">Not selected</p>
             )}
           </div>
           {slot && step > 2 && (
-            <button
-              onClick={onChangeSlot}
-              className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]"
-            >
+            <button onClick={onChangeSlot} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">
               Change
             </button>
           )}
         </div>
 
-        {/* Price */}
         {service && (
-          <div className="pt-3">
-            <div className="flex items-baseline justify-between">
-              <p className="text-[12px] text-[#9a9890]">
-                {formatDuration(service.durationMinutes)}
-              </p>
-              <p className="text-xl font-bold text-[#1a1814]">
-                ${service.price.toFixed(2)}
-              </p>
-            </div>
+          <div className="flex items-baseline justify-between pt-3">
+            <p className="text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
+            <p className="text-xl font-bold text-[#1a1814]">${service.price.toFixed(2)}</p>
           </div>
         )}
       </div>
+
+      {/* Time slots — shown in sidebar when step 2 and date selected */}
+      {step === 2 && selectedDate && (
+        <div className="rounded-2xl border border-[#e8e6e1] bg-white p-5 shadow-sm">
+          <p className="mb-1 text-[12px] font-semibold text-[#1a1814]">
+            {format(selectedDate, "EEEE, MMMM d")}
+          </p>
+          <p className="mb-4 text-[11px] text-[#9a9890]">Available times</p>
+
+          {slotsLoading && (
+            <div className="flex h-24 items-center justify-center">
+              <p className="text-[12px] text-[#9a9890]">Loading…</p>
+            </div>
+          )}
+
+          {!slotsLoading && slots.length === 0 && (
+            <div className="flex h-24 flex-col items-center justify-center rounded-xl bg-[#f9f8f6]">
+              <p className="text-[12px] font-medium text-[#1a1814]">No availability</p>
+              <p className="mt-0.5 text-[11px] text-[#9a9890]">Try another date</p>
+            </div>
+          )}
+
+          {!slotsLoading && slots.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {slots.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => onSelectSlot(s)}
+                  className="rounded-xl border border-[#e8e6e1] bg-white py-2 text-[12px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
+                >
+                  {formatSlotTime(s, timezone)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* CTA */}
       {canBook && (
@@ -213,32 +340,20 @@ function Sidebar({
           {isSubmitting ? "Booking…" : "Book Appointment"}
         </button>
       )}
-
     </aside>
   );
 }
 
 // ─── Step 1 — Service Selection ───────────────────────────────────────────────
 
-function Step1Service({
-  categories,
-  onSelect,
-}: {
-  categories: Category[];
-  onSelect: (s: Service) => void;
-}) {
+function Step1Service({ categories, onSelect }: { categories: Category[]; onSelect: (s: Service) => void }) {
   const [activeCat, setActiveCat] = useState(categories[0]?.id ?? "");
-
-  const currentServices =
-    categories.find((c) => c.id === activeCat)?.services ?? [];
+  const currentServices = categories.find((c) => c.id === activeCat)?.services ?? [];
 
   return (
     <div>
-      <h2 className="mb-5 text-xl font-bold text-[#1a1814]">
-        Select your service
-      </h2>
+      <h2 className="mb-5 text-xl font-bold text-[#1a1814]">Select your service</h2>
 
-      {/* Category tabs */}
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
         {categories.map((cat) => (
           <button
@@ -255,178 +370,89 @@ function Step1Service({
         ))}
       </div>
 
-      {/* Service cards */}
       <div className="grid gap-3 sm:grid-cols-2">
         {currentServices.map((service) => (
-          <ServiceCard
+          <button
             key={service.id}
-            service={service}
-            onSelect={onSelect}
-          />
+            onClick={() => onSelect(service)}
+            className="group flex flex-col items-start rounded-2xl border border-[#e8e6e1] bg-white p-5 text-left transition-all hover:border-[#C9A96E] hover:shadow-md active:scale-[0.99]"
+          >
+            <div className="flex w-full items-start justify-between gap-2">
+              <p className="text-[14px] font-semibold text-[#1a1814]">{service.name}</p>
+              <span className="shrink-0 text-[14px] font-bold text-[#1a1814]">${service.price.toFixed(2)}</span>
+            </div>
+            <p className="mt-1 text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
+            {service.description && (
+              <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-[#9a9890]">{service.description}</p>
+            )}
+          </button>
         ))}
       </div>
     </div>
   );
 }
 
-function ServiceCard({
-  service,
-  onSelect,
-}: {
-  service: Service;
-  onSelect: (s: Service) => void;
-}) {
-  return (
-    <button
-      onClick={() => onSelect(service)}
-      className="group flex flex-col items-start rounded-2xl border border-[#e8e6e1] bg-white p-5 text-left transition-all hover:border-[#C9A96E] hover:shadow-md active:scale-[0.99]"
-    >
-      <div className="flex w-full items-start justify-between gap-2">
-        <p className="text-[14px] font-semibold text-[#1a1814]">
-          {service.name}
-        </p>
-        <span className="shrink-0 text-[14px] font-bold text-[#1a1814]">
-          ${service.price.toFixed(2)}
-        </span>
-      </div>
+// ─── Step 2 — Calendar (main panel) ──────────────────────────────────────────
 
-      <p className="mt-1 text-[12px] text-[#9a9890]">
-        {formatDuration(service.durationMinutes)}
-      </p>
-
-      {service.description && (
-        <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-[#9a9890]">
-          {service.description}
-        </p>
-      )}
-    </button>
-  );
-}
-
-// ─── Step 2 — Date & Time ─────────────────────────────────────────────────────
-
-const DATE_STRIP_DAYS = 21;
-
-function Step2DateTime({
-  clientId,
-  service,
+function Step2Calendar({
+  selectedDate,
+  onDateSelect,
+  slots,
+  slotsLoading,
   timezone,
-  onSelect,
+  onSelectSlot,
 }: {
-  clientId: string;
-  service: Service;
+  selectedDate: Date | null;
+  onDateSelect: (d: Date) => void;
+  slots: string[];
+  slotsLoading: boolean;
   timezone: string;
-  onSelect: (slotUtc: string) => void;
+  onSelectSlot: (s: string) => void;
 }) {
-  const dates = getDateStrip(DATE_STRIP_DAYS);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [slots, setSlots] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const dateStripRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!selectedDate) return;
-    const dateStr = format(selectedDate, "yyyy-MM-dd");
-    setLoading(true);
-    setSlots([]);
-    setError(null);
-    fetch("/api/bookings/slots", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clientId, serviceId: service.id, date: dateStr }),
-    })
-      .then((r) => r.json())
-      .then((data) => setSlots(data.slots ?? []))
-      .catch(() => setError("Failed to load times. Try again."))
-      .finally(() => setLoading(false));
-  }, [selectedDate, clientId, service.id]);
-
   return (
     <div>
-      <h2 className="mb-1 text-xl font-bold text-[#1a1814]">
-        Pick your date & time
-      </h2>
+      <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Pick your date & time</h2>
       <p className="mb-5 text-[13px] text-[#9a9890]">
-        Select a date, then choose an available time slot
+        Select a date — available times will appear on the right
       </p>
 
-      {/* Date strip */}
-      <div
-        ref={dateStripRef}
-        className="mb-5 flex gap-2 overflow-x-auto pb-2"
-        style={{ scrollbarWidth: "none" }}
-      >
-        {dates.map((date) => {
-          const isSelected = selectedDate ? isSameDay(date, selectedDate) : false;
-          return (
-            <button
-              key={date.toISOString()}
-              onClick={() => setSelectedDate(date)}
-              className={`flex shrink-0 flex-col items-center rounded-xl border px-3 py-2.5 transition-all ${
-                isSelected
-                  ? "border-[#C9A96E] bg-[#C9A96E] text-white"
-                  : "border-[#e8e6e1] bg-white text-[#1a1814] hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
-              }`}
-            >
-              <span className={`text-[10px] uppercase font-medium ${isSelected ? "text-white" : "text-[#9a9890] group-hover:text-white"}`}>
-                {format(date, "EEE")}
-              </span>
-              <span className="mt-0.5 text-[16px] font-bold leading-none">
-                {format(date, "d")}
-              </span>
-              <span className={`text-[10px] ${isSelected ? "text-white" : "text-[#9a9890]"}`}>
-                {format(date, "MMM")}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <CalendarWidget selectedDate={selectedDate} onSelect={onDateSelect} />
 
-      {/* Time slots */}
-      {!selectedDate && (
-        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-[#e8e6e1] bg-[#f9f8f6]">
-          <p className="text-[13px] text-[#9a9890]">Select a date to see available times</p>
-        </div>
-      )}
-
-      {loading && (
-        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-[#e8e6e1] bg-[#f9f8f6]">
-          <p className="text-[13px] text-[#9a9890]">Loading available times…</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-red-100 bg-red-50">
-          <p className="text-[13px] text-red-600">{error}</p>
-        </div>
-      )}
-
-      {selectedDate && !loading && !error && slots.length === 0 && (
-        <div className="flex h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-[#e8e6e1] bg-[#f9f8f6]">
-          <p className="text-[13px] font-medium text-[#1a1814]">No availability</p>
-          <p className="mt-1 text-[12px] text-[#9a9890]">Try a different date</p>
-        </div>
-      )}
-
-      {!loading && slots.length > 0 && (
-        <>
-          <p className="mb-3 text-[12px] text-[#9a9890]">
-            {slots.length} time{slots.length !== 1 ? "s" : ""} available on{" "}
-            {selectedDate ? format(selectedDate, "EEEE, MMMM d") : ""}
+      {/* Mobile: time slots below calendar */}
+      {selectedDate && (
+        <div className="mt-6 lg:hidden">
+          <p className="mb-1 text-[13px] font-semibold text-[#1a1814]">
+            {format(selectedDate, "EEEE, MMMM d")}
           </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-            {slots.map((slot) => (
-              <button
-                key={slot}
-                onClick={() => onSelect(slot)}
-                className="rounded-xl border border-[#e8e6e1] bg-white py-2.5 text-[13px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
-              >
-                {formatSlotTime(slot, timezone)}
-              </button>
-            ))}
-          </div>
-        </>
+          <p className="mb-3 text-[11px] text-[#9a9890]">Available times</p>
+
+          {slotsLoading && (
+            <div className="flex h-20 items-center justify-center rounded-xl bg-[#f9f8f6]">
+              <p className="text-[12px] text-[#9a9890]">Loading…</p>
+            </div>
+          )}
+
+          {!slotsLoading && slots.length === 0 && (
+            <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-[#f9f8f6]">
+              <p className="text-[12px] font-medium text-[#1a1814]">No availability</p>
+              <p className="mt-0.5 text-[11px] text-[#9a9890]">Try another date</p>
+            </div>
+          )}
+
+          {!slotsLoading && slots.length > 0 && (
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {slots.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => onSelectSlot(s)}
+                  className="rounded-xl border border-[#e8e6e1] bg-white py-2.5 text-[13px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
+                >
+                  {formatSlotTime(s, timezone)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -434,30 +460,8 @@ function Step2DateTime({
 
 // ─── Step 3 — Your Info ───────────────────────────────────────────────────────
 
-interface CustomerInfo {
-  fullName: string;
-  email: string;
-  phone: string;
-  notes: string;
-  isNewClient: boolean;
-}
-
-function Step3YourInfo({
-  onSubmit,
-  isSubmitting,
-  error,
-}: {
-  onSubmit: (info: CustomerInfo) => void;
-  isSubmitting: boolean;
-  error: string | null;
-}) {
-  const [form, setForm] = useState<CustomerInfo>({
-    fullName: "",
-    email: "",
-    phone: "",
-    notes: "",
-    isNewClient: false,
-  });
+function Step3YourInfo({ onSubmit, isSubmitting, error }: { onSubmit: (info: CustomerInfo) => void; isSubmitting: boolean; error: string | null }) {
+  const [form, setForm] = useState<CustomerInfo>({ fullName: "", email: "", phone: "", notes: "", isNewClient: false });
   const [errors, setErrors] = useState<Partial<Record<keyof CustomerInfo, string>>>({});
 
   function set<K extends keyof CustomerInfo>(key: K, val: CustomerInfo[K]) {
@@ -468,11 +472,8 @@ function Step3YourInfo({
   function validate() {
     const errs: Partial<Record<keyof CustomerInfo, string>> = {};
     if (!form.fullName.trim()) errs.fullName = "Name is required";
-    if (!form.email.trim()) {
-      errs.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      errs.email = "Enter a valid email";
-    }
+    if (!form.email.trim()) { errs.email = "Email is required"; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { errs.email = "Enter a valid email"; }
     if (!form.phone.trim()) errs.phone = "Phone number is required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -484,112 +485,50 @@ function Step3YourInfo({
     onSubmit({ ...form, fullName: form.fullName.trim(), email: form.email.trim(), phone: form.phone.trim(), notes: form.notes.trim() });
   }
 
+  const inputCls = (field: keyof CustomerInfo) =>
+    `w-full rounded-xl border px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E] ${errors[field] ? "border-red-400" : "border-[#e8e6e1]"}`;
+
   return (
     <div>
-      <h2 className="mb-1 text-xl font-bold text-[#1a1814]">
-        Almost there!
-      </h2>
-      <p className="mb-6 text-[13px] text-[#9a9890]">
-        Just a few details so we can confirm your appointment
-      </p>
+      <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Almost there!</h2>
+      <p className="mb-6 text-[13px] text-[#9a9890]">Just a few details so we can confirm your appointment</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
-            Full Name <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="text"
-            value={form.fullName}
-            onChange={(e) => set("fullName", e.target.value)}
-            placeholder="Jane Smith"
-            className={`w-full rounded-xl border px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E] ${
-              errors.fullName ? "border-red-400" : "border-[#e8e6e1]"
-            }`}
-          />
-          {errors.fullName && (
-            <p className="mt-1 text-[11px] text-red-500">{errors.fullName}</p>
-          )}
+          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Full Name <span className="text-red-400">*</span></label>
+          <input type="text" value={form.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="Jane Smith" className={inputCls("fullName")} />
+          {errors.fullName && <p className="mt-1 text-[11px] text-red-500">{errors.fullName}</p>}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
-            Email Address <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="email"
-            value={form.email}
-            onChange={(e) => set("email", e.target.value)}
-            placeholder="jane@example.com"
-            className={`w-full rounded-xl border px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E] ${
-              errors.email ? "border-red-400" : "border-[#e8e6e1]"
-            }`}
-          />
-          {errors.email && (
-            <p className="mt-1 text-[11px] text-red-500">{errors.email}</p>
-          )}
+          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Email Address <span className="text-red-400">*</span></label>
+          <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="jane@example.com" className={inputCls("email")} />
+          {errors.email && <p className="mt-1 text-[11px] text-red-500">{errors.email}</p>}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
-            Phone Number <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="tel"
-            value={form.phone}
-            onChange={(e) => set("phone", e.target.value)}
-            placeholder="(682) 555-0100"
-            className={`w-full rounded-xl border px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E] ${
-              errors.phone ? "border-red-400" : "border-[#e8e6e1]"
-            }`}
-          />
-          {errors.phone && (
-            <p className="mt-1 text-[11px] text-red-500">{errors.phone}</p>
-          )}
+          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Phone Number <span className="text-red-400">*</span></label>
+          <input type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="(682) 555-0100" className={inputCls("phone")} />
+          {errors.phone && <p className="mt-1 text-[11px] text-red-500">{errors.phone}</p>}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
-            Notes <span className="text-[#c0bdb8] font-normal">(optional)</span>
-          </label>
-          <textarea
-            value={form.notes}
-            onChange={(e) => set("notes", e.target.value)}
-            placeholder="Any skin sensitivities, preferences, or questions for Anisha…"
-            rows={3}
-            className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]"
-          />
+          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Notes <span className="font-normal text-[#c0bdb8]">(optional)</span></label>
+          <textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any skin sensitivities, preferences, or questions for Anisha…" rows={3} className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]" />
         </div>
 
         <label className="flex cursor-pointer items-center gap-3">
-          <input
-            type="checkbox"
-            checked={form.isNewClient}
-            onChange={(e) => set("isNewClient", e.target.checked)}
-            className="h-4 w-4 rounded accent-[#C9A96E]"
-          />
-          <span className="text-[13px] text-[#6b6860]">
-            This is my first time at Smoove Skin Studio
-          </span>
+          <input type="checkbox" checked={form.isNewClient} onChange={(e) => set("isNewClient", e.target.checked)} className="h-4 w-4 rounded accent-[#C9A96E]" />
+          <span className="text-[13px] text-[#6b6860]">This is my first time at Smoove Skin Studio</span>
         </label>
 
-        {error && (
-          <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">
-            {error}
-          </div>
-        )}
+        {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">{error}</div>}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-[#1a1814] transition-colors hover:bg-[#b8954f] disabled:opacity-60"
-        >
+        <button type="submit" disabled={isSubmitting} className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-[#1a1814] transition-colors hover:bg-[#b8954f] disabled:opacity-60">
           {isSubmitting ? "Booking your appointment…" : "Book Appointment →"}
         </button>
 
-        <p className="text-center text-[11px] text-[#9a9890]">
-          You&apos;ll receive a confirmation email right away
-        </p>
+        <p className="text-center text-[11px] text-[#9a9890]">You&apos;ll receive a confirmation email right away</p>
       </form>
     </div>
   );
@@ -597,24 +536,41 @@ function Step3YourInfo({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function BookSelection({
-  clientSlug,
-  clientId,
-  categories,
-  businessSettings,
-}: BookSelectionProps) {
+export function BookSelection({ clientSlug, clientId, categories, businessSettings }: BookSelectionProps) {
   const router = useRouter();
   const { timezone } = businessSettings;
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [service, setService] = useState<Service | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [slots, setSlots] = useState<string[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Load slots whenever selectedDate or service changes (step 2 only)
+  useEffect(() => {
+    if (!selectedDate || !service || step !== 2) return;
+    const dateStr = format(selectedDate, "yyyy-MM-dd");
+    setSlotsLoading(true);
+    setSlots([]);
+    fetch("/api/bookings/slots", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clientId, serviceId: service.id, date: dateStr }),
+    })
+      .then((r) => r.json())
+      .then((data) => setSlots(data.slots ?? []))
+      .catch(() => setSlots([]))
+      .finally(() => setSlotsLoading(false));
+  }, [selectedDate, service, clientId, step]);
 
   function handleSelectService(s: Service) {
     setService(s);
     setSlot(null);
+    setSelectedDate(null);
+    setSlots([]);
     setStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -629,7 +585,6 @@ export function BookSelection({
     if (!service || !slot) return;
     setIsSubmitting(true);
     setSubmitError(null);
-
     try {
       const res = await fetch("/api/bookings", {
         method: "POST",
@@ -638,24 +593,16 @@ export function BookSelection({
           clientId,
           serviceId: service.id,
           startTimeUtc: slot,
-          customer: {
-            fullName: info.fullName,
-            email: info.email,
-            phone: info.phone,
-            notes: info.notes || undefined,
-          },
+          customer: { fullName: info.fullName, email: info.email, phone: info.phone, notes: info.notes || undefined },
           formAnswers: [],
         }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         setSubmitError(data.error ?? "Something went wrong. Please try again.");
         setIsSubmitting(false);
         return;
       }
-
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
@@ -678,7 +625,7 @@ export function BookSelection({
       </div>
 
       {/* Main content */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 pb-24 lg:pb-6">
         <div className="mx-auto max-w-5xl">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
             {/* Left: step content */}
@@ -686,12 +633,13 @@ export function BookSelection({
               {step === 1 && (
                 <Step1Service categories={categories} onSelect={handleSelectService} />
               )}
+
               {step === 2 && service && (
                 <>
                   <div className="mb-5 flex items-center gap-2">
                     <button
                       onClick={() => setStep(1)}
-                      className="flex items-center gap-1 text-[12px] text-[#9a9890] hover:text-[#C9A96E] transition-colors"
+                      className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]"
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="15 18 9 12 15 6" />
@@ -704,20 +652,23 @@ export function BookSelection({
                       {formatDuration(service.durationMinutes)} · ${service.price.toFixed(2)}
                     </span>
                   </div>
-                  <Step2DateTime
-                    clientId={clientId}
-                    service={service}
+                  <Step2Calendar
+                    selectedDate={selectedDate}
+                    onDateSelect={setSelectedDate}
+                    slots={slots}
+                    slotsLoading={slotsLoading}
                     timezone={timezone}
-                    onSelect={handleSelectSlot}
+                    onSelectSlot={handleSelectSlot}
                   />
                 </>
               )}
+
               {step === 3 && (
                 <>
                   <div className="mb-5 flex items-center gap-2">
                     <button
                       onClick={() => setStep(2)}
-                      className="flex items-center gap-1 text-[12px] text-[#9a9890] hover:text-[#C9A96E] transition-colors"
+                      className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]"
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="15 18 9 12 15 6" />
@@ -733,11 +684,7 @@ export function BookSelection({
                       </>
                     )}
                   </div>
-                  <Step3YourInfo
-                    onSubmit={handleSubmit}
-                    isSubmitting={isSubmitting}
-                    error={submitError}
-                  />
+                  <Step3YourInfo onSubmit={handleSubmit} isSubmitting={isSubmitting} error={submitError} />
                 </>
               )}
             </div>
@@ -749,12 +696,13 @@ export function BookSelection({
                 service={service}
                 slot={slot}
                 timezone={timezone}
-                onChangeService={() => { setStep(1); setSlot(null); }}
-                onChangeSlot={() => setStep(2)}
-                onBook={() => {
-                  const form = document.querySelector<HTMLFormElement>("form");
-                  form?.requestSubmit();
-                }}
+                slots={slots}
+                slotsLoading={slotsLoading}
+                selectedDate={selectedDate}
+                onChangeService={() => { setStep(1); setSlot(null); setSelectedDate(null); setSlots([]); }}
+                onChangeSlot={() => { setStep(2); setSlot(null); }}
+                onBook={() => { document.querySelector<HTMLFormElement>("form")?.requestSubmit(); }}
+                onSelectSlot={handleSelectSlot}
                 isSubmitting={isSubmitting}
               />
             </div>
@@ -777,9 +725,7 @@ export function BookSelection({
                 <p className="text-[12px] text-[#6b6860]">
                   {format(toZonedTime(new Date(slot), timezone), "MMM d")}
                 </p>
-                <p className="text-[12px] font-medium text-[#1a1814]">
-                  {formatSlotTime(slot, timezone)}
-                </p>
+                <p className="text-[12px] font-medium text-[#1a1814]">{formatSlotTime(slot, timezone)}</p>
               </div>
             )}
           </div>
