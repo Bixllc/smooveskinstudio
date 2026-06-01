@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { stripe } from "@/lib/stripe";
 import { isSlotAvailable } from "@/lib/availability";
-import { createCheckoutSession } from "@/lib/square";
 import { addMinutes } from "date-fns";
 import { parseFields, validateFormAnswers, type FormAnswers } from "@/lib/forms";
 
@@ -42,31 +42,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate form submissions before entering the transaction
     const formError = await validateFormSubmissions(serviceId, formAnswers);
     if (formError) {
       return NextResponse.json({ error: formError }, { status: 400 });
     }
 
     const result = await prisma.$transaction(async (tx: any) => {
-      // Check slot availability inside transaction
-      const available = await isSlotAvailable(
-        { clientId, serviceId, startTimeUtc },
-        tx
-      );
+      const available = await isSlotAvailable({ clientId, serviceId, startTimeUtc }, tx);
+      if (!available) return { conflict: true } as const;
 
-      if (!available) {
-        return { conflict: true } as const;
-      }
-
-      // Fetch service for duration and pricing
       const service = await tx.service.findFirstOrThrow({
         where: { id: serviceId, clientId, active: true },
       });
 
       const endTimeUtc = addMinutes(startTimeUtc, service.durationMinutes);
 
-      // Upsert customer by email + clientId
       let existingCustomer = await tx.customer.findFirst({
         where: { clientId, email: customer.email },
       });
@@ -74,11 +64,7 @@ export async function POST(request: NextRequest) {
       if (existingCustomer) {
         existingCustomer = await tx.customer.update({
           where: { id: existingCustomer.id },
-          data: {
-            fullName: customer.fullName,
-            phone: customer.phone,
-            notes: customer.notes,
-          },
+          data: { fullName: customer.fullName, phone: customer.phone, notes: customer.notes },
         });
       } else {
         existingCustomer = await tx.customer.create({
@@ -92,10 +78,8 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Generate unique manage token
       const manageToken = crypto.randomUUID();
 
-      // Create booking
       const booking = await tx.booking.create({
         data: {
           clientId,
@@ -109,7 +93,6 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Create form submissions inside the transaction
       for (const entry of formAnswers) {
         await tx.formSubmission.create({
           data: {
@@ -122,12 +105,9 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      const depositAmount = service.depositAmount
-        ? Number(service.depositAmount)
-        : null;
       const chargeAmount =
-        service.paymentType === "DEPOSIT" && depositAmount
-          ? depositAmount
+        service.paymentType === "DEPOSIT" && service.depositAmount
+          ? Number(service.depositAmount)
           : Number(service.price);
 
       return {
@@ -137,6 +117,7 @@ export async function POST(request: NextRequest) {
         chargeAmount,
         manageToken,
         customerEmail: customer.email,
+        customerName: customer.fullName,
       } as const;
     });
 
@@ -147,30 +128,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create Square checkout outside transaction (external call)
-    const checkout = await createCheckoutSession({
-      bookingId: result.booking.id,
-      serviceName: result.service.name,
+    const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(result.chargeAmount * 100),
-      customerEmail: result.customerEmail,
-    });
-
-    // Store the payment reference on booking
-    await prisma.booking.update({
-      where: { id: result.booking.id },
-      data: {
-        paymentProvider: "square",
-        paymentId: checkout.paymentId,
+      currency: "usd",
+      receipt_email: result.customerEmail,
+      metadata: {
+        bookingId: result.booking.id,
+        clientId,
+        customerName: result.customerName,
+        serviceName: result.service.name,
       },
     });
 
-    // Create payment record
+    await prisma.booking.update({
+      where: { id: result.booking.id },
+      data: { paymentProvider: "stripe", paymentId: paymentIntent.id },
+    });
+
     await prisma.payment.create({
       data: {
         clientId,
         bookingId: result.booking.id,
-        provider: "square",
-        providerPaymentId: checkout.paymentId,
+        provider: "stripe",
+        providerPaymentId: paymentIntent.id,
         amount: result.chargeAmount,
         status: "PENDING",
       },
@@ -179,17 +159,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         bookingId: result.booking.id,
-        checkoutUrl: checkout.checkoutUrl,
+        clientSecret: paymentIntent.client_secret,
         manageToken: result.manageToken,
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("Error creating booking:", error);
-    return NextResponse.json(
-      { error: "Failed to create booking" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
   }
 }
 
@@ -198,58 +175,31 @@ async function validateFormSubmissions(
   formAnswers: FormAnswerEntry[]
 ): Promise<string | null> {
   const assignments = await prisma.serviceFormAssignment.findMany({
-    where: {
-      serviceId,
-      required: true,
-      formTemplate: { active: true },
-    },
-    include: {
-      formTemplate: { select: { id: true, name: true, fields: true } },
-    },
+    where: { serviceId, required: true, formTemplate: { active: true } },
+    include: { formTemplate: { select: { id: true, name: true, fields: true } } },
   });
 
   const answersMap = new Map(formAnswers.map((e) => [e.formTemplateId, e.answers]));
 
   for (const assignment of assignments) {
     const answers = answersMap.get(assignment.formTemplateId);
-    if (!answers) {
-      return `Form "${assignment.formTemplate.name}" is required and must be completed`;
-    }
-
+    if (!answers) return `Form "${assignment.formTemplate.name}" is required and must be completed`;
     const fields = parseFields(assignment.formTemplate.fields);
     const fieldError = validateFormAnswers(fields, answers);
-    if (fieldError) {
-      return `${assignment.formTemplate.name}: ${fieldError}`;
-    }
+    if (fieldError) return `${assignment.formTemplate.name}: ${fieldError}`;
   }
 
   return null;
 }
 
 function validateBookingInput(body: any): string | null {
-  if (!body.clientId || typeof body.clientId !== "string") {
-    return "clientId is required";
-  }
-  if (!body.serviceId || typeof body.serviceId !== "string") {
-    return "serviceId is required";
-  }
-  if (!body.startTimeUtc || typeof body.startTimeUtc !== "string") {
-    return "startTimeUtc is required";
-  }
-  if (!body.customer || typeof body.customer !== "object") {
-    return "customer is required";
-  }
-  if (!body.customer.fullName || typeof body.customer.fullName !== "string") {
-    return "customer.fullName is required";
-  }
-  if (!body.customer.email || typeof body.customer.email !== "string") {
-    return "customer.email is required";
-  }
-  if (!body.customer.phone || typeof body.customer.phone !== "string") {
-    return "customer.phone is required";
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.customer.email)) {
-    return "customer.email must be a valid email address";
-  }
+  if (!body.clientId || typeof body.clientId !== "string") return "clientId is required";
+  if (!body.serviceId || typeof body.serviceId !== "string") return "serviceId is required";
+  if (!body.startTimeUtc || typeof body.startTimeUtc !== "string") return "startTimeUtc is required";
+  if (!body.customer || typeof body.customer !== "object") return "customer is required";
+  if (!body.customer.fullName || typeof body.customer.fullName !== "string") return "customer.fullName is required";
+  if (!body.customer.email || typeof body.customer.email !== "string") return "customer.email is required";
+  if (!body.customer.phone || typeof body.customer.phone !== "string") return "customer.phone is required";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.customer.email)) return "customer.email must be a valid email address";
   return null;
 }
