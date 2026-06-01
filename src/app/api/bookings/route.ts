@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
 import { isSlotAvailable } from "@/lib/availability";
+import { createCheckoutSession } from "@/lib/square";
 import { addMinutes } from "date-fns";
 import { parseFields, validateFormAnswers, type FormAnswers } from "@/lib/forms";
 
@@ -122,17 +122,21 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      const depositAmount = service.depositAmount
+        ? Number(service.depositAmount)
+        : null;
+      const chargeAmount =
+        service.paymentType === "DEPOSIT" && depositAmount
+          ? depositAmount
+          : Number(service.price);
+
       return {
         conflict: false,
         booking,
         service,
-        chargeAmount:
-          service.paymentType === "DEPOSIT" && service.depositAmount
-            ? Number(service.depositAmount)
-            : Number(service.price),
+        chargeAmount,
         manageToken,
         customerEmail: customer.email,
-        customerName: customer.fullName,
       } as const;
     });
 
@@ -143,25 +147,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create Stripe PaymentIntent outside transaction (Stripe is external)
-    const paymentIntent = await stripe.paymentIntents.create({
+    // Create Square checkout outside transaction (external call)
+    const checkout = await createCheckoutSession({
+      bookingId: result.booking.id,
+      serviceName: result.service.name,
       amount: Math.round(result.chargeAmount * 100),
-      currency: "usd",
-      receipt_email: result.customerEmail,
-      metadata: {
-        bookingId: result.booking.id,
-        clientId,
-        customerName: result.customerName,
-        serviceName: result.service.name,
-      },
+      customerEmail: result.customerEmail,
     });
 
-    // Store Stripe payment reference on booking
+    // Store the payment reference on booking
     await prisma.booking.update({
       where: { id: result.booking.id },
       data: {
-        paymentProvider: "stripe",
-        paymentId: paymentIntent.id,
+        paymentProvider: "square",
+        paymentId: checkout.paymentId,
       },
     });
 
@@ -170,8 +169,8 @@ export async function POST(request: NextRequest) {
       data: {
         clientId,
         bookingId: result.booking.id,
-        provider: "stripe",
-        providerPaymentId: paymentIntent.id,
+        provider: "square",
+        providerPaymentId: checkout.paymentId,
         amount: result.chargeAmount,
         status: "PENDING",
       },
@@ -180,7 +179,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         bookingId: result.booking.id,
-        clientSecret: paymentIntent.client_secret,
+        checkoutUrl: checkout.checkoutUrl,
         manageToken: result.manageToken,
       },
       { status: 201 }
