@@ -1,5 +1,47 @@
 import crypto from "crypto";
 
+function squareBaseUrl() {
+  return process.env.SQUARE_ENVIRONMENT === "production"
+    ? "https://connect.squareup.com"
+    : "https://connect.squareupsandbox.com";
+}
+
+export async function chargeCard({
+  sourceId,
+  amountCents,
+  bookingId,
+  customerEmail,
+}: {
+  sourceId: string;
+  amountCents: number;
+  bookingId: string;
+  customerEmail: string;
+}): Promise<{ paymentId: string }> {
+  const response = await fetch(`${squareBaseUrl()}/v2/payments`, {
+    method: "POST",
+    headers: {
+      "Square-Version": "2024-11-20",
+      Authorization: `Bearer ${process.env.SQUARE_ACCESS_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      source_id: sourceId,
+      idempotency_key: crypto.randomUUID(),
+      amount_money: { amount: amountCents, currency: "USD" },
+      reference_id: bookingId,
+      buyer_email_address: customerEmail,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(`Square charge failed: ${response.status} ${JSON.stringify(err)}`);
+  }
+
+  const data = await response.json();
+  return { paymentId: data.payment.id };
+}
+
 interface CreateCheckoutParams {
   bookingId: string;
   serviceName: string;

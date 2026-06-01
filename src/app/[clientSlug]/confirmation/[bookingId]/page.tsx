@@ -1,42 +1,16 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import Link from "next/link";
 import { CalendarActions } from "./calendar-actions";
 
-async function verifyAndConfirmPayment(paymentIntentId: string, bookingId: string) {
-  try {
-    const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
-    if (pi.status === "succeeded") {
-      await prisma.booking.update({
-        where: { id: bookingId },
-        data: { status: "CONFIRMED", paymentStatus: "PAID", paymentId: paymentIntentId },
-      });
-      await prisma.payment.updateMany({
-        where: { bookingId, providerPaymentId: paymentIntentId },
-        data: { status: "PAID", paidAt: new Date() },
-      });
-    }
-  } catch {
-    // Verification failed — booking stays PENDING_PAYMENT
-  }
-}
-
 export default async function ConfirmationPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ clientSlug: string; bookingId: string }>;
-  searchParams: Promise<{ payment_intent?: string; redirect_status?: string }>;
 }) {
   const { clientSlug, bookingId } = await params;
-  const { payment_intent, redirect_status } = await searchParams;
-
-  if (payment_intent && redirect_status === "succeeded") {
-    await verifyAndConfirmPayment(payment_intent, bookingId);
-  }
 
   const client = await prisma.client.findUnique({
     where: { slug: clientSlug, active: true },

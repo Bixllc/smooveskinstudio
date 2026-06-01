@@ -1,13 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   format,
   startOfToday,
@@ -25,7 +19,11 @@ import {
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+declare global {
+  interface Window {
+    Square?: any;
+  }
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -121,13 +119,7 @@ function StepIndicator({
               >
                 {done ? (
                   <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                    <polyline
-                      points="2,6 5,9 10,3"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                    <polyline points="2,6 5,9 10,3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ) : (
                   n
@@ -135,22 +127,14 @@ function StepIndicator({
               </div>
               <span
                 className={`hidden text-[11px] font-medium sm:inline sm:text-[12px] ${
-                  active
-                    ? "text-[#1a1814]"
-                    : done
-                    ? "text-[#C9A96E]"
-                    : "text-[#9a9890]"
+                  active ? "text-[#1a1814]" : done ? "text-[#C9A96E]" : "text-[#9a9890]"
                 }`}
               >
                 {label}
               </span>
             </button>
             {i < STEPS.length - 1 && (
-              <div
-                className={`h-px w-3 sm:w-6 ${
-                  current > n ? "bg-[#C9A96E]" : "bg-[#e8e6e1]"
-                }`}
-              />
+              <div className={`h-px w-3 sm:w-6 ${current > n ? "bg-[#C9A96E]" : "bg-[#e8e6e1]"}`} />
             )}
           </div>
         );
@@ -163,19 +147,13 @@ function StepIndicator({
 
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function CalendarWidget({
-  selectedDate,
-  onSelect,
-}: {
-  selectedDate: Date | null;
-  onSelect: (d: Date) => void;
-}) {
+function CalendarWidget({ selectedDate, onSelect }: { selectedDate: Date | null; onSelect: (d: Date) => void }) {
   const today = startOfToday();
   const [viewMonth, setViewMonth] = useState(today);
-  const monthStart = startOfMonth(viewMonth);
-  const calStart = startOfWeek(monthStart);
-  const calEnd = endOfWeek(endOfMonth(viewMonth));
-  const days = eachDayOfInterval({ start: calStart, end: calEnd });
+  const days = eachDayOfInterval({
+    start: startOfWeek(startOfMonth(viewMonth)),
+    end: endOfWeek(endOfMonth(viewMonth)),
+  });
 
   return (
     <div>
@@ -185,38 +163,27 @@ function CalendarWidget({
           disabled={isSameMonth(viewMonth, today)}
           className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e8e6e1] bg-white text-[#9a9890] transition-colors hover:border-[#C9A96E] hover:text-[#C9A96E] disabled:cursor-not-allowed disabled:opacity-30"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
         </button>
-        <span className="text-[14px] font-semibold text-[#1a1814]">
-          {format(viewMonth, "MMMM yyyy")}
-        </span>
+        <span className="text-[14px] font-semibold text-[#1a1814]">{format(viewMonth, "MMMM yyyy")}</span>
         <button
           onClick={() => setViewMonth((m) => addMonths(m, 1))}
           className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e8e6e1] bg-white text-[#9a9890] transition-colors hover:border-[#C9A96E] hover:text-[#C9A96E]"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
         </button>
       </div>
-
       <div className="mb-1 grid grid-cols-7">
         {DOW.map((d) => (
-          <div key={d} className="py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-[#9a9890]">
-            {d}
-          </div>
+          <div key={d} className="py-1 text-center text-[10px] font-semibold uppercase tracking-wide text-[#9a9890]">{d}</div>
         ))}
       </div>
-
       <div className="grid grid-cols-7 gap-y-1">
         {days.map((day) => {
           const isPast = isBefore(day, today);
           const isCurrentMonth = isSameMonth(day, viewMonth);
           const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
           const isTodayDay = isToday(day);
-
           return (
             <button
               key={day.toISOString()}
@@ -244,15 +211,7 @@ function CalendarWidget({
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 
 function Sidebar({
-  step,
-  service,
-  slot,
-  timezone,
-  slots,
-  slotsLoading,
-  selectedDate,
-  onGoTo,
-  onSelectSlot,
+  step, service, slot, timezone, slots, slotsLoading, selectedDate, onGoTo, onSelectSlot,
 }: {
   step: 1 | 2 | 3 | 4;
   service: Service | null;
@@ -267,47 +226,26 @@ function Sidebar({
   return (
     <aside className="flex flex-col gap-4">
       <div className="rounded-2xl border border-[#e8e6e1] bg-white p-5 shadow-sm">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#9a9890]">
-          Your Booking
-        </p>
-
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#9a9890]">Your Booking</p>
         <div className="flex items-start justify-between gap-2 border-b border-dashed border-[#e8e6e1] pb-3">
           <div>
             <p className="text-[11px] text-[#9a9890]">Service</p>
-            {service ? (
-              <p className="text-[13px] font-medium text-[#1a1814]">{service.name}</p>
-            ) : (
-              <p className="text-[13px] italic text-[#c0bdb8]">Not selected</p>
-            )}
+            {service ? <p className="text-[13px] font-medium text-[#1a1814]">{service.name}</p> : <p className="text-[13px] italic text-[#c0bdb8]">Not selected</p>}
           </div>
-          {service && step > 1 && (
-            <button onClick={() => onGoTo(1)} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">
-              Change
-            </button>
-          )}
+          {service && step > 1 && <button onClick={() => onGoTo(1)} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">Change</button>}
         </div>
-
         <div className="flex items-start justify-between gap-2 border-b border-dashed border-[#e8e6e1] py-3">
           <div>
             <p className="text-[11px] text-[#9a9890]">Date & Time</p>
             {slot ? (
               <>
-                <p className="text-[13px] font-medium text-[#1a1814]">
-                  {format(toZonedTime(new Date(slot), timezone), "EEEE, MMM d")}
-                </p>
+                <p className="text-[13px] font-medium text-[#1a1814]">{format(toZonedTime(new Date(slot), timezone), "EEEE, MMM d")}</p>
                 <p className="text-[12px] text-[#6b6860]">{formatSlotTime(slot, timezone)}</p>
               </>
-            ) : (
-              <p className="text-[13px] italic text-[#c0bdb8]">Not selected</p>
-            )}
+            ) : <p className="text-[13px] italic text-[#c0bdb8]">Not selected</p>}
           </div>
-          {slot && step > 2 && (
-            <button onClick={() => onGoTo(2)} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">
-              Change
-            </button>
-          )}
+          {slot && step > 2 && <button onClick={() => onGoTo(2)} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">Change</button>}
         </div>
-
         {service && (
           <div className="flex items-baseline justify-between pt-3">
             <p className="text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
@@ -318,16 +256,9 @@ function Sidebar({
 
       {step === 2 && selectedDate && (
         <div className="rounded-2xl border border-[#e8e6e1] bg-white p-5 shadow-sm">
-          <p className="mb-1 text-[12px] font-semibold text-[#1a1814]">
-            {format(selectedDate, "EEEE, MMMM d")}
-          </p>
+          <p className="mb-1 text-[12px] font-semibold text-[#1a1814]">{format(selectedDate, "EEEE, MMMM d")}</p>
           <p className="mb-4 text-[11px] text-[#9a9890]">Available times</p>
-
-          {slotsLoading && (
-            <div className="flex h-24 items-center justify-center">
-              <p className="text-[12px] text-[#9a9890]">Loading…</p>
-            </div>
-          )}
+          {slotsLoading && <div className="flex h-24 items-center justify-center"><p className="text-[12px] text-[#9a9890]">Loading…</p></div>}
           {!slotsLoading && slots.length === 0 && (
             <div className="flex h-24 flex-col items-center justify-center rounded-xl bg-[#f9f8f6]">
               <p className="text-[12px] font-medium text-[#1a1814]">No availability</p>
@@ -337,11 +268,7 @@ function Sidebar({
           {!slotsLoading && slots.length > 0 && (
             <div className="grid grid-cols-2 gap-2">
               {slots.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => onSelectSlot(s)}
-                  className="rounded-xl border border-[#e8e6e1] bg-white py-2 text-[12px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
-                >
+                <button key={s} onClick={() => onSelectSlot(s)} className="rounded-xl border border-[#e8e6e1] bg-white py-2 text-[12px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white">
                   {formatSlotTime(s, timezone)}
                 </button>
               ))}
@@ -364,34 +291,22 @@ function Step1Service({ categories, onSelect }: { categories: Category[]; onSele
       <h2 className="mb-5 text-xl font-bold text-[#1a1814]">Select your service</h2>
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
         {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveCat(cat.id)}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-[12px] font-medium transition-colors ${
-              activeCat === cat.id
-                ? "bg-[#C9A96E] text-white"
-                : "bg-[#f5f4f2] text-[#6b6860] hover:bg-[#C9A96E] hover:text-white"
-            }`}
-          >
+          <button key={cat.id} onClick={() => setActiveCat(cat.id)}
+            className={`shrink-0 rounded-full px-4 py-1.5 text-[12px] font-medium transition-colors ${activeCat === cat.id ? "bg-[#C9A96E] text-white" : "bg-[#f5f4f2] text-[#6b6860] hover:bg-[#C9A96E] hover:text-white"}`}>
             {cat.name}
           </button>
         ))}
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {currentServices.map((service) => (
-          <button
-            key={service.id}
-            onClick={() => onSelect(service)}
-            className="group flex flex-col items-start rounded-2xl border border-[#e8e6e1] bg-white p-5 text-left transition-all hover:border-[#C9A96E] hover:shadow-md active:scale-[0.99]"
-          >
+          <button key={service.id} onClick={() => onSelect(service)}
+            className="group flex flex-col items-start rounded-2xl border border-[#e8e6e1] bg-white p-5 text-left transition-all hover:border-[#C9A96E] hover:shadow-md active:scale-[0.99]">
             <div className="flex w-full items-start justify-between gap-2">
               <p className="text-[14px] font-semibold text-[#1a1814]">{service.name}</p>
               <span className="shrink-0 text-[14px] font-bold text-[#1a1814]">${service.price.toFixed(2)}</span>
             </div>
             <p className="mt-1 text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
-            {service.description && (
-              <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-[#9a9890]">{service.description}</p>
-            )}
+            {service.description && <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-[#9a9890]">{service.description}</p>}
           </button>
         ))}
       </div>
@@ -401,40 +316,20 @@ function Step1Service({ categories, onSelect }: { categories: Category[]; onSele
 
 // ─── Step 2 — Calendar ────────────────────────────────────────────────────────
 
-function Step2Calendar({
-  selectedDate,
-  onDateSelect,
-  slots,
-  slotsLoading,
-  timezone,
-  onSelectSlot,
-}: {
-  selectedDate: Date | null;
-  onDateSelect: (d: Date) => void;
-  slots: string[];
-  slotsLoading: boolean;
-  timezone: string;
-  onSelectSlot: (s: string) => void;
+function Step2Calendar({ selectedDate, onDateSelect, slots, slotsLoading, timezone, onSelectSlot }: {
+  selectedDate: Date | null; onDateSelect: (d: Date) => void; slots: string[];
+  slotsLoading: boolean; timezone: string; onSelectSlot: (s: string) => void;
 }) {
   return (
     <div>
       <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Pick your date & time</h2>
-      <p className="mb-5 text-[13px] text-[#9a9890]">
-        Select a date — available times will appear on the right
-      </p>
+      <p className="mb-5 text-[13px] text-[#9a9890]">Select a date — available times will appear on the right</p>
       <CalendarWidget selectedDate={selectedDate} onSelect={onDateSelect} />
-
       {selectedDate && (
         <div className="mt-6 lg:hidden">
-          <p className="mb-1 text-[13px] font-semibold text-[#1a1814]">
-            {format(selectedDate, "EEEE, MMMM d")}
-          </p>
+          <p className="mb-1 text-[13px] font-semibold text-[#1a1814]">{format(selectedDate, "EEEE, MMMM d")}</p>
           <p className="mb-3 text-[11px] text-[#9a9890]">Available times</p>
-          {slotsLoading && (
-            <div className="flex h-20 items-center justify-center rounded-xl bg-[#f9f8f6]">
-              <p className="text-[12px] text-[#9a9890]">Loading…</p>
-            </div>
-          )}
+          {slotsLoading && <div className="flex h-20 items-center justify-center rounded-xl bg-[#f9f8f6]"><p className="text-[12px] text-[#9a9890]">Loading…</p></div>}
           {!slotsLoading && slots.length === 0 && (
             <div className="flex h-20 flex-col items-center justify-center rounded-xl bg-[#f9f8f6]">
               <p className="text-[12px] font-medium text-[#1a1814]">No availability</p>
@@ -444,11 +339,8 @@ function Step2Calendar({
           {!slotsLoading && slots.length > 0 && (
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
               {slots.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => onSelectSlot(s)}
-                  className="rounded-xl border border-[#e8e6e1] bg-white py-2.5 text-[13px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white"
-                >
+                <button key={s} onClick={() => onSelectSlot(s)}
+                  className="rounded-xl border border-[#e8e6e1] bg-white py-2.5 text-[13px] font-medium text-[#1a1814] transition-all hover:border-[#C9A96E] hover:bg-[#C9A96E] hover:text-white">
                   {formatSlotTime(s, timezone)}
                 </button>
               ))}
@@ -462,16 +354,9 @@ function Step2Calendar({
 
 // ─── Consent Accordion ────────────────────────────────────────────────────────
 
-function ConsentAccordion({
-  businessSettings,
-  signed,
-  onSign,
-  error,
-}: {
-  businessSettings: BusinessSettings;
-  signed: boolean;
-  onSign: (name: string) => void;
-  error?: string;
+function ConsentAccordion({ businessSettings, signed, onSign, error }: {
+  businessSettings: BusinessSettings; signed: boolean;
+  onSign: (name: string) => void; error?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [typedName, setTypedName] = useState("");
@@ -496,14 +381,10 @@ function ConsentAccordion({
       <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
         Consent Form <span className="text-red-400">*</span>
       </label>
-
       <div className={`overflow-hidden rounded-xl border transition-colors ${error ? "border-red-400" : "border-[#e8e6e1]"}`}>
         {/* Header */}
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          className="flex w-full items-center justify-between bg-[#faf9f7] px-4 py-3 text-left transition-colors hover:bg-[#f5f4f2]"
-        >
+        <button type="button" onClick={() => setOpen((o) => !o)}
+          className="flex w-full items-center justify-between bg-[#faf9f7] px-4 py-3 text-left transition-colors hover:bg-[#f5f4f2]">
           <div className="flex items-center gap-2.5">
             {signed ? (
               <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#C9A96E]">
@@ -516,35 +397,24 @@ function ConsentAccordion({
             )}
             <div>
               <p className="text-[13px] font-medium text-[#1a1814]">Studio Policies & Consent</p>
-              {signed && (
+              {signed ? (
                 <p className="text-[11px] text-[#9a9890]">
                   Signed as{" "}
-                  <span style={{ fontFamily: "cursive", fontStyle: "italic", fontSize: "13px", color: "#1a1814" }}>
+                  <span style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontStyle: "italic", fontSize: "14px", color: "#1a1814" }}>
                     {appliedName}
                   </span>
                 </p>
-              )}
-              {!signed && (
+              ) : (
                 <p className="text-[11px] text-[#9a9890]">Click to review and sign</p>
               )}
             </div>
           </div>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#9a9890"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
-          >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9890" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`}>
             <polyline points="6 9 12 15 18 9" />
           </svg>
         </button>
 
-        {/* Expanded content */}
         {open && (
           <div className="border-t border-[#e8e6e1]">
             {/* Policy text */}
@@ -566,41 +436,28 @@ function ConsentAccordion({
               )}
             </div>
 
-            {/* Signature section */}
+            {/* Signature */}
             <div className="border-t border-dashed border-[#e8e6e1] bg-white px-4 py-4">
               <p className="mb-3 text-[12px] font-medium text-[#1a1814]">
-                Sign below to acknowledge you have read and agree to the policies above
+                Type your full name to sign
               </p>
-
-              <div>
-                <label className="mb-1.5 block text-[11px] text-[#9a9890]">
-                  Type your full name
-                </label>
-                <input
-                  type="text"
-                  value={typedName}
-                  onChange={(e) => setTypedName(e.target.value)}
-                  placeholder="Your full name"
-                  className="w-full rounded-xl border border-[#e8e6e1] px-4 py-2.5 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]"
-                />
-              </div>
-
-              {/* Signature preview */}
+              <input
+                type="text"
+                value={typedName}
+                onChange={(e) => setTypedName(e.target.value)}
+                placeholder="Your full name"
+                className="w-full rounded-xl border border-[#e8e6e1] px-4 py-2.5 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]"
+              />
               {typedName.trim() && (
                 <div className="mt-3 rounded-xl border border-dashed border-[#e8e6e1] bg-[#faf9f7] px-4 py-3">
-                  <p className="mb-1 text-[10px] uppercase tracking-widest text-[#9a9890]">
-                    Signature Preview
-                  </p>
-                  <p
-                    className="text-[28px] text-[#1a1814]"
-                    style={{ fontFamily: "'Brush Script MT', 'Segoe Script', cursive", fontStyle: "italic" }}
-                  >
+                  <p className="mb-1.5 text-[10px] uppercase tracking-widest text-[#9a9890]">Signature Preview</p>
+                  <p className="text-[30px] leading-tight text-[#1a1814]"
+                    style={{ fontFamily: "'Brush Script MT','Segoe Script',cursive", fontStyle: "italic" }}>
                     {typedName}
                   </p>
-                  <div className="mt-2 border-t border-[#e8e6e1]" />
+                  <div className="mt-2 border-t border-[#c0bdb8]" />
                 </div>
               )}
-
               <button
                 type="button"
                 onClick={handleApply}
@@ -613,7 +470,6 @@ function ConsentAccordion({
           </div>
         )}
       </div>
-
       {error && <p className="mt-1 text-[11px] text-red-500">{error}</p>}
     </div>
   );
@@ -621,16 +477,9 @@ function ConsentAccordion({
 
 // ─── Step 3 — Your Info + Consent ─────────────────────────────────────────────
 
-function Step3YourInfo({
-  onSubmit,
-  isSubmitting,
-  error,
-  businessSettings,
-}: {
-  onSubmit: (info: CustomerInfo) => void;
-  isSubmitting: boolean;
-  error: string | null;
-  businessSettings: BusinessSettings;
+function Step3YourInfo({ onSubmit, isSubmitting, error, businessSettings }: {
+  onSubmit: (info: CustomerInfo) => void; isSubmitting: boolean;
+  error: string | null; businessSettings: BusinessSettings;
 }) {
   const [form, setForm] = useState<CustomerInfo>({ fullName: "", email: "", phone: "", notes: "" });
   const [signed, setSigned] = useState(false);
@@ -672,22 +521,20 @@ function Step3YourInfo({
           <input type="text" value={form.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="Jane Smith" className={inputCls("fullName")} />
           {errors.fullName && <p className="mt-1 text-[11px] text-red-500">{errors.fullName}</p>}
         </div>
-
         <div>
           <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Email Address <span className="text-red-400">*</span></label>
           <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="jane@example.com" className={inputCls("email")} />
           {errors.email && <p className="mt-1 text-[11px] text-red-500">{errors.email}</p>}
         </div>
-
         <div>
           <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Phone Number <span className="text-red-400">*</span></label>
           <input type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="(682) 555-0100" className={inputCls("phone")} />
           {errors.phone && <p className="mt-1 text-[11px] text-red-500">{errors.phone}</p>}
         </div>
-
         <div>
           <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Notes <span className="font-normal text-[#c0bdb8]">(optional)</span></label>
-          <textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any skin sensitivities, preferences, or questions…" rows={3} className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]" />
+          <textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any skin sensitivities, preferences, or questions…" rows={3}
+            className="w-full resize-none rounded-xl border border-[#e8e6e1] px-4 py-3 text-[13px] text-[#1a1814] outline-none transition-colors placeholder:text-[#c0bdb8] focus:border-[#C9A96E]" />
         </div>
 
         <ConsentAccordion
@@ -699,149 +546,147 @@ function Step3YourInfo({
 
         {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">{error}</div>}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f] disabled:opacity-60"
-        >
+        <button type="submit" disabled={isSubmitting}
+          className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f] disabled:opacity-60">
           {isSubmitting ? "Preparing payment…" : "Continue to Payment →"}
         </button>
 
-        <p className="text-center text-[11px] text-[#9a9890]">
-          You&apos;ll enter your card details on the next step
-        </p>
+        <p className="text-center text-[11px] text-[#9a9890]">You&apos;ll enter your card details on the next step</p>
       </form>
     </div>
   );
 }
 
-// ─── Step 4 — Payment ─────────────────────────────────────────────────────────
+// ─── Step 4 — Square Payment ──────────────────────────────────────────────────
 
-function PaymentForm({
-  amount,
-  bookingId,
-  clientSlug,
-  isSubmitting,
-  setIsSubmitting,
-  submitError,
-  setSubmitError,
-}: {
-  amount: number;
-  bookingId: string;
-  clientSlug: string;
-  isSubmitting: boolean;
-  setIsSubmitting: (v: boolean) => void;
-  submitError: string | null;
-  setSubmitError: (v: string | null) => void;
+function Step4Payment({ bookingId, clientSlug, chargeAmount }: {
+  bookingId: string; clientSlug: string; chargeAmount: number;
 }) {
-  const stripe = useStripe();
-  const elements = useElements();
+  const router = useRouter();
+  const cardRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [sdkReady, setSdkReady] = useState(false);
+  const [cardMounted, setCardMounted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load Square.js
+  useEffect(() => {
+    if (window.Square) { setSdkReady(true); return; }
+    const existing = document.querySelector('script[data-square-sdk]');
+    if (existing) { existing.addEventListener("load", () => setSdkReady(true)); return; }
+    const script = document.createElement("script");
+    const isProd = process.env.NEXT_PUBLIC_SQUARE_ENVIRONMENT === "production";
+    script.src = isProd
+      ? "https://web.squarecdn.com/v1/square.js"
+      : "https://sandbox.web.squarecdn.com/v1/square.js";
+    script.setAttribute("data-square-sdk", "true");
+    script.onload = () => setSdkReady(true);
+    script.onerror = () => setError("Could not load payment form. Please refresh the page.");
+    document.head.appendChild(script);
+  }, []);
+
+  // Mount card form
+  useEffect(() => {
+    if (!sdkReady || cardMounted || !window.Square) return;
+
+    async function mountCard() {
+      try {
+        const appId = process.env.NEXT_PUBLIC_SQUARE_APP_ID;
+        const locationId = process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID;
+        if (!appId || !locationId) {
+          setError("Payment is not configured yet. Please contact the studio.");
+          return;
+        }
+        const payments = window.Square.payments(appId, locationId);
+        const card = await payments.card({
+          style: {
+            ".input-container": { borderRadius: "12px" },
+            ".input-container.is-focus": { borderColor: "#C9A96E" },
+            ".input-container.is-error": { borderColor: "#ef4444" },
+            ".message-text": { color: "#6b6860" },
+            ".message-icon": { color: "#6b6860" },
+          },
+        });
+        await card.attach("#square-card-container");
+        cardRef.current = card;
+        setCardMounted(true);
+      } catch (e) {
+        setError("Could not load card form. Please refresh and try again.");
+      }
+    }
+
+    mountCard();
+  }, [sdkReady, cardMounted]);
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!cardRef.current || isSubmitting) return;
     setIsSubmitting(true);
-    setSubmitError(null);
+    setError(null);
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/${clientSlug}/confirmation/${bookingId}`,
-      },
+    const result = await cardRef.current.tokenize();
+    if (result.status !== "OK") {
+      setError(result.errors?.[0]?.message ?? "Card validation failed. Please check your details.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const res = await fetch("/api/payments/square", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sourceId: result.token, bookingId }),
     });
 
-    if (error) {
-      setSubmitError(error.message ?? "Payment failed. Please try again.");
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Payment failed. Please try again.");
       setIsSubmitting(false);
+      return;
     }
-    // On success, Stripe redirects automatically
+
+    router.push(`/${clientSlug}/confirmation/${bookingId}`);
   }
 
   return (
-    <form onSubmit={handlePay} className="space-y-5">
-      <div className="overflow-hidden rounded-xl border border-[#e8e6e1] p-4">
-        <PaymentElement options={{ layout: "tabs" }} />
-      </div>
-
-      {submitError && (
-        <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">
-          {submitError}
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={!stripe || isSubmitting}
-        className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f] disabled:opacity-60"
-      >
-        {isSubmitting ? "Processing…" : `Pay $${amount.toFixed(2)} →`}
-      </button>
-
-      <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-[#9a9890]">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-        Secured by Stripe. Your card info is never stored on our servers.
-      </p>
-    </form>
-  );
-}
-
-function Step4Payment({
-  clientSecret,
-  service,
-  bookingId,
-  clientSlug,
-  isSubmitting,
-  setIsSubmitting,
-  submitError,
-  setSubmitError,
-}: {
-  clientSecret: string;
-  service: Service;
-  bookingId: string;
-  clientSlug: string;
-  isSubmitting: boolean;
-  setIsSubmitting: (v: boolean) => void;
-  submitError: string | null;
-  setSubmitError: (v: string | null) => void;
-}) {
-  return (
     <div>
       <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Payment</h2>
-      <p className="mb-6 text-[13px] text-[#9a9890]">
-        Enter your card details to confirm your appointment
-      </p>
+      <p className="mb-6 text-[13px] text-[#9a9890]">Enter your card details to confirm your appointment</p>
 
-      <Elements
-        stripe={stripePromise}
-        options={{
-          clientSecret,
-          appearance: {
-            theme: "stripe",
-            variables: {
-              colorPrimary: "#C9A96E",
-              colorBackground: "#ffffff",
-              colorText: "#1a1814",
-              colorDanger: "#ef4444",
-              fontFamily: "inherit",
-              borderRadius: "12px",
-              spacingUnit: "4px",
-            },
-          },
-        }}
-      >
-        <PaymentForm
-          amount={service.price}
-          bookingId={bookingId}
-          clientSlug={clientSlug}
-          isSubmitting={isSubmitting}
-          setIsSubmitting={setIsSubmitting}
-          submitError={submitError}
-          setSubmitError={setSubmitError}
-        />
-      </Elements>
+      <form onSubmit={handlePay} className="space-y-5">
+        {/* Square card container */}
+        <div>
+          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">Card Details</label>
+          <div
+            ref={containerRef}
+            id="square-card-container"
+            className="min-h-[88px] rounded-xl border border-[#e8e6e1] bg-white p-3"
+          />
+          {!cardMounted && !error && (
+            <p className="mt-2 text-center text-[12px] text-[#9a9890]">Loading payment form…</p>
+          )}
+        </div>
+
+        {error && (
+          <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">{error}</div>
+        )}
+
+        <button
+          type="submit"
+          disabled={!cardMounted || isSubmitting}
+          className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f] disabled:opacity-60"
+        >
+          {isSubmitting ? "Processing…" : `Pay $${chargeAmount.toFixed(2)} →`}
+        </button>
+
+        <p className="flex items-center justify-center gap-1.5 text-center text-[11px] text-[#9a9890]">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          Secured by Square. Your card info is never stored on our servers.
+        </p>
+      </form>
     </div>
   );
 }
@@ -859,8 +704,8 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [paymentClientSecret, setPaymentClientSecret] = useState<string | null>(null);
   const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
+  const [chargeAmount, setChargeAmount] = useState<number>(0);
 
   useEffect(() => {
     if (!selectedDate || !service || step !== 2) return;
@@ -920,8 +765,8 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
         setIsSubmitting(false);
         return;
       }
-      setPaymentClientSecret(data.clientSecret);
       setPendingBookingId(data.bookingId);
+      setChargeAmount(data.chargeAmount);
       setIsSubmitting(false);
       setStep(4);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -934,10 +779,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
   return (
     <div>
       {/* Step indicator — full bleed */}
-      <div
-        className="border-b border-[#e8e6e1] bg-white py-3"
-        style={{ width: "100vw", marginLeft: "calc(50% - 50vw)" }}
-      >
+      <div className="border-b border-[#e8e6e1] bg-white py-3" style={{ width: "100vw", marginLeft: "calc(50% - 50vw)" }}>
         <StepIndicator current={step} onGoTo={handleGoTo} />
       </div>
 
@@ -946,17 +788,13 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
             {/* Left */}
             <div className="rounded-2xl border border-[#e8e6e1] bg-white p-6 shadow-sm">
-              {step === 1 && (
-                <Step1Service categories={categories} onSelect={handleSelectService} />
-              )}
+              {step === 1 && <Step1Service categories={categories} onSelect={handleSelectService} />}
 
               {step === 2 && service && (
                 <>
                   <div className="mb-5 flex items-center gap-2">
                     <button onClick={() => handleGoTo(1)} className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="15 18 9 12 15 6" />
-                      </svg>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                       Back
                     </button>
                     <span className="text-[#e8e6e1]">·</span>
@@ -965,14 +803,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                       {formatDuration(service.durationMinutes)} · ${service.price.toFixed(2)}
                     </span>
                   </div>
-                  <Step2Calendar
-                    selectedDate={selectedDate}
-                    onDateSelect={setSelectedDate}
-                    slots={slots}
-                    slotsLoading={slotsLoading}
-                    timezone={timezone}
-                    onSelectSlot={handleSelectSlot}
-                  />
+                  <Step2Calendar selectedDate={selectedDate} onDateSelect={setSelectedDate} slots={slots} slotsLoading={slotsLoading} timezone={timezone} onSelectSlot={handleSelectSlot} />
                 </>
               )}
 
@@ -980,9 +811,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                 <>
                   <div className="mb-5 flex items-center gap-2">
                     <button onClick={() => handleGoTo(2)} className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="15 18 9 12 15 6" />
-                      </svg>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                       Back
                     </button>
                     {slot && (
@@ -994,25 +823,16 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                       </>
                     )}
                   </div>
-                  <Step3YourInfo
-                    onSubmit={handleStep3Submit}
-                    isSubmitting={isSubmitting}
-                    error={submitError}
-                    businessSettings={businessSettings}
-                  />
+                  <Step3YourInfo onSubmit={handleStep3Submit} isSubmitting={isSubmitting} error={submitError} businessSettings={businessSettings} />
                 </>
               )}
 
-              {step === 4 && paymentClientSecret && pendingBookingId && service && (
+              {step === 4 && pendingBookingId && (
                 <>
                   <div className="mb-5 flex items-center gap-2">
-                    <button
-                      onClick={() => { handleGoTo(3); setSubmitError(null); }}
-                      className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]"
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="15 18 9 12 15 6" />
-                      </svg>
+                    <button onClick={() => { handleGoTo(3); setSubmitError(null); }}
+                      className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                       Back
                     </button>
                     {slot && (
@@ -1024,33 +844,14 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                       </>
                     )}
                   </div>
-                  <Step4Payment
-                    clientSecret={paymentClientSecret}
-                    service={service}
-                    bookingId={pendingBookingId}
-                    clientSlug={clientSlug}
-                    isSubmitting={isSubmitting}
-                    setIsSubmitting={setIsSubmitting}
-                    submitError={submitError}
-                    setSubmitError={setSubmitError}
-                  />
+                  <Step4Payment bookingId={pendingBookingId} clientSlug={clientSlug} chargeAmount={chargeAmount} />
                 </>
               )}
             </div>
 
             {/* Right: sidebar */}
             <div className="hidden lg:block">
-              <Sidebar
-                step={step}
-                service={service}
-                slot={slot}
-                timezone={timezone}
-                slots={slots}
-                slotsLoading={slotsLoading}
-                selectedDate={selectedDate}
-                onGoTo={handleGoTo}
-                onSelectSlot={handleSelectSlot}
-              />
+              <Sidebar step={step} service={service} slot={slot} timezone={timezone} slots={slots} slotsLoading={slotsLoading} selectedDate={selectedDate} onGoTo={handleGoTo} onSelectSlot={handleSelectSlot} />
             </div>
           </div>
         </div>
@@ -1062,15 +863,11 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[13px] font-semibold text-[#1a1814]">{service.name}</p>
-              <p className="text-[12px] text-[#9a9890]">
-                {formatDuration(service.durationMinutes)} · ${service.price.toFixed(2)}
-              </p>
+              <p className="text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)} · ${service.price.toFixed(2)}</p>
             </div>
             {slot && (
               <div className="text-right">
-                <p className="text-[12px] text-[#6b6860]">
-                  {format(toZonedTime(new Date(slot), timezone), "MMM d")}
-                </p>
+                <p className="text-[12px] text-[#6b6860]">{format(toZonedTime(new Date(slot), timezone), "MMM d")}</p>
                 <p className="text-[12px] font-medium text-[#1a1814]">{formatSlotTime(slot, timezone)}</p>
               </div>
             )}

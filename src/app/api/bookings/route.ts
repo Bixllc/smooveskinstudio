@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
 import { isSlotAvailable } from "@/lib/availability";
 import { addMinutes } from "date-fns";
 import { parseFields, validateFormAnswers, type FormAnswers } from "@/lib/forms";
@@ -105,19 +104,13 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      const chargeAmount =
-        service.paymentType === "DEPOSIT" && service.depositAmount
-          ? Number(service.depositAmount)
-          : Number(service.price);
-
       return {
         conflict: false,
-        booking,
-        service,
-        chargeAmount,
+        bookingId: booking.id,
         manageToken,
-        customerEmail: customer.email,
-        customerName: customer.fullName,
+        servicePrice: Number(service.price),
+        serviceDepositAmount: service.depositAmount ? Number(service.depositAmount) : null,
+        paymentType: service.paymentType,
       } as const;
     });
 
@@ -128,40 +121,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(result.chargeAmount * 100),
-      currency: "usd",
-      receipt_email: result.customerEmail,
-      metadata: {
-        bookingId: result.booking.id,
-        clientId,
-        customerName: result.customerName,
-        serviceName: result.service.name,
-      },
-    });
-
-    await prisma.booking.update({
-      where: { id: result.booking.id },
-      data: { paymentProvider: "stripe", paymentId: paymentIntent.id },
-    });
-
-    await prisma.payment.create({
-      data: {
-        clientId,
-        bookingId: result.booking.id,
-        provider: "stripe",
-        providerPaymentId: paymentIntent.id,
-        amount: result.chargeAmount,
-        status: "PENDING",
-      },
-    });
+    const chargeAmount =
+      result.paymentType === "DEPOSIT" && result.serviceDepositAmount
+        ? result.serviceDepositAmount
+        : result.servicePrice;
 
     return NextResponse.json(
-      {
-        bookingId: result.booking.id,
-        clientSecret: paymentIntent.client_secret,
-        manageToken: result.manageToken,
-      },
+      { bookingId: result.bookingId, manageToken: result.manageToken, chargeAmount },
       { status: 201 }
     );
   } catch (error) {
