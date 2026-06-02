@@ -1,48 +1,59 @@
+import Image from "next/image";
+
 const offers = [
   {
     name: "BushBalm Aftercare",
     discount: "20% OFF",
     url: "https://bushbalm.superfiliate.com/SMOOVESKIN",
+    logo: "/images/partners/bushbalm.png",
   },
   {
     name: "BushBalm Pro",
     discount: "$50 off",
     url: "https://pros.bushbalm.com/?ll_ref_id=5ogyvV0SO",
+    logo: "/images/partners/bushbalm.png",
   },
   {
     name: "Wax Wax",
     discount: "30% OFF",
     code: "SSSVIP",
     url: "https://www.waxwax.com/?rfsn=7811340.776d3a",
+    logo: "/images/partners/waxwax.png",
   },
   {
     name: "Tress Wellness Bikini Star Wax",
     url: "https://www.amazon.com/dp/B09XRB7YWH/ref=cm_sw_r_as_gl_api_gl_i_B5KG99WCEGPP505Y41BT?linkCode=ml1&tag=anishas17-20&th=1",
+    logo: "/images/partners/tresswellness.png",
   },
   {
     name: "Tress Wellness Waxing Kit",
     url: "https://www.amazon.com/dp/B0B8RT97ZL/ref=cm_sw_r_as_gl_api_gl_i_DYWCGKSD1MXWKXEX9PB7?linkCode=ml1&tag=anishas17-20",
+    logo: "/images/partners/tresswellness.png",
   },
   {
     name: "Honeycomb Wax",
     discount: "10% OFF",
     code: "SSS10",
     url: "https://honeycombwaxco.com/?ref=AnishaD&utm_source=affiliate",
+    logo: "/images/partners/honeycombwax.png",
   },
   {
     name: "Indulge Wax",
     discount: "10% OFF",
     code: "Smooveskin",
     url: "https://www.indulgewax.com/?sca_ref=4973353.sXK76wzuE5",
+    logo: "/images/partners/indulgewax.png",
   },
   {
-    name: "NovaWax - Luxury Wax",
+    name: "NovaWax",
     url: "https://nova-wax.com/?rfsn=7802111.a1bedb",
+    logo: "/images/partners/novawax.jpg",
   },
   {
     name: "Waxness",
     code: "Smooveskin",
     url: "https://waxness.com/hard-wax/147-polymer-blend-premium-luxury-hard-wax-beads-russian-pearl-22-lb-3527-oz.html",
+    logo: "/images/partners/waxness.png",
   },
 ];
 
@@ -61,19 +72,31 @@ export default function PartnerOffers() {
               className="bg-white rounded-2xl shadow-sm p-7 flex flex-col justify-between"
             >
               <div>
+                {/* Logo */}
+                <div className="mb-5 h-14 flex items-center">
+                  <Image
+                    src={offer.logo}
+                    alt={offer.name}
+                    width={160}
+                    height={56}
+                    className="max-h-12 w-auto object-contain"
+                    onError={() => {}}
+                  />
+                </div>
+
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="text-lg font-medium text-[var(--color-text)]">
+                  <h3 className="text-base font-medium text-[var(--color-text)]">
                     {offer.name}
                   </h3>
-                  {offer.discount && (
+                  {"discount" in offer && offer.discount && (
                     <span className="shrink-0 text-xs font-medium text-[var(--color-primary-dark)] border border-[var(--color-border)] rounded-full px-3 py-1">
                       {offer.discount}
                     </span>
                   )}
                 </div>
-                {offer.code && (
+                {"code" in offer && offer.code && (
                   <p className="text-sm text-[var(--color-text-light)]">
-                    Code: {offer.code}
+                    Code: <span className="font-medium text-[var(--color-text)]">{offer.code}</span>
                   </p>
                 )}
               </div>

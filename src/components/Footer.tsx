@@ -94,7 +94,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#book" className="text-sm text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors">
+                <a href="/smooveskinstudio/book" className="text-sm text-[var(--color-text-light)] hover:text-[var(--color-primary)] transition-colors">
                   Book Online
                 </a>
               </li>

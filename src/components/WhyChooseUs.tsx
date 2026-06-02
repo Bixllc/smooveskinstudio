@@ -30,7 +30,7 @@ export default function WhyChooseUs() {
       <div className="max-w-[1320px] mx-auto px-4 md:px-10">
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-border)] text-xs font-medium tracking-widest uppercase text-[var(--color-text-light)]">
+          <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]">
             Why Choose Us
           </span>
           <h2 className="mt-6 font-light text-2xl sm:text-3xl md:text-5xl tracking-tight text-[var(--color-text)]">
