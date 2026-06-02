@@ -53,7 +53,7 @@ const offers = [
     name: "Waxness",
     code: "Smooveskin",
     url: "https://waxness.com/hard-wax/147-polymer-blend-premium-luxury-hard-wax-beads-russian-pearl-22-lb-3527-oz.html",
-    logo: "/images/partners/waxness.png",
+    logo: "/images/partners/waxness.jpg",
   },
 ];
 
