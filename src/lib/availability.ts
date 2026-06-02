@@ -105,10 +105,12 @@ export async function getAvailableSlots(
 
 /**
  * Checks if a specific slot is still available. Use inside a transaction to prevent races.
+ * Pass excludeBookingId to ignore the current booking (used when rescheduling).
  */
 export async function isSlotAvailable(
   params: IsSlotAvailableParams,
-  tx?: typeof prisma
+  tx?: typeof prisma,
+  excludeBookingId?: string
 ): Promise<boolean> {
   const db = tx || prisma;
   const { clientId, serviceId, startTimeUtc } = params;
@@ -126,6 +128,7 @@ export async function isSlotAvailable(
   const overlappingBooking = await db.booking.findFirst({
     where: {
       clientId,
+      ...(excludeBookingId ? { id: { not: excludeBookingId } } : {}),
       status: { notIn: ["CANCELLED", "RESCHEDULED"] },
       startTimeUtc: { lt: blockEnd },
       endTimeUtc: { gt: blockStart },

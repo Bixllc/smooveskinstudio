@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import Link from "next/link";
 import { CancelButton } from "./cancel-button";
+import { RescheduleButton } from "./reschedule-button";
 
 export default async function ManagePage({
   searchParams,
@@ -17,10 +18,11 @@ export default async function ManagePage({
   const booking = await prisma.booking.findUnique({
     where: { manageToken: token },
     include: {
-      service: { select: { name: true, durationMinutes: true, price: true } },
+      service: { select: { id: true, name: true, durationMinutes: true, price: true } },
       customer: { select: { fullName: true, email: true } },
       client: {
         select: {
+          id: true,
           slug: true,
           businessSettings: {
             select: { timezone: true, address: true, cancellationPolicy: true, phone: true },
@@ -142,18 +144,13 @@ export default async function ManagePage({
           {/* Actions */}
           {!isCancelled && !isPast && (
             <div className="mt-6 flex flex-col gap-3">
+              <RescheduleButton
+                token={token}
+                clientId={booking.client.id}
+                serviceId={booking.service.id}
+                timezone={booking.client.businessSettings?.timezone ?? "America/Chicago"}
+              />
               <CancelButton token={token} clientSlug={clientSlug} />
-              {booking.client.businessSettings?.phone && (
-                <p className="text-center text-[12px] text-[#9a9890]">
-                  To reschedule, call us at{" "}
-                  <a
-                    href={`tel:${booking.client.businessSettings.phone}`}
-                    className="font-medium text-[#1a1814] hover:text-[#C9A96E]"
-                  >
-                    {booking.client.businessSettings.phone}
-                  </a>
-                </p>
-              )}
             </div>
           )}
 

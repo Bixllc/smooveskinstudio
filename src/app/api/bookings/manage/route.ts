@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isSlotAvailable } from "@/lib/availability";
+import { addMinutes } from "date-fns";
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
@@ -15,6 +17,7 @@ export async function GET(request: NextRequest) {
       customer: { select: { fullName: true, email: true } },
       client: {
         select: {
+          id: true,
           slug: true,
           businessSettings: { select: { timezone: true, address: true, cancellationPolicy: true } },
         },
@@ -31,7 +34,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, action } = await request.json();
+    const body = await request.json();
+    const { token, action, newStartTimeUtc } = body;
 
     if (!token || !action) {
       return NextResponse.json({ error: "token and action are required" }, { status: 400 });
@@ -39,6 +43,10 @@ export async function POST(request: NextRequest) {
 
     const booking = await prisma.booking.findUnique({
       where: { manageToken: token },
+      include: {
+        service: { select: { durationMinutes: true } },
+        client: { select: { id: true } },
+      },
     });
 
     if (!booking) {
@@ -50,17 +58,52 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "cancel") {
-      // Allow cancellation only if booking is CONFIRMED or PENDING_PAYMENT
       if (!["CONFIRMED", "PENDING_PAYMENT"].includes(booking.status)) {
-        return NextResponse.json(
-          { error: "This booking cannot be cancelled" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "This booking cannot be cancelled" }, { status: 400 });
       }
 
       await prisma.booking.update({
         where: { id: booking.id },
         data: { status: "CANCELLED" },
+      });
+
+      return NextResponse.json({ success: true });
+    }
+
+    if (action === "reschedule") {
+      if (!newStartTimeUtc || typeof newStartTimeUtc !== "string") {
+        return NextResponse.json({ error: "newStartTimeUtc is required" }, { status: 400 });
+      }
+
+      if (!["CONFIRMED", "PENDING_PAYMENT"].includes(booking.status)) {
+        return NextResponse.json({ error: "This booking cannot be rescheduled" }, { status: 400 });
+      }
+
+      const newStart = new Date(newStartTimeUtc);
+      if (isNaN(newStart.getTime())) {
+        return NextResponse.json({ error: "Invalid newStartTimeUtc" }, { status: 400 });
+      }
+
+      const newEnd = addMinutes(newStart, booking.service.durationMinutes);
+
+      // Check availability — temporarily exclude this booking from conflict check
+      const available = await isSlotAvailable(
+        { clientId: booking.clientId, serviceId: booking.serviceId, startTimeUtc: newStart },
+        undefined,
+        booking.id // exclude current booking
+      );
+
+      if (!available) {
+        return NextResponse.json({ error: "That time slot is no longer available" }, { status: 409 });
+      }
+
+      await prisma.booking.update({
+        where: { id: booking.id },
+        data: {
+          startTimeUtc: newStart,
+          endTimeUtc: newEnd,
+          status: "CONFIRMED",
+        },
       });
 
       return NextResponse.json({ success: true });
