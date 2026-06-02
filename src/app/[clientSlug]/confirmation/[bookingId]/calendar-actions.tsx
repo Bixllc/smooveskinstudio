@@ -32,7 +32,8 @@ export function CalendarActions({
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#e8e6e1] bg-white py-3 text-[13px] font-medium text-[#1a1814] transition-colors hover:border-[#C9A96E] hover:bg-[#faf9f7]"
       >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {/* Calendar icon — gold */}
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C9A96E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" />
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
@@ -56,6 +57,7 @@ export function CalendarActions({
 
       {open && (
         <div className="absolute left-0 right-0 top-full z-10 mt-1 overflow-hidden rounded-xl border border-[#e8e6e1] bg-white shadow-lg">
+          {/* Google Calendar */}
           <a
             href={gcalUrl}
             target="_blank"
@@ -72,17 +74,20 @@ export function CalendarActions({
             </svg>
             Google Calendar
           </a>
+
+          {/* Apple Calendar / iCal — works on macOS + iOS */}
           <button
             onClick={downloadIcs}
-            className="flex w-full items-center gap-3 px-4 py-3 text-[13px] text-[#1a1814] transition-colors hover:bg-[#faf9f7]"
+            className="flex w-full items-center gap-3 border-t border-[#f0ede8] px-4 py-3 text-[13px] text-[#1a1814] transition-colors hover:bg-[#faf9f7]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <rect x="3" y="4" width="18" height="18" rx="2" fill="#1a1814" />
               <line x1="16" y1="2" x2="16" y2="6" stroke="white" strokeWidth="2" strokeLinecap="round" />
               <line x1="8" y1="2" x2="8" y2="6" stroke="white" strokeWidth="2" strokeLinecap="round" />
               <line x1="3" y1="10" x2="21" y2="10" stroke="white" strokeWidth="1.5" />
+              <circle cx="12" cy="16" r="2.5" fill="white" />
             </svg>
-            Apple Calendar / iCal
+            Apple Calendar
           </button>
         </div>
       )}
