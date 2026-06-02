@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
+import { IconChevronRight } from "@tabler/icons-react";
 
 interface SettingsForm {
   businessName: string;
@@ -186,6 +188,29 @@ export default function SettingsPage() {
             >
               {saving ? "Saving…" : "Save settings"}
             </button>
+
+            {/* Sub-settings links */}
+            <div className="rounded-xl border border-[#e8e6e1] bg-white overflow-hidden">
+              <p className="border-b border-[#e8e6e1] px-5 py-3 text-[12px] font-medium text-[#1a1814]">
+                Advanced Settings
+              </p>
+              {[
+                { href: "/admin/settings/scheduling", label: "Scheduling Limits", description: "Min lead time, max days out, cancel/reschedule rules" },
+                { href: "/admin/settings/alerts", label: "Booking Alerts", description: "Email notifications for new bookings, cancellations, reschedules" },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center justify-between border-b border-[#e8e6e1] px-5 py-3 last:border-b-0 hover:bg-[#faf9f7] transition-colors"
+                >
+                  <div>
+                    <p className="text-[12px] font-medium text-[#1a1814]">{item.label}</p>
+                    <p className="text-[10px] text-[#9a9890]">{item.description}</p>
+                  </div>
+                  <IconChevronRight size={14} className="text-[#9a9890]" />
+                </Link>
+              ))}
+            </div>
           </form>
         )}
       </div>

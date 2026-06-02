@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { BlockTimeModal } from "@/components/admin/block-time-modal";
 
 const HOURS = Array.from({ length: 24 }, (_, i) => {
   const h = i.toString().padStart(2, "0");
@@ -27,12 +31,25 @@ interface DaySchedule {
 
 export default function AvailabilityPage() {
   const qc = useQueryClient();
+  const [showBlockModal, setShowBlockModal] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["availability"],
     queryFn: () =>
       fetch("/api/admin/availability").then((r) => r.json()),
   });
+
+  const { data: blockedTimesData, refetch: refetchBlocked } = useQuery({
+    queryKey: ["blocked-times"],
+    queryFn: () => fetch("/api/admin/blocked-times").then((r) => r.json()),
+  });
+
+  const { data: settingsData } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => fetch("/api/admin/settings").then((r) => r.json()),
+  });
+
+  const timezone = settingsData?.timezone ?? "America/Chicago";
 
   const [schedule, setSchedule] = useState<DaySchedule[]>([]);
 
@@ -157,7 +174,71 @@ export default function AvailabilityPage() {
             ))}
           </div>
         )}
+
+        {/* Blocked Times */}
+        <div className="mt-8 max-w-xl">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[12px] font-medium text-[#1a1814]">Blocked Times</p>
+            <button
+              onClick={() => setShowBlockModal(true)}
+              className="flex h-[26px] items-center gap-1.5 rounded-full border border-[#e8e6e1] px-2.5 text-[11px] text-[#6b6860] hover:border-[#C9A96E] hover:text-[#C9A96E] transition-colors"
+            >
+              <IconPlus size={11} />
+              Block Time
+            </button>
+          </div>
+
+          {!blockedTimesData || blockedTimesData.length === 0 ? (
+            <p className="text-[11px] text-[#9a9890]">No blocked times.</p>
+          ) : (
+            <div className="space-y-1.5">
+              {(blockedTimesData as any[]).map((bt: any) => {
+                const localStart = toZonedTime(new Date(bt.startTimeUtc), timezone);
+                const localEnd = toZonedTime(new Date(bt.endTimeUtc), timezone);
+                return (
+                  <div
+                    key={bt.id}
+                    className="flex items-center justify-between rounded-lg border border-[#e8e6e1] bg-white px-4 py-2.5"
+                  >
+                    <div>
+                      <p className="text-[12px] font-medium text-[#1a1814]">
+                        {format(localStart, "EEE, MMM d, yyyy")}
+                      </p>
+                      <p className="text-[11px] text-[#9a9890]">
+                        {format(localStart, "h:mm a")} – {format(localEnd, "h:mm a")}
+                        {bt.reason ? ` · ${bt.reason}` : ""}
+                      </p>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        const res = await fetch(`/api/admin/blocked-times/${bt.id}`, {
+                          method: "DELETE",
+                        });
+                        if (res.ok) {
+                          toast.success("Blocked time removed");
+                          refetchBlocked();
+                        } else {
+                          toast.error("Failed to delete");
+                        }
+                      }}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-[#9a9890] hover:bg-red-50 hover:text-red-500 transition-colors"
+                    >
+                      <IconTrash size={13} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
+
+      {showBlockModal && (
+        <BlockTimeModal
+          onClose={() => setShowBlockModal(false)}
+          onSuccess={() => refetchBlocked()}
+        />
+      )}
     </div>
   );
 }

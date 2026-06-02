@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
                 latePolicy: true,
                 noShowPolicy: true,
                 depositPolicy: true,
+                alertNewBooking: true,
               },
             },
           },
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      if (biz?.email) {
+      if (biz?.email && biz.alertNewBooking !== false) {
         await sendAdminNotificationEmail({
           adminEmail: biz.email,
           customerName: booking.customer.fullName,

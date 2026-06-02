@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isSlotAvailable } from "@/lib/availability";
 import { addMinutes } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
+import { format } from "date-fns";
+import { sendAdminNotificationEmail } from "@/lib/email";
 
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
@@ -44,8 +47,24 @@ export async function POST(request: NextRequest) {
     const booking = await prisma.booking.findUnique({
       where: { manageToken: token },
       include: {
-        service: { select: { durationMinutes: true } },
-        client: { select: { id: true } },
+        service: { select: { durationMinutes: true, name: true } },
+        customer: { select: { fullName: true, email: true, phone: true } },
+        client: {
+          select: {
+            id: true,
+            businessSettings: {
+              select: {
+                allowClientCancel: true,
+                allowClientReschedule: true,
+                cancelRescheduleWindowHours: true,
+                alertCancellation: true,
+                alertReschedule: true,
+                email: true,
+                timezone: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -57,7 +76,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Booking is already cancelled" }, { status: 400 });
     }
 
+    const biz = booking.client.businessSettings;
+    const windowHours = biz?.cancelRescheduleWindowHours ?? 24;
+    const hoursUntilAppointment = (booking.startTimeUtc.getTime() - Date.now()) / (1000 * 60 * 60);
+
     if (action === "cancel") {
+      if (biz?.allowClientCancel === false) {
+        return NextResponse.json({ error: "Cancellations are not allowed online" }, { status: 400 });
+      }
+
+      if (hoursUntilAppointment < windowHours) {
+        return NextResponse.json(
+          { error: `Cannot cancel within ${windowHours} hours of appointment` },
+          { status: 400 }
+        );
+      }
+
       if (!["CONFIRMED", "PENDING_PAYMENT"].includes(booking.status)) {
         return NextResponse.json({ error: "This booking cannot be cancelled" }, { status: 400 });
       }
@@ -67,12 +101,41 @@ export async function POST(request: NextRequest) {
         data: { status: "CANCELLED" },
       });
 
+      // Send admin cancellation notification
+      try {
+        if (biz?.email && biz.alertCancellation !== false) {
+          const tz = biz.timezone ?? "America/Chicago";
+          const zonedStart = toZonedTime(booking.startTimeUtc, tz);
+          const dateTimeStr = format(zonedStart, "EEEE, MMMM d, yyyy 'at' h:mm a");
+          await sendAdminNotificationEmail({
+            adminEmail: biz.email,
+            customerName: booking.customer.fullName,
+            customerEmail: booking.customer.email,
+            customerPhone: booking.customer.phone ?? undefined,
+            serviceName: booking.service.name,
+            dateTime: `CANCELLED — ${dateTimeStr}`,
+            bookingId: booking.id,
+          });
+        }
+      } catch {}
+
       return NextResponse.json({ success: true });
     }
 
     if (action === "reschedule") {
       if (!newStartTimeUtc || typeof newStartTimeUtc !== "string") {
         return NextResponse.json({ error: "newStartTimeUtc is required" }, { status: 400 });
+      }
+
+      if (biz?.allowClientReschedule === false) {
+        return NextResponse.json({ error: "Rescheduling is not allowed online" }, { status: 400 });
+      }
+
+      if (hoursUntilAppointment < windowHours) {
+        return NextResponse.json(
+          { error: `Cannot reschedule within ${windowHours} hours of appointment` },
+          { status: 400 }
+        );
       }
 
       if (!["CONFIRMED", "PENDING_PAYMENT"].includes(booking.status)) {
@@ -105,6 +168,24 @@ export async function POST(request: NextRequest) {
           status: "CONFIRMED",
         },
       });
+
+      // Send admin reschedule notification
+      try {
+        if (biz?.email && biz.alertReschedule !== false) {
+          const tz = biz.timezone ?? "America/Chicago";
+          const zonedNew = toZonedTime(newStart, tz);
+          const dateTimeStr = format(zonedNew, "EEEE, MMMM d, yyyy 'at' h:mm a");
+          await sendAdminNotificationEmail({
+            adminEmail: biz.email,
+            customerName: booking.customer.fullName,
+            customerEmail: booking.customer.email,
+            customerPhone: booking.customer.phone ?? undefined,
+            serviceName: booking.service.name,
+            dateTime: `RESCHEDULED TO — ${dateTimeStr}`,
+            bookingId: booking.id,
+          });
+        }
+      } catch {}
 
       return NextResponse.json({ success: true });
     }

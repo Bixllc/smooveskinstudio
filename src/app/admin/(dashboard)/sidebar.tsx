@@ -13,6 +13,8 @@ import {
   IconSettings,
   IconLogout,
   IconClock,
+  IconReportAnalytics,
+  IconBell,
 } from "@tabler/icons-react";
 
 const navItems = [
@@ -31,10 +33,12 @@ const navItems = [
   { href: "/admin/clients", label: "Clients", icon: IconUsers },
   { href: "/admin/services", label: "Services", icon: IconSparkles },
   { href: "/admin/analytics", label: "Analytics", icon: IconChartBar },
+  { href: "/admin/reports", label: "Reports", icon: IconReportAnalytics },
 ];
 
 const bottomItems = [
   { href: "/admin/availability", label: "Availability", icon: IconClock },
+  { href: "/admin/notifications", label: "Notifications", icon: IconBell },
   { href: "/admin/settings", label: "Settings", icon: IconSettings },
 ];
 

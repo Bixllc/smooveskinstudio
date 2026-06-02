@@ -27,19 +27,31 @@ model Client {
 }
 
 model BusinessSettings {
-  id                 String   @id @default(uuid())
-  clientId           String   @unique
-  businessName       String
-  address            String?
-  phone              String?
-  email              String?
-  timezone           String   @default("America/New_York")
-  cancellationPolicy String?
-  latePolicy         String?
-  noShowPolicy       String?
-  depositPolicy      String?
-  updatedAt          DateTime @updatedAt
-  client             Client   @relation(fields: [clientId], references: [id])
+  id                          String   @id @default(uuid())
+  clientId                    String   @unique
+  businessName                String
+  address                     String?
+  phone                       String?
+  email                       String?
+  timezone                    String   @default("America/New_York")
+  cancellationPolicy          String?
+  latePolicy                  String?
+  noShowPolicy                String?
+  depositPolicy               String?
+  minBookingLeadHours         Int      @default(2)
+  maxBookingDaysOut            Int      @default(100)
+  cancelRescheduleWindowHours Int      @default(24)
+  allowClientCancel           Boolean  @default(true)
+  allowClientReschedule       Boolean  @default(true)
+  alertNewBooking             Boolean  @default(true)
+  alertCancellation           Boolean  @default(true)
+  alertReschedule             Boolean  @default(true)
+  summaryEmailEnabled         Boolean  @default(false)
+  summaryEmailTime            String   @default("17:00")
+  summaryEmailFrequency       String   @default("daily")
+  emailTemplateSettings       Json?
+  updatedAt                   DateTime @updatedAt
+  client                      Client   @relation(fields: [clientId], references: [id])
 }
 
 model Category {

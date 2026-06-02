@@ -37,6 +37,18 @@ export async function PATCH(request: NextRequest) {
     "latePolicy",
     "noShowPolicy",
     "depositPolicy",
+    "minBookingLeadHours",
+    "maxBookingDaysOut",
+    "cancelRescheduleWindowHours",
+    "allowClientCancel",
+    "allowClientReschedule",
+    "alertNewBooking",
+    "alertCancellation",
+    "alertReschedule",
+    "summaryEmailEnabled",
+    "summaryEmailTime",
+    "summaryEmailFrequency",
+    "emailTemplateSettings",
   ];
 
   const data: Record<string, unknown> = {};

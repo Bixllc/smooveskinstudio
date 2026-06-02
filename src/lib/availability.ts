@@ -1,5 +1,5 @@
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
-import { addMinutes, startOfDay, setHours, setMinutes, isBefore, isEqual } from "date-fns";
+import { addMinutes, addDays, startOfDay, setHours, setMinutes, isBefore, isAfter, isEqual } from "date-fns";
 import { prisma } from "./prisma";
 
 export interface GetAvailableSlotsParams {
@@ -154,6 +154,16 @@ export async function isSlotAvailable(
   });
 
   if (!settings) return false;
+
+  // Check minBookingLeadHours
+  const minLeadHours = settings.minBookingLeadHours ?? 2;
+  const minLeadMs = minLeadHours * 60 * 60 * 1000;
+  if (startTimeUtc.getTime() - Date.now() < minLeadMs) return false;
+
+  // Check maxBookingDaysOut
+  const maxDaysOut = settings.maxBookingDaysOut ?? 100;
+  const maxFuture = addDays(new Date(), maxDaysOut);
+  if (isAfter(startTimeUtc, maxFuture)) return false;
 
   const timezone = settings.timezone;
   const zonedStart = toZonedTime(startTimeUtc, timezone);
