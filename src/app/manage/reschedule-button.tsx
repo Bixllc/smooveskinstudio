@@ -68,6 +68,11 @@ export function RescheduleButton({ token, clientId, serviceId, timezone }: Resch
         setConfirming(false);
         return;
       }
+      setOpen(false);
+      setSelectedDate("");
+      setSlots([]);
+      setSelectedSlot(null);
+      setConfirming(false);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
