@@ -20,6 +20,8 @@ interface BookingRequestBody {
     notes?: string;
   };
   formAnswers?: FormAnswerEntry[];
+  selectedAddOnIds?: string[];
+  couponCode?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -31,14 +33,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    const { clientId, serviceId, startTimeUtc: startTimeStr, customer, formAnswers = [] } = body;
-    const startTimeUtc = new Date(startTimeStr);
+    const {
+      clientId,
+      serviceId,
+      startTimeUtc: startTimeStr,
+      customer,
+      formAnswers = [],
+      selectedAddOnIds = [],
+      couponCode,
+    } = body;
 
+    const startTimeUtc = new Date(startTimeStr);
     if (isNaN(startTimeUtc.getTime())) {
-      return NextResponse.json(
-        { error: "startTimeUtc must be a valid ISO date string" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "startTimeUtc must be a valid ISO date string" }, { status: 400 });
     }
 
     const formError = await validateFormSubmissions(serviceId, formAnswers);
@@ -46,20 +53,65 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: formError }, { status: 400 });
     }
 
+    // Fetch add-ons (outside transaction — read-only pre-check)
+    const selectedAddOns = selectedAddOnIds.length > 0
+      ? await prisma.addOn.findMany({
+          where: { id: { in: selectedAddOnIds }, clientId, active: true },
+        })
+      : [];
+
+    if (selectedAddOns.length !== selectedAddOnIds.length) {
+      return NextResponse.json({ error: "One or more add-ons are unavailable" }, { status: 400 });
+    }
+
+    const addOnDurationMinutes = selectedAddOns.reduce((sum, a) => sum + a.durationMinutes, 0);
+
     const result = await prisma.$transaction(async (tx: any) => {
-      const available = await isSlotAvailable({ clientId, serviceId, startTimeUtc }, tx);
+      const available = await isSlotAvailable(
+        { clientId, serviceId, startTimeUtc, addOnDurationMinutes },
+        tx
+      );
       if (!available) return { conflict: true } as const;
 
       const service = await tx.service.findFirstOrThrow({
         where: { id: serviceId, clientId, active: true },
       });
 
-      const endTimeUtc = addMinutes(startTimeUtc, service.durationMinutes);
+      // Validate and lock coupon inside transaction
+      let coupon: any = null;
+      if (couponCode) {
+        const upperCode = String(couponCode).trim().toUpperCase();
+        coupon = await tx.coupon.findFirst({
+          where: { clientId, code: upperCode, active: true },
+        });
+        if (!coupon) return { conflict: false, couponInvalid: true } as const;
+        if (coupon.expiresAt && coupon.expiresAt < new Date()) {
+          return { conflict: false, couponInvalid: true } as const;
+        }
+        if (coupon.usageLimit !== null && coupon.usageCount >= coupon.usageLimit) {
+          return { conflict: false, couponInvalid: true } as const;
+        }
+      }
 
+      // Compute pricing
+      const servicePrice = Number(service.price);
+      const addOnsTotal = selectedAddOns.reduce((sum, a) => sum + Number(a.price), 0);
+      const subtotal = servicePrice + addOnsTotal;
+      const discountAmount = coupon
+        ? parseFloat((subtotal * (Number(coupon.discountPercent) / 100)).toFixed(2))
+        : 0;
+      const totalAmount = parseFloat((subtotal - discountAmount).toFixed(2));
+
+      // endTimeUtc: no buffers (buffers are only for availability checks, not stored)
+      const endTimeUtc = addMinutes(
+        startTimeUtc,
+        service.durationMinutes + addOnDurationMinutes
+      );
+
+      // Upsert customer
       let existingCustomer = await tx.customer.findFirst({
         where: { clientId, email: customer.email },
       });
-
       if (existingCustomer) {
         existingCustomer = await tx.customer.update({
           where: { id: existingCustomer.id },
@@ -89,9 +141,28 @@ export async function POST(request: NextRequest) {
           status: "PENDING_PAYMENT",
           paymentStatus: "UNPAID",
           manageToken,
+          couponId: coupon?.id ?? null,
+          discountAmount: discountAmount > 0 ? discountAmount : null,
+          addOnsTotalAmount: addOnsTotal > 0 ? addOnsTotal : null,
+          totalAmount,
         },
       });
 
+      // Snapshot add-ons
+      for (const addOn of selectedAddOns) {
+        await tx.bookingAddOn.create({
+          data: {
+            clientId,
+            bookingId: booking.id,
+            addOnId: addOn.id,
+            name: addOn.name,
+            price: Number(addOn.price),
+            durationMinutes: addOn.durationMinutes,
+          },
+        });
+      }
+
+      // Form submissions
       for (const entry of formAnswers) {
         await tx.formSubmission.create({
           data: {
@@ -104,27 +175,38 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      // Increment coupon usage
+      if (coupon) {
+        await tx.coupon.update({
+          where: { id: coupon.id },
+          data: { usageCount: { increment: 1 } },
+        });
+      }
+
       return {
         conflict: false,
+        couponInvalid: false,
         bookingId: booking.id,
         manageToken,
-        servicePrice: Number(service.price),
+        servicePrice,
         serviceDepositAmount: service.depositAmount ? Number(service.depositAmount) : null,
         paymentType: service.paymentType,
+        totalAmount,
       } as const;
     });
 
     if (result.conflict) {
-      return NextResponse.json(
-        { error: "Time slot is no longer available" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "Time slot is no longer available" }, { status: 409 });
+    }
+    if ("couponInvalid" in result && result.couponInvalid) {
+      return NextResponse.json({ error: "Promo code is no longer valid" }, { status: 400 });
     }
 
+    // chargeAmount: for DEPOSIT, always service.depositAmount; for FULL, totalAmount
     const chargeAmount =
       result.paymentType === "DEPOSIT" && result.serviceDepositAmount
         ? result.serviceDepositAmount
-        : result.servicePrice;
+        : result.totalAmount;
 
     return NextResponse.json(
       { bookingId: result.bookingId, manageToken: result.manageToken, chargeAmount },

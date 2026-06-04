@@ -56,9 +56,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // For DEPOSIT: charge the fixed deposit amount only (add-ons collected after appointment)
+    // For FULL: charge the pre-computed totalAmount which includes add-ons minus any discount
     const chargeAmount =
       booking.service.paymentType === "DEPOSIT" && booking.service.depositAmount
         ? Number(booking.service.depositAmount)
+        : booking.totalAmount !== null && booking.totalAmount !== undefined
+        ? Number(booking.totalAmount)
         : Number(booking.service.price);
 
     const { paymentId } = await chargeCard({
