@@ -87,6 +87,8 @@ const BRAND = {
   text: "#6b6860",
 };
 
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.smooveskinstudio.com";
+
 function wrapper(content: string) {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -96,8 +98,9 @@ function wrapper(content: string) {
   <tr><td align="center">
     <table width="100%" style="max-width:520px;background:#fff;border-radius:16px;border:1px solid ${BRAND.border};overflow:hidden;">
       <!-- Header -->
-      <tr><td style="background:${BRAND.dark};padding:20px 28px;">
-        <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:${BRAND.gold};">Smoove Skin Studio</p>
+      <tr><td style="background:#faf9f7;padding:28px 28px 20px;text-align:center;border-bottom:1px solid ${BRAND.border};">
+        <img src="${SITE_URL}/images/logo.svg" alt="Smoove Skin Studio" width="56" height="56" style="display:block;margin:0 auto 12px;width:56px;height:56px;">
+        <p style="margin:0;font-size:18px;font-weight:400;letter-spacing:0.06em;color:${BRAND.dark};font-family:Georgia,'Times New Roman',serif;">Smoove Skin Studio</p>
       </td></tr>
       <!-- Body -->
       <tr><td style="padding:28px;">
