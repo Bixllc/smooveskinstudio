@@ -6,12 +6,14 @@ export interface GetAvailableSlotsParams {
   clientId: string;
   serviceId: string;
   date: string; // YYYY-MM-DD in client timezone
+  addOnDurationMinutes?: number;
 }
 
 export interface IsSlotAvailableParams {
   clientId: string;
   serviceId: string;
   startTimeUtc: Date;
+  addOnDurationMinutes?: number;
 }
 
 interface TimeBlock {
@@ -78,12 +80,14 @@ export async function getAvailableSlots(
 
   const slots: string[] = [];
 
+  const extraMinutes = params.addOnDurationMinutes ?? 0;
+
   for (const rule of rules) {
     const candidates = generateCandidateSlots(date, rule.startTime, rule.endTime, timezone);
 
     for (const candidateUtc of candidates) {
       const blockStart = addMinutes(candidateUtc, -service.bufferBeforeMinutes);
-      const blockEnd = addMinutes(candidateUtc, service.durationMinutes + service.bufferAfterMinutes);
+      const blockEnd = addMinutes(candidateUtc, service.durationMinutes + extraMinutes + service.bufferAfterMinutes);
 
       if (!hasOverlap(blockStart, blockEnd, occupiedBlocks)) {
         // Ensure entire block fits within the availability window
@@ -121,8 +125,9 @@ export async function isSlotAvailable(
 
   if (!service) return false;
 
+  const extraMinutes = params.addOnDurationMinutes ?? 0;
   const blockStart = addMinutes(startTimeUtc, -service.bufferBeforeMinutes);
-  const blockEnd = addMinutes(startTimeUtc, service.durationMinutes + service.bufferAfterMinutes);
+  const blockEnd = addMinutes(startTimeUtc, service.durationMinutes + extraMinutes + service.bufferAfterMinutes);
 
   // Check for overlapping bookings
   const overlappingBooking = await db.booking.findFirst({

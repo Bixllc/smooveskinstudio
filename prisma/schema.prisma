@@ -24,6 +24,10 @@ model Client {
   services          Service[]
   formTemplates     FormTemplate[]
   formSubmissions   FormSubmission[]
+  addOns        AddOn[]
+  serviceAddOns ServiceAddOn[]
+  bookingAddOns BookingAddOn[]
+  coupons       Coupon[]
 }
 
 model BusinessSettings {
@@ -84,6 +88,7 @@ model Service {
   category            Category    @relation(fields: [categoryId], references: [id])
   client              Client      @relation(fields: [clientId], references: [id])
   formAssignments     ServiceFormAssignment[]
+  serviceAddOns       ServiceAddOn[]
 
   @@index([clientId])
   @@index([categoryId])
@@ -120,6 +125,10 @@ model Booking {
   confirmationEmailSentAt DateTime?
   reminderEmailSentAt     DateTime?
   notes                   String?
+  couponId                String?
+  discountAmount          Decimal?      @db.Decimal(10, 2)
+  addOnsTotalAmount       Decimal?      @db.Decimal(10, 2)
+  totalAmount             Decimal?      @db.Decimal(10, 2)
   manageToken             String?       @unique
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
@@ -128,6 +137,8 @@ model Booking {
   service                 Service          @relation(fields: [serviceId], references: [id])
   payments                Payment[]
   formSubmissions         FormSubmission[]
+  coupon                  Coupon?          @relation(fields: [couponId], references: [id])
+  addOns                  BookingAddOn[]
 
   @@index([clientId])
   @@index([clientId, status])
@@ -173,6 +184,77 @@ model BlockedTime {
 
   @@index([clientId])
   @@index([startTimeUtc, endTimeUtc])
+}
+
+model AddOn {
+  id              String   @id @default(uuid())
+  clientId        String
+  name            String
+  description     String?
+  price           Decimal  @db.Decimal(10, 2)
+  durationMinutes Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  client        Client         @relation(fields: [clientId], references: [id])
+  serviceAddOns ServiceAddOn[]
+  bookingAddOns BookingAddOn[]
+
+  @@index([clientId])
+}
+
+model ServiceAddOn {
+  id           String @id @default(uuid())
+  clientId     String
+  serviceId    String
+  addOnId      String
+  displayOrder Int    @default(0)
+
+  client  Client  @relation(fields: [clientId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  addOn   AddOn   @relation(fields: [addOnId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, addOnId])
+  @@index([clientId])
+  @@index([serviceId])
+}
+
+model BookingAddOn {
+  id              String  @id @default(uuid())
+  clientId        String
+  bookingId       String
+  addOnId         String
+  name            String
+  price           Decimal @db.Decimal(10, 2)
+  durationMinutes Int     @default(0)
+
+  client  Client  @relation(fields: [clientId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+  addOn   AddOn   @relation(fields: [addOnId], references: [id])
+
+  @@index([clientId])
+  @@index([bookingId])
+}
+
+model Coupon {
+  id              String    @id @default(uuid())
+  clientId        String
+  code            String
+  name            String
+  discountPercent Decimal   @db.Decimal(5, 2)
+  usageLimit      Int?
+  usageCount      Int       @default(0)
+  expiresAt       DateTime?
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  client   Client    @relation(fields: [clientId], references: [id])
+  bookings Booking[]
+
+  @@unique([clientId, code])
+  @@index([clientId])
 }
 
 enum PaymentType {
