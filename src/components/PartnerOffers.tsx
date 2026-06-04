@@ -80,7 +80,6 @@ export default function PartnerOffers() {
                     width={160}
                     height={56}
                     className="max-h-12 w-auto object-contain"
-                    onError={() => {}}
                   />
                 </div>
 
