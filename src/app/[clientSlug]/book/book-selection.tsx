@@ -89,6 +89,14 @@ interface ServiceForm {
 // formAnswers: { formTemplateId → { fieldId → value } }
 type FormAnswers = Record<string, Record<string, string | boolean>>;
 
+interface AddOn {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  durationMinutes: number;
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function formatDuration(minutes: number): string {
@@ -121,19 +129,22 @@ function isFormComplete(form: ServiceForm, answers: Record<string, string | bool
 
 // ─── Step Indicator ──────────────────────────────────────────────────────────
 
-const STEPS = ["Service", "Date & Time", "Your Info", "Payment"];
+const STEPS_WITHOUT_ADDONS = ["Service", "Date & Time", "Your Info", "Payment"];
+const STEPS_WITH_ADDONS    = ["Service", "Add-ons", "Date & Time", "Your Info", "Payment"];
 
 function StepIndicator({
   current,
+  steps,
   onGoTo,
 }: {
-  current: 1 | 2 | 3 | 4;
-  onGoTo: (n: 1 | 2 | 3 | 4) => void;
+  current: number;
+  steps: string[];
+  onGoTo: (n: any) => void;
 }) {
   return (
     <div className="flex items-center justify-center gap-0">
-      {STEPS.map((label, i) => {
-        const n = (i + 1) as 1 | 2 | 3 | 4;
+      {steps.map((label, i) => {
+        const n = i + 1;
         const done = current > n;
         const active = current === n;
         return (
@@ -170,7 +181,7 @@ function StepIndicator({
                 {label}
               </span>
             </button>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`h-px w-3 sm:w-6 ${current > n ? "bg-[#C9A96E]" : "bg-[#e8e6e1]"}`} />
             )}
           </div>
@@ -250,14 +261,14 @@ function CalendarWidget({ selectedDate, onSelect }: { selectedDate: Date | null;
 function Sidebar({
   step, service, slot, timezone, slots, slotsLoading, selectedDate, onGoTo, onSelectSlot,
 }: {
-  step: 1 | 2 | 3 | 4;
+  step: number;
   service: Service | null;
   slot: string | null;
   timezone: string;
   slots: string[];
   slotsLoading: boolean;
   selectedDate: Date | null;
-  onGoTo: (n: 1 | 2 | 3 | 4) => void;
+  onGoTo: (n: any) => void;
   onSelectSlot: (s: string) => void;
 }) {
   return (
@@ -281,7 +292,7 @@ function Sidebar({
               </>
             ) : <p className="text-[13px] italic text-[#c0bdb8]">Not selected</p>}
           </div>
-          {slot && step > 2 && <button onClick={() => onGoTo(2)} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">Change</button>}
+          {slot && step > 3 && <button onClick={() => onGoTo(3)} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">Change</button>}
         </div>
         {service && (
           <div className="flex items-baseline justify-between pt-3">
@@ -291,7 +302,7 @@ function Sidebar({
         )}
       </div>
 
-      {step === 2 && selectedDate && (
+      {step === 3 && selectedDate && (
         <div className="rounded-2xl border border-[#e8e6e1] bg-white p-5 shadow-sm">
           <p className="mb-1 text-[12px] font-semibold text-[#1a1814]">{format(selectedDate, "EEEE, MMMM d")}</p>
           <p className="mb-4 text-[11px] text-[#9a9890]">Available times</p>
@@ -320,33 +331,143 @@ function Sidebar({
 // ─── Step 1 — Service Selection ───────────────────────────────────────────────
 
 function Step1Service({ categories, onSelect }: { categories: Category[]; onSelect: (s: Service) => void }) {
-  const [activeCat, setActiveCat] = useState(categories[0]?.id ?? "");
-  const currentServices = categories.find((c) => c.id === activeCat)?.services ?? [];
-
   return (
     <div>
       <h2 className="mb-5 text-xl font-bold text-[#1a1814]">Select your service</h2>
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
-        {categories.map((cat) => (
-          <button key={cat.id} onClick={() => setActiveCat(cat.id)}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-[12px] font-medium transition-colors ${activeCat === cat.id ? "bg-[#C9A96E] text-white" : "bg-[#f5f4f2] text-[#6b6860] hover:bg-[#C9A96E] hover:text-white"}`}>
-            {cat.name}
-          </button>
-        ))}
+      {categories.map((cat) => (
+        <div key={cat.id} className="mb-6">
+          {categories.length > 1 && (
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#9a9890]">
+              {cat.name}
+            </p>
+          )}
+          <div className="grid gap-3 sm:grid-cols-2">
+            {cat.services.map((service) => (
+              <button
+                key={service.id}
+                onClick={() => onSelect(service)}
+                className="group flex flex-col items-start rounded-2xl border border-[#e8e6e1] bg-white p-5 text-left transition-all hover:border-[#C9A96E] hover:shadow-md active:scale-[0.99]"
+              >
+                <div className="flex w-full items-start justify-between gap-2">
+                  <p className="text-[14px] font-semibold text-[#1a1814]">{service.name}</p>
+                  <span className="shrink-0 text-[14px] font-bold text-[#1a1814]">
+                    ${service.price.toFixed(2)}
+                  </span>
+                </div>
+                <p className="mt-1 text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
+                {service.description && (
+                  <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-[#9a9890]">
+                    {service.description}
+                  </p>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Step 2 — Add-ons ────────────────────────────────────────────────────────
+
+function Step2AddOns({
+  addOns,
+  selectedIds,
+  onToggle,
+  onContinue,
+  serviceName,
+  servicePrice,
+}: {
+  addOns: AddOn[];
+  selectedIds: string[];
+  onToggle: (id: string) => void;
+  onContinue: () => void;
+  serviceName: string;
+  servicePrice: number;
+}) {
+  const selectedAddOns = addOns.filter((a) => selectedIds.includes(a.id));
+  const addOnsTotal = selectedAddOns.reduce((sum, a) => sum + a.price, 0);
+  const total = servicePrice + addOnsTotal;
+
+  return (
+    <div>
+      <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Add-ons</h2>
+      <p className="mb-5 text-[13px] text-[#9a9890]">
+        Enhance your {serviceName} with optional extras
+      </p>
+
+      <div className="space-y-3">
+        {addOns.map((addOn) => {
+          const selected = selectedIds.includes(addOn.id);
+          return (
+            <button
+              key={addOn.id}
+              type="button"
+              onClick={() => onToggle(addOn.id)}
+              className={`flex w-full items-start justify-between rounded-2xl border p-4 text-left transition-all ${
+                selected
+                  ? "border-[#C9A96E] bg-[#fdfaf5] shadow-sm"
+                  : "border-[#e8e6e1] bg-white hover:border-[#C9A96E]"
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                    selected
+                      ? "border-[#C9A96E] bg-[#C9A96E]"
+                      : "border-[#e8e6e1]"
+                  }`}
+                >
+                  {selected && (
+                    <svg width="9" height="9" viewBox="0 0 12 12" fill="none">
+                      <polyline points="2,6 5,9 10,3" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <p className="text-[13px] font-semibold text-[#1a1814]">{addOn.name}</p>
+                  {addOn.description && (
+                    <p className="mt-0.5 text-[12px] text-[#9a9890]">{addOn.description}</p>
+                  )}
+                  {addOn.durationMinutes > 0 && (
+                    <p className="mt-0.5 text-[11px] text-[#9a9890]">+{addOn.durationMinutes} min</p>
+                  )}
+                </div>
+              </div>
+              <span className="shrink-0 text-[14px] font-bold text-[#1a1814]">
+                +${addOn.price.toFixed(2)}
+              </span>
+            </button>
+          );
+        })}
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {currentServices.map((service) => (
-          <button key={service.id} onClick={() => onSelect(service)}
-            className="group flex flex-col items-start rounded-2xl border border-[#e8e6e1] bg-white p-5 text-left transition-all hover:border-[#C9A96E] hover:shadow-md active:scale-[0.99]">
-            <div className="flex w-full items-start justify-between gap-2">
-              <p className="text-[14px] font-semibold text-[#1a1814]">{service.name}</p>
-              <span className="shrink-0 text-[14px] font-bold text-[#1a1814]">${service.price.toFixed(2)}</span>
+
+      {selectedAddOns.length > 0 && (
+        <div className="mt-4 rounded-xl bg-[#f9f8f6] px-4 py-3 text-[12px]">
+          <div className="flex items-center justify-between text-[#6b6860]">
+            <span>Service</span>
+            <span>${servicePrice.toFixed(2)}</span>
+          </div>
+          {selectedAddOns.map((a) => (
+            <div key={a.id} className="flex items-center justify-between text-[#6b6860]">
+              <span>{a.name}</span>
+              <span>+${a.price.toFixed(2)}</span>
             </div>
-            <p className="mt-1 text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
-            {service.description && <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-[#9a9890]">{service.description}</p>}
-          </button>
-        ))}
-      </div>
+          ))}
+          <div className="mt-2 flex items-center justify-between border-t border-[#e8e6e1] pt-2 font-semibold text-[#1a1814]">
+            <span>Total</span>
+            <span>${total.toFixed(2)}</span>
+          </div>
+        </div>
+      )}
+
+      <button
+        onClick={onContinue}
+        className="mt-6 w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f]"
+      >
+        {selectedAddOns.length > 0 ? "Continue with add-ons →" : "Continue without add-ons →"}
+      </button>
     </div>
   );
 }
@@ -632,14 +753,17 @@ function PoliciesAccordion({ businessSettings }: { businessSettings: BusinessSet
 
 function Step3YourInfo({
   onSubmit, isSubmitting, error, businessSettings, serviceForms, formAnswers, onUpdateFormAnswer,
+  clientId, serviceSubtotal,
 }: {
-  onSubmit: (info: CustomerInfo) => void;
+  onSubmit: (info: CustomerInfo, couponCode?: string) => void;
   isSubmitting: boolean;
   error: string | null;
   businessSettings: BusinessSettings;
   serviceForms: ServiceForm[];
   formAnswers: FormAnswers;
   onUpdateFormAnswer: (formId: string, fieldId: string, value: string | boolean) => void;
+  clientId: string;
+  serviceSubtotal: number;
 }) {
   const [form, setForm] = useState<CustomerInfo>({ fullName: "", email: "", phone: "", notes: "" });
   const [showFormErrors, setShowFormErrors] = useState(false);
@@ -648,6 +772,36 @@ function Step3YourInfo({
   function set<K extends keyof CustomerInfo>(key: K, val: CustomerInfo[K]) {
     setForm((prev) => ({ ...prev, [key]: val }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
+  }
+
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  async function handleApplyCoupon() {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      const res = await fetch("/api/booking/validate-coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId, code: couponCode.trim(), subtotal: serviceSubtotal }),
+      });
+      const data = await res.json();
+      if (!data.valid) {
+        setCouponError(data.error ?? "Invalid code");
+      } else {
+        setCouponApplied(true);
+        setCouponDiscount(data.discountAmount);
+      }
+    } catch {
+      setCouponError("Failed to validate code");
+    } finally {
+      setCouponLoading(false);
+    }
   }
 
   function validate() {
@@ -672,7 +826,10 @@ function Step3YourInfo({
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
-    onSubmit({ ...form, fullName: form.fullName.trim(), email: form.email.trim(), phone: form.phone.trim(), notes: form.notes.trim() });
+    onSubmit(
+      { ...form, fullName: form.fullName.trim(), email: form.email.trim(), phone: form.phone.trim(), notes: form.notes.trim() },
+      couponApplied ? couponCode.trim() : undefined
+    );
   }
 
   const inputCls = (field: keyof CustomerInfo) =>
@@ -734,6 +891,37 @@ function Step3YourInfo({
 
         {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-[12px] text-red-600">{error}</div>}
 
+        {/* Promo code */}
+        <div>
+          <label className="mb-1.5 block text-[12px] font-medium text-[#1a1814]">
+            Promo Code <span className="font-normal text-[#c0bdb8]">(optional)</span>
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+              disabled={couponApplied}
+              placeholder="Enter code"
+              className="flex-1 rounded-xl border border-[#e8e6e1] px-4 py-2.5 font-mono text-[13px] uppercase text-[#1a1814] outline-none placeholder:normal-case placeholder:text-[#c0bdb8] focus:border-[#C9A96E] disabled:bg-[#f9f8f6]"
+            />
+            <button
+              type="button"
+              onClick={handleApplyCoupon}
+              disabled={couponApplied || !couponCode.trim() || couponLoading}
+              className="rounded-xl bg-[#1a1814] px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#2d2925] disabled:opacity-40"
+            >
+              {couponApplied ? "Applied ✓" : couponLoading ? "…" : "Apply"}
+            </button>
+          </div>
+          {couponError && <p className="mt-1 text-[11px] text-red-500">{couponError}</p>}
+          {couponApplied && (
+            <p className="mt-1 text-[11px] text-green-600">
+              {couponDiscount > 0 ? `$${couponDiscount.toFixed(2)} discount` : "Discount"} applied
+            </p>
+          )}
+        </div>
+
         <button type="submit" disabled={isSubmitting}
           className="w-full rounded-xl bg-[#C9A96E] py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#b8954f] disabled:opacity-60">
           {isSubmitting ? "Preparing payment…" : "Continue to Payment →"}
@@ -747,7 +935,7 @@ function Step3YourInfo({
 
 // ─── Step 4 — Square Payment ──────────────────────────────────────────────────
 
-function Step4Payment({ bookingId, clientSlug, chargeAmount }: {
+function Step5Payment({ bookingId, clientSlug, chargeAmount }: {
   bookingId: string; clientSlug: string; chargeAmount: number;
 }) {
   const router = useRouter();
@@ -883,7 +1071,7 @@ function Step4Payment({ bookingId, clientSlug, chargeAmount }: {
 export function BookSelection({ clientSlug, clientId, categories, businessSettings }: BookSelectionProps) {
   const { timezone } = businessSettings;
 
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [step, setStep] = useState<1|2|3|4|5>(1);
   const [service, setService] = useState<Service | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -895,24 +1083,37 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
   const [chargeAmount, setChargeAmount] = useState<number>(0);
   const [serviceForms, setServiceForms] = useState<ServiceForm[]>([]);
   const [formAnswers, setFormAnswers] = useState<FormAnswers>({});
+  const [availableAddOns, setAvailableAddOns] = useState<AddOn[]>([]);
+  const [selectedAddOnIds, setSelectedAddOnIds] = useState<string[]>([]);
+
+  const hasAddOns = availableAddOns.length > 0;
+  const activeSteps = hasAddOns ? STEPS_WITH_ADDONS : STEPS_WITHOUT_ADDONS;
+
+  function stepToDisplay(s: number): number {
+    if (hasAddOns) return s - 1;
+    if (s === 1) return 0;
+    if (s === 3) return 1;
+    if (s === 4) return 2;
+    return 3;
+  }
 
   useEffect(() => {
-    if (!selectedDate || !service || step !== 2) return;
+    if (!selectedDate || !service || step !== 3) return;
     const dateStr = format(selectedDate, "yyyy-MM-dd");
     setSlotsLoading(true);
     setSlots([]);
     fetch("/api/bookings/slots", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ clientId, serviceId: service.id, date: dateStr }),
+      body: JSON.stringify({ clientId, serviceId: service.id, date: dateStr, addOnIds: selectedAddOnIds }),
     })
       .then((r) => r.json())
       .then((data) => setSlots(data.slots ?? []))
       .catch(() => setSlots([]))
       .finally(() => setSlotsLoading(false));
-  }, [selectedDate, service, clientId, step]);
+  }, [selectedDate, service, clientId, step, selectedAddOnIds]);
 
-  function handleGoTo(n: 1 | 2 | 3 | 4) {
+  function handleGoTo(n: 1|2|3|4|5) {
     setStep(n);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -923,21 +1124,16 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
     setSelectedDate(null);
     setSlots([]);
     setFormAnswers({});
+    setSelectedAddOnIds([]);
 
-    // Fetch forms for this service
-    try {
-      const res = await fetch(`/api/services/${s.id}/forms`);
-      if (res.ok) {
-        const forms: ServiceForm[] = await res.json();
-        setServiceForms(forms);
-      } else {
-        setServiceForms([]);
-      }
-    } catch {
-      setServiceForms([]);
-    }
+    const [formsRes, addOnsRes] = await Promise.all([
+      fetch(`/api/services/${s.id}/forms`).then((r) => r.ok ? r.json() : []).catch(() => []),
+      fetch(`/api/services/${s.id}/add-ons`).then((r) => r.ok ? r.json() : []).catch(() => []),
+    ]);
 
-    setStep(2);
+    setServiceForms(formsRes);
+    setAvailableAddOns(addOnsRes);
+    setStep(addOnsRes.length > 0 ? 2 : 3);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -954,12 +1150,11 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
     }));
   }
 
-  async function handleStep3Submit(info: CustomerInfo) {
+  async function handleStep4Submit(info: CustomerInfo, couponCode?: string) {
     if (!service || !slot) return;
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // Build formAnswers payload
     const formAnswersPayload = serviceForms.map((f) => ({
       formTemplateId: f.id,
       answers: formAnswers[f.id] ?? {},
@@ -973,13 +1168,10 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
           clientId,
           serviceId: service.id,
           startTimeUtc: slot,
-          customer: {
-            fullName: info.fullName,
-            email: info.email,
-            phone: info.phone,
-            notes: info.notes || undefined,
-          },
+          customer: { fullName: info.fullName, email: info.email, phone: info.phone, notes: info.notes || undefined },
           formAnswers: formAnswersPayload,
+          selectedAddOnIds,
+          couponCode: couponCode ?? undefined,
         }),
       });
       const data = await res.json();
@@ -991,7 +1183,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
       setPendingBookingId(data.bookingId);
       setChargeAmount(data.chargeAmount);
       setIsSubmitting(false);
-      setStep(4);
+      setStep(5);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setSubmitError("Something went wrong. Please try again.");
@@ -1003,7 +1195,18 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
     <div>
       {/* Step indicator — full bleed */}
       <div className="border-b border-[#e8e6e1] bg-white py-3" style={{ width: "100vw", marginLeft: "calc(50% - 50vw)" }}>
-        <StepIndicator current={step} onGoTo={handleGoTo} />
+        <StepIndicator
+          current={stepToDisplay(step) + 1}
+          steps={activeSteps}
+          onGoTo={(displayN: number) => {
+            if (hasAddOns) {
+              handleGoTo(displayN as 1 | 2 | 3 | 4 | 5);
+            } else {
+              const map: Record<number, number> = { 1: 1, 2: 3, 3: 4, 4: 5 };
+              handleGoTo((map[displayN] ?? displayN) as 1 | 2 | 3 | 4 | 5);
+            }
+          }}
+        />
       </div>
 
       <div className="px-4 py-6 pb-24 lg:pb-6">
@@ -1013,10 +1216,33 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
             <div className="rounded-2xl border border-[#e8e6e1] bg-white p-6 shadow-sm">
               {step === 1 && <Step1Service categories={categories} onSelect={handleSelectService} />}
 
-              {step === 2 && service && (
+              {step === 2 && service && hasAddOns && (
                 <>
                   <div className="mb-5 flex items-center gap-2">
                     <button onClick={() => handleGoTo(1)} className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                      Back
+                    </button>
+                    <span className="text-[#e8e6e1]">·</span>
+                    <span className="text-[12px] font-medium text-[#1a1814]">{service.name}</span>
+                  </div>
+                  <Step2AddOns
+                    addOns={availableAddOns}
+                    selectedIds={selectedAddOnIds}
+                    onToggle={(id) => setSelectedAddOnIds((prev) =>
+                      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+                    )}
+                    onContinue={() => { setStep(3); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    serviceName={service.name}
+                    servicePrice={service.price}
+                  />
+                </>
+              )}
+
+              {step === 3 && service && (
+                <>
+                  <div className="mb-5 flex items-center gap-2">
+                    <button onClick={() => handleGoTo(hasAddOns ? 2 : 1)} className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                       Back
                     </button>
@@ -1030,10 +1256,10 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                 </>
               )}
 
-              {step === 3 && (
+              {step === 4 && (
                 <>
                   <div className="mb-5 flex items-center gap-2">
-                    <button onClick={() => handleGoTo(2)} className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
+                    <button onClick={() => handleGoTo(3)} className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                       Back
                     </button>
@@ -1047,21 +1273,30 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                     )}
                   </div>
                   <Step3YourInfo
-                    onSubmit={handleStep3Submit}
+                    onSubmit={handleStep4Submit}
                     isSubmitting={isSubmitting}
                     error={submitError}
                     businessSettings={businessSettings}
                     serviceForms={serviceForms}
                     formAnswers={formAnswers}
                     onUpdateFormAnswer={handleUpdateFormAnswer}
+                    clientId={clientId}
+                    serviceSubtotal={
+                      service
+                        ? Number(service.price) +
+                          availableAddOns
+                            .filter((a) => selectedAddOnIds.includes(a.id))
+                            .reduce((s, a) => s + a.price, 0)
+                        : 0
+                    }
                   />
                 </>
               )}
 
-              {step === 4 && pendingBookingId && (
+              {step === 5 && pendingBookingId && (
                 <>
                   <div className="mb-5 flex items-center gap-2">
-                    <button onClick={() => { handleGoTo(3); setSubmitError(null); }}
+                    <button onClick={() => { handleGoTo(4); setSubmitError(null); }}
                       className="flex items-center gap-1 text-[12px] text-[#9a9890] transition-colors hover:text-[#C9A96E]">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                       Back
@@ -1075,7 +1310,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                       </>
                     )}
                   </div>
-                  <Step4Payment bookingId={pendingBookingId} clientSlug={clientSlug} chargeAmount={chargeAmount} />
+                  <Step5Payment bookingId={pendingBookingId} clientSlug={clientSlug} chargeAmount={chargeAmount} />
                 </>
               )}
             </div>
@@ -1089,7 +1324,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
       </div>
 
       {/* Mobile sticky bar */}
-      {service && step < 3 && (
+      {service && step < 4 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#e8e6e1] bg-white px-4 py-3 lg:hidden">
           <div className="flex items-center justify-between">
             <div>
