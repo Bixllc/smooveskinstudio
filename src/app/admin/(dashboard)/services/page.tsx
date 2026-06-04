@@ -538,7 +538,7 @@ const emptyAddOnForm: AddOnForm = {
   serviceIds: [],
 };
 
-export function AddOnsSection({ services }: { services: { id: string; name: string }[] }) {
+function AddOnsSection({ services }: { services: { id: string; name: string }[] }) {
   const [addOns, setAddOns] = useState<AddOn[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
