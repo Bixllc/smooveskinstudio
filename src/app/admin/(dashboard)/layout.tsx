@@ -13,7 +13,7 @@ export default async function AdminDashboardLayout({
 
   return (
     <AdminProviders>
-      <div className="flex min-h-screen bg-[#f5f4f2]">
+      <div className="flex min-h-screen bg-[#edeae5]">
         <AdminSidebar />
         <div className="flex flex-1 flex-col overflow-hidden">{children}</div>
       </div>
