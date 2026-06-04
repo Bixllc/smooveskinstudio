@@ -1139,7 +1139,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
 
   function handleSelectSlot(slotUtc: string) {
     setSlot(slotUtc);
-    setStep(3);
+    setStep(4);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
