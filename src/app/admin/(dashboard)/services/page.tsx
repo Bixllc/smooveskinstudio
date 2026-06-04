@@ -379,6 +379,8 @@ export default function ServicesPage() {
           </p>
         )}
       </div>
+
+      <AddOnsSection services={services.map((s) => ({ id: s.id, name: s.name }))} />
     </div>
   );
 }
@@ -502,6 +504,286 @@ function AssignedForms({
           All active forms are assigned.
         </p>
       )}
+    </div>
+  );
+}
+
+// ─── Add-ons Section ─────────────────────────────────────────────────────────
+
+interface AddOn {
+  id: string;
+  name: string;
+  description: string | null;
+  price: string;
+  durationMinutes: number;
+  active: boolean;
+  serviceAddOns: { serviceId: string; service: { name: string } }[];
+}
+
+interface AddOnForm {
+  name: string;
+  description: string;
+  price: string;
+  durationMinutes: string;
+  active: boolean;
+  serviceIds: string[];
+}
+
+const emptyAddOnForm: AddOnForm = {
+  name: "",
+  description: "",
+  price: "",
+  durationMinutes: "0",
+  active: true,
+  serviceIds: [],
+};
+
+export function AddOnsSection({ services }: { services: { id: string; name: string }[] }) {
+  const [addOns, setAddOns] = useState<AddOn[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<AddOnForm>(emptyAddOnForm);
+  const [error, setError] = useState<string | null>(null);
+
+  async function fetchAddOns() {
+    const res = await fetch("/api/admin/add-ons");
+    if (res.ok) setAddOns(await res.json());
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchAddOns();
+  }, []);
+
+  function updateForm(field: keyof AddOnForm, value: string | boolean | string[]) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function toggleService(serviceId: string) {
+    setForm((prev) => ({
+      ...prev,
+      serviceIds: prev.serviceIds.includes(serviceId)
+        ? prev.serviceIds.filter((id) => id !== serviceId)
+        : [...prev.serviceIds, serviceId],
+    }));
+  }
+
+  function startEdit(addOn: AddOn) {
+    setEditingId(addOn.id);
+    setForm({
+      name: addOn.name,
+      description: addOn.description ?? "",
+      price: String(addOn.price),
+      durationMinutes: String(addOn.durationMinutes),
+      active: addOn.active,
+      serviceIds: addOn.serviceAddOns.map((sa) => sa.serviceId),
+    });
+    setShowForm(true);
+  }
+
+  function resetForm() {
+    setForm(emptyAddOnForm);
+    setEditingId(null);
+    setShowForm(false);
+    setError(null);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    const payload = {
+      name: form.name,
+      description: form.description || null,
+      price: Number(form.price),
+      durationMinutes: Number(form.durationMinutes),
+      active: form.active,
+    };
+
+    const url = editingId ? `/api/admin/add-ons/${editingId}` : "/api/admin/add-ons";
+    const method = editingId ? "PATCH" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error);
+      return;
+    }
+
+    const saved = await res.json();
+    const addOnId = saved.id ?? editingId;
+
+    // Save service assignments
+    await fetch(`/api/admin/add-ons/${addOnId}/services`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ serviceIds: form.serviceIds }),
+    });
+
+    resetForm();
+    fetchAddOns();
+  }
+
+  async function handleToggleActive(addOn: AddOn) {
+    await fetch(`/api/admin/add-ons/${addOn.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ active: !addOn.active }),
+    });
+    fetchAddOns();
+  }
+
+  if (loading) {
+    return <p className="text-sm text-[var(--color-text-light)]">Loading add-ons…</p>;
+  }
+
+  return (
+    <div className="mt-10 border-t border-[var(--color-border)] pt-8">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-xl font-semibold text-[var(--color-text)]">Add-ons</h3>
+        {!showForm && (
+          <Button onClick={() => setShowForm(true)}>Add Add-on</Button>
+        )}
+      </div>
+
+      {error && (
+        <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
+      )}
+
+      {showForm && (
+        <form
+          onSubmit={handleSubmit}
+          className="mb-8 rounded-xl border border-[var(--color-border)] bg-white p-6"
+        >
+          <p className="mb-4 text-sm font-medium text-[var(--color-text)]">
+            {editingId ? "Edit Add-on" : "New Add-on"}
+          </p>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="aoName">Name *</Label>
+              <Input
+                id="aoName"
+                value={form.name}
+                onChange={(e) => updateForm("name", e.target.value)}
+                required
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="aoPrice">Price ($) *</Label>
+              <Input
+                id="aoPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.price}
+                onChange={(e) => updateForm("price", e.target.value)}
+                required
+                className="mt-1"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <Label htmlFor="aoDesc">Description</Label>
+              <Textarea
+                id="aoDesc"
+                value={form.description}
+                onChange={(e) => updateForm("description", e.target.value)}
+                rows={2}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="aoDuration">Duration added (minutes)</Label>
+              <Input
+                id="aoDuration"
+                type="number"
+                min="0"
+                value={form.durationMinutes}
+                onChange={(e) => updateForm("durationMinutes", e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 pt-6">
+              <input
+                id="aoActive"
+                type="checkbox"
+                checked={form.active}
+                onChange={(e) => updateForm("active", e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <Label htmlFor="aoActive">Active</Label>
+            </div>
+
+            <div className="sm:col-span-2">
+              <Label>Applies to services</Label>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {services.map((s) => (
+                  <label key={s.id} className="flex cursor-pointer items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      checked={form.serviceIds.includes(s.id)}
+                      onChange={() => toggleService(s.id)}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="text-sm text-[var(--color-text)]">{s.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 flex gap-2">
+            <Button type="submit">{editingId ? "Update Add-on" : "Create Add-on"}</Button>
+            <Button type="button" variant="ghost" onClick={resetForm}>Cancel</Button>
+          </div>
+        </form>
+      )}
+
+      <div className="space-y-2">
+        {addOns.map((addOn) => (
+          <div
+            key={addOn.id}
+            className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-white p-4"
+          >
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium text-[var(--color-text)]">{addOn.name}</p>
+                {!addOn.active && <Badge variant="outline">Inactive</Badge>}
+              </div>
+              <p className="text-xs text-[var(--color-text-light)]">
+                ${Number(addOn.price).toFixed(2)}
+                {addOn.durationMinutes > 0 && ` · +${addOn.durationMinutes} min`}
+                {addOn.serviceAddOns.length > 0 &&
+                  ` · ${addOn.serviceAddOns.map((sa) => sa.service.name).join(", ")}`}
+              </p>
+            </div>
+            <div className="flex gap-1">
+              <Button size="sm" variant="ghost" onClick={() => startEdit(addOn)}>Edit</Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleToggleActive(addOn)}
+              >
+                {addOn.active ? "Deactivate" : "Activate"}
+              </Button>
+            </div>
+          </div>
+        ))}
+        {addOns.length === 0 && (
+          <p className="text-sm text-[var(--color-text-light)]">No add-ons yet.</p>
+        )}
+      </div>
     </div>
   );
 }

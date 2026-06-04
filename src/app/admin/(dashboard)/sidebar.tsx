@@ -15,6 +15,7 @@ import {
   IconClock,
   IconReportAnalytics,
   IconBell,
+  IconTag,
 } from "@tabler/icons-react";
 
 const navItems = [
@@ -32,6 +33,7 @@ const navItems = [
   },
   { href: "/admin/clients", label: "Clients", icon: IconUsers },
   { href: "/admin/services", label: "Services", icon: IconSparkles },
+  { href: "/admin/coupons", label: "Coupons", icon: IconTag },
   { href: "/admin/analytics", label: "Analytics", icon: IconChartBar },
   { href: "/admin/reports", label: "Reports", icon: IconReportAnalytics },
 ];
