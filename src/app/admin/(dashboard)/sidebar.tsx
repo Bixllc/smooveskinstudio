@@ -61,20 +61,20 @@ const allNavItems = navSections.flatMap((s) => s.items);
 function LogoBlock() {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
-    <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-white/[0.07]">
+    <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-black/[0.07]">
       <button
         onClick={() => inputRef.current?.click()}
         className="relative h-[34px] w-[34px] flex-shrink-0 rounded-[9px] overflow-hidden group"
       >
         <Image src="/images/logo.svg" alt="Logo" fill className="object-cover" />
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <span className="text-white text-[9px] font-medium">Edit</span>
         </div>
       </button>
       <input ref={inputRef} type="file" accept="image/*" className="hidden" />
       <div className="flex flex-col">
-        <span className="text-[15px] font-semibold text-white leading-tight">Smoove</span>
-        <span className="text-[11px] text-white/30 mt-0.5">Skin Studio</span>
+        <span className="text-[15px] font-semibold text-[#1b1814] leading-tight">Smoove</span>
+        <span className="text-[11px] text-[#a8a39c] mt-0.5">Skin Studio</span>
       </div>
     </div>
   );
@@ -99,7 +99,7 @@ export function AdminSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-[232px] flex-shrink-0 flex-col bg-[#1b1814] h-screen sticky top-0">
+      <aside className="hidden md:flex w-[232px] flex-shrink-0 flex-col bg-white border-r border-black/[0.07] h-screen sticky top-0">
         {/* Logo */}
         <LogoBlock />
 
@@ -107,7 +107,7 @@ export function AdminSidebar() {
         <nav className="flex-1 overflow-y-auto px-[10px] py-3">
           {navSections.map((section, si) => (
             <div key={section.label} className={si > 0 ? "mt-4" : ""}>
-              <p className="px-2 py-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/[0.22] first:pt-0.5">
+              <p className="px-2 py-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#c0bbb4] first:pt-0.5">
                 {section.label}
               </p>
               {section.items.map((item) => {
@@ -119,8 +119,8 @@ export function AdminSidebar() {
                     href={item.href}
                     className={`mb-0.5 flex items-center gap-[10px] rounded-[8px] px-[10px] py-[9px] text-[13.5px] font-normal transition-colors ${
                       active
-                        ? "bg-[rgba(201,169,110,0.14)] text-[#C9A96E]"
-                        : "text-white/50 hover:bg-white/[0.06] hover:text-white/[0.82]"
+                        ? "bg-[rgba(201,169,110,0.12)] text-[#C9A96E]"
+                        : "text-[#7a756e] hover:bg-[#f5f3f0] hover:text-[#1b1814]"
                     }`}
                   >
                     <Icon size={18} stroke={1.6} />
@@ -134,7 +134,7 @@ export function AdminSidebar() {
           {/* Log out inside configure section */}
           <button
             onClick={handleLogout}
-            className="mb-0.5 flex w-full items-center gap-[10px] rounded-[8px] px-[10px] py-[9px] text-[13.5px] font-normal text-white/50 transition-colors hover:bg-white/[0.06] hover:text-white/[0.82]"
+            className="mb-0.5 flex w-full items-center gap-[10px] rounded-[8px] px-[10px] py-[9px] text-[13.5px] font-normal text-[#7a756e] transition-colors hover:bg-[#f5f3f0] hover:text-[#1b1814]"
           >
             <IconLogout size={18} stroke={1.6} />
             <span>Log out</span>
@@ -142,22 +142,22 @@ export function AdminSidebar() {
         </nav>
 
         {/* User footer */}
-        <div className="border-t border-white/[0.07] px-[10px] py-3">
-          <div className="flex items-center gap-[10px] rounded-[8px] px-[10px] py-2 cursor-pointer hover:bg-white/[0.05]">
+        <div className="border-t border-black/[0.07] px-[10px] py-3">
+          <div className="flex items-center gap-[10px] rounded-[8px] px-[10px] py-2 cursor-pointer hover:bg-[#f5f3f0]">
             <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#C9A96E]">
               <span className="text-[13px] font-semibold text-[#1b1814]">A</span>
             </div>
             <div className="flex flex-1 flex-col min-w-0">
-              <span className="text-[13px] font-medium text-white/[0.82] leading-tight">Anisha</span>
-              <span className="text-[11px] text-white/[0.28]">Admin</span>
+              <span className="text-[13px] font-medium text-[#1b1814] leading-tight">Anisha</span>
+              <span className="text-[11px] text-[#a8a39c]">Admin</span>
             </div>
-            <IconDotsVertical size={15} stroke={1.8} className="text-white/25 flex-shrink-0" />
+            <IconDotsVertical size={15} stroke={1.8} className="text-[#c0bbb4] flex-shrink-0" />
           </div>
         </div>
       </aside>
 
       {/* Mobile bottom tab bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-[#2d2b26] bg-[#1a1814] md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-black/[0.07] bg-white md:hidden">
         {allNavItems.slice(0, 5).map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href, item.exact);
@@ -166,7 +166,7 @@ export function AdminSidebar() {
               key={item.href}
               href={item.href}
               className={`flex flex-1 flex-col items-center justify-center py-2 gap-0.5 transition-colors ${
-                active ? "text-[#C9A96E]" : "text-[#7a786e]"
+                active ? "text-[#C9A96E]" : "text-[#a8a39c]"
               }`}
             >
               <Icon size={20} stroke={1.5} />
