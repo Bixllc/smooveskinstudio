@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   IconLayoutDashboard,
@@ -59,19 +58,18 @@ const navSections = [
 const allNavItems = navSections.flatMap((s) => s.items);
 
 function LogoBlock() {
-  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-black/[0.07]">
-      <button
-        onClick={() => inputRef.current?.click()}
-        className="relative h-[34px] w-[34px] flex-shrink-0 rounded-[9px] overflow-hidden group"
+      <label
+        htmlFor="logo-upload"
+        className="relative h-[34px] w-[34px] flex-shrink-0 rounded-[9px] overflow-hidden group cursor-pointer"
       >
         <Image src="/images/logo.svg" alt="Logo" fill className="object-cover" />
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <span className="text-white text-[9px] font-medium">Edit</span>
         </div>
-      </button>
-      <input ref={inputRef} type="file" accept="image/*" className="hidden" />
+      </label>
+      <input id="logo-upload" type="file" accept="image/*" className="hidden" />
       <div className="flex flex-col">
         <span className="text-[15px] font-semibold text-[#1b1814] leading-tight">Smoove</span>
         <span className="text-[11px] text-[#a8a39c] mt-0.5">Skin Studio</span>
