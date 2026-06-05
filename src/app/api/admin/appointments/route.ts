@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
           },
         },
         payments: {
-          where: { status: "COMPLETED" },
+          where: { status: "PAID" },
           select: { amount: true },
         },
       },

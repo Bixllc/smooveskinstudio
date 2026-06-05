@@ -9,10 +9,16 @@ export default async function AdminDashboard() {
   const session = await getAdminSession();
   if (!session) redirect("/admin/login");
 
-  const settings = await prisma.businessSettings.findUnique({
-    where: { clientId: session.clientId },
-    select: { timezone: true },
-  });
+  const [settings, client] = await Promise.all([
+    prisma.businessSettings.findUnique({
+      where: { clientId: session.clientId },
+      select: { timezone: true },
+    }),
+    prisma.client.findUnique({
+      where: { id: session.clientId },
+      select: { slug: true },
+    }),
+  ]);
 
   const tz = settings?.timezone ?? "America/Chicago";
   const nowLocal = toZonedTime(new Date(), tz);
@@ -22,6 +28,6 @@ export default async function AdminDashboard() {
   const dateLabel = format(nowLocal, "EEEE, MMM d");
 
   return (
-    <DashboardClient greeting={greeting} dateLabel={dateLabel} tz={tz} />
+    <DashboardClient greeting={greeting} dateLabel={dateLabel} tz={tz} clientSlug={client?.slug ?? ""} />
   );
 }

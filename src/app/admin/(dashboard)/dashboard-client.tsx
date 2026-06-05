@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { useRouter } from "next/navigation";
 import { IconPlus, IconChevronRight } from "@tabler/icons-react";
 
 function getCategoryColors(name: string) {
@@ -12,7 +13,8 @@ function getCategoryColors(name: string) {
   return { dot: "bg-[#e05c4a]" };
 }
 
-export function DashboardClient({ greeting, dateLabel, tz }: { greeting: string; dateLabel: string; tz: string }) {
+export function DashboardClient({ greeting, dateLabel, tz, clientSlug }: { greeting: string; dateLabel: string; tz: string; clientSlug: string }) {
+  const router = useRouter();
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => fetch("/api/admin/dashboard").then((r) => r.json()),
@@ -28,7 +30,10 @@ export function DashboardClient({ greeting, dateLabel, tz }: { greeting: string;
         <div>
           <p className="text-[26px] font-semibold text-[#1b1814]">{greeting}, Anisha</p>
         </div>
-        <button className="inline-flex items-center gap-1.5 rounded-[9px] bg-[#c9a96e] px-[20px] py-[11px] text-[14px] font-semibold text-[#1b1814] transition-opacity hover:opacity-85 border-none cursor-pointer">
+        <button
+          onClick={() => router.push(`/${clientSlug}/book`)}
+          className="inline-flex items-center gap-1.5 rounded-[9px] bg-[#c9a96e] px-[20px] py-[11px] text-[14px] font-semibold text-[#1b1814] transition-opacity hover:opacity-85 border-none cursor-pointer"
+        >
           <IconPlus size={17} stroke={2.2} /> New booking
         </button>
       </div>
