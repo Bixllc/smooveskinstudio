@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   IconLayoutDashboard,
@@ -58,18 +59,27 @@ const navSections = [
 const allNavItems = navSections.flatMap((s) => s.items);
 
 function LogoBlock() {
+  const [logoSrc, setLogoSrc] = useState("/images/logo.svg");
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setLogoSrc(url);
+  }
+
   return (
     <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-black/[0.07]">
       <label
         htmlFor="logo-upload"
         className="relative h-[34px] w-[34px] flex-shrink-0 rounded-[9px] overflow-hidden group cursor-pointer"
       >
-        <Image src="/images/logo.svg" alt="Logo" fill className="object-cover" />
+        <Image src={logoSrc} alt="Logo" fill className="object-cover" unoptimized />
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <span className="text-white text-[9px] font-medium">Edit</span>
         </div>
       </label>
-      <input id="logo-upload" type="file" accept="image/*" className="hidden" />
+      <input id="logo-upload" type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       <div className="flex flex-col">
         <span className="text-[15px] font-semibold text-[#1b1814] leading-tight">Smoove</span>
         <span className="text-[11px] text-[#a8a39c] mt-0.5">Skin Studio</span>
