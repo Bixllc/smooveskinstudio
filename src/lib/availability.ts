@@ -83,6 +83,15 @@ export async function getAvailableSlots(
   const maxDaysOut = settings.maxBookingDaysOut ?? 100;
   const maxFutureUtc = addDays(now, maxDaysOut);
 
+  // Parse latestBookingTime ("HH:MM") into a UTC cutoff for this date
+  let latestCutoffUtc: Date | null = null;
+  if (settings.latestBookingTime) {
+    latestCutoffUtc = fromZonedTime(
+      new Date(`${date}T${settings.latestBookingTime}:00`),
+      timezone
+    );
+  }
+
   const slots: string[] = [];
 
   const extraMinutes = params.addOnDurationMinutes ?? 0;
@@ -95,6 +104,8 @@ export async function getAvailableSlots(
       if (candidateUtc.getTime() - now.getTime() < minLeadMs) continue;
       // Filter: must not exceed maxBookingDaysOut
       if (isAfter(candidateUtc, maxFutureUtc)) continue;
+      // Filter: must not be after latestBookingTime
+      if (latestCutoffUtc && isAfter(candidateUtc, latestCutoffUtc)) continue;
 
       const blockStart = addMinutes(candidateUtc, -service.bufferBeforeMinutes);
       const blockEnd = addMinutes(candidateUtc, service.durationMinutes + extraMinutes + service.bufferAfterMinutes);

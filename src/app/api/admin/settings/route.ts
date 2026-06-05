@@ -42,6 +42,7 @@ export async function PATCH(request: NextRequest) {
     "cancelRescheduleWindowHours",
     "allowClientCancel",
     "allowClientReschedule",
+    "latestBookingTime",
     "alertNewBooking",
     "alertCancellation",
     "alertReschedule",

@@ -48,6 +48,7 @@ model BusinessSettings {
   cancelRescheduleWindowHours Int      @default(24)
   allowClientCancel           Boolean  @default(true)
   allowClientReschedule       Boolean  @default(true)
+  latestBookingTime           String?  // "HH:MM" in client timezone, e.g. "21:00"
   alertNewBooking             Boolean  @default(true)
   alertCancellation           Boolean  @default(true)
   alertReschedule             Boolean  @default(true)

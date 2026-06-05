@@ -11,6 +11,7 @@ interface SchedulingForm {
   cancelRescheduleWindowHours: number;
   allowClientCancel: boolean;
   allowClientReschedule: boolean;
+  latestBookingTime: string;
 }
 
 export default function SchedulingLimitsPage() {
@@ -20,6 +21,7 @@ export default function SchedulingLimitsPage() {
     cancelRescheduleWindowHours: 24,
     allowClientCancel: true,
     allowClientReschedule: true,
+    latestBookingTime: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -34,6 +36,7 @@ export default function SchedulingLimitsPage() {
           cancelRescheduleWindowHours: data.cancelRescheduleWindowHours ?? 24,
           allowClientCancel: data.allowClientCancel ?? true,
           allowClientReschedule: data.allowClientReschedule ?? true,
+          latestBookingTime: data.latestBookingTime ?? "",
         });
       })
       .finally(() => setLoading(false));
@@ -95,6 +98,15 @@ export default function SchedulingLimitsPage() {
                   onChange={(v) => setForm((f) => ({ ...f, maxBookingDaysOut: v }))}
                   min={1}
                   max={365}
+                />
+              </Field>
+
+              <Field label="Latest booking time" hint="No appointments can be booked to start after this time (leave blank for no limit)">
+                <input
+                  type="time"
+                  value={form.latestBookingTime}
+                  onChange={(e) => setForm((f) => ({ ...f, latestBookingTime: e.target.value }))}
+                  className="w-full rounded-lg border border-[#e8e6e1] px-3 py-2 text-[12px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
                 />
               </Field>
             </div>
