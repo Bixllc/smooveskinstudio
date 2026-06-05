@@ -59,7 +59,7 @@ const navSections = [
 const allNavItems = navSections.flatMap((s) => s.items);
 
 function LogoBlock() {
-  const [logoSrc, setLogoSrc] = useState("/images/logo.svg");
+  const [logoSrc, setLogoSrc] = useState("/icon.png");
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
