@@ -99,20 +99,20 @@ export default function NotificationsPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <div className="flex h-11 flex-shrink-0 items-center gap-3 border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Notifications</span>
+      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Notifications</h1>
         <div className="flex-1" />
         <button
           onClick={saveAll}
           disabled={saving === "all" || loading}
-          className="flex h-[26px] items-center rounded-full bg-[#C9A96E] px-3 text-[11px] font-medium text-[#1a1814] disabled:opacity-60 hover:bg-[#b8954f] transition-colors"
+          className="inline-flex items-center rounded-[9px] bg-[#c9a96e] px-[18px] py-[9px] text-[13px] font-semibold text-[#1b1814] hover:opacity-85 transition-opacity disabled:opacity-60 border-none cursor-pointer"
         >
           {saving === "all" ? "Saving…" : "Save changes"}
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto p-4 pb-20 md:pb-4 space-y-3">
-        <p className="text-[11px] text-[#9a9890]">
+      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7 space-y-3">
+        <p className="text-[13px] text-[#7a756e]">
           Control which emails are sent to customers and customize their subject lines.
         </p>
 

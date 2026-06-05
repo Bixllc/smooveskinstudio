@@ -37,18 +37,18 @@ export default function AnalyticsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center gap-3 border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Analytics</span>
+      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Analytics</h1>
         <div className="flex-1" />
-        <div className="flex gap-0.5 rounded-lg border border-[#e8e6e1] bg-[#f5f4f2] p-0.5">
+        <div className="flex gap-0.5 rounded-[9px] border border-black/[0.07] bg-[#edeae5] p-0.5">
           {DAYS_OPTIONS.map((d) => (
             <button
               key={d}
               onClick={() => setDays(d)}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              className={`rounded-[7px] px-3 py-1.5 text-[12px] font-medium transition-colors ${
                 days === d
-                  ? "border border-[#e8e6e1] bg-white text-[#1a1814] shadow-sm"
-                  : "text-[#9a9890] hover:text-[#1a1814]"
+                  ? "bg-white text-[#1b1814] shadow-sm"
+                  : "text-[#a8a39c] hover:text-[#1b1814]"
               }`}
             >
               {d === 365 ? "1 year" : `${d} days`}
@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-4 pb-20 md:pb-4 space-y-4">
+      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7 space-y-[22px]">
         {isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -71,30 +71,16 @@ export default function AnalyticsPage() {
         ) : (
           <>
             {/* Metric cards */}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <MetricCard
-                label="No-show rate"
-                value={`${data?.noShowRate ?? 0}%`}
-              />
-              <MetricCard
-                label="Cancellation rate"
-                value={`${data?.cancellationRate ?? 0}%`}
-              />
-              <MetricCard
-                label="New clients"
-                value={String(data?.newClients ?? 0)}
-                gold
-              />
-              <MetricCard
-                label="Returning clients"
-                value={String(data?.returningClients ?? 0)}
-                gold
-              />
+            <div className="grid grid-cols-2 gap-[14px] lg:grid-cols-4">
+              <MetricCard label="No-show rate" value={`${data?.noShowRate ?? 0}%`} />
+              <MetricCard label="Cancellation rate" value={`${data?.cancellationRate ?? 0}%`} />
+              <MetricCard label="New clients" value={String(data?.newClients ?? 0)} gold />
+              <MetricCard label="Returning clients" value={String(data?.returningClients ?? 0)} gold />
             </div>
 
             {/* Revenue by month */}
-            <div className="rounded-xl border border-[#e8e6e1] bg-white p-4">
-              <p className="mb-4 text-[12px] font-medium text-[#1a1814]">
+            <div className="rounded-[14px] border border-black/[0.07] bg-white p-5">
+              <p className="mb-4 text-[13px] font-semibold text-[#1b1814]">
                 Revenue by month
               </p>
               {(data?.revenueByMonth?.length ?? 0) === 0 ? (
@@ -134,10 +120,10 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Top services + busiest days */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-[14px] sm:grid-cols-2">
               {/* Top services */}
-              <div className="rounded-xl border border-[#e8e6e1] bg-white p-4">
-                <p className="mb-3 text-[12px] font-medium text-[#1a1814]">
+              <div className="rounded-[14px] border border-black/[0.07] bg-white p-5">
+                <p className="mb-3 text-[13px] font-semibold text-[#1b1814]">
                   Top services
                 </p>
                 {(data?.topServices?.length ?? 0) === 0 ? (
@@ -166,8 +152,8 @@ export default function AnalyticsPage() {
               </div>
 
               {/* Busiest days */}
-              <div className="rounded-xl border border-[#e8e6e1] bg-white p-4">
-                <p className="mb-3 text-[12px] font-medium text-[#1a1814]">
+              <div className="rounded-[14px] border border-black/[0.07] bg-white p-5">
+                <p className="mb-3 text-[13px] font-semibold text-[#1b1814]">
                   Busiest days
                 </p>
                 <ResponsiveContainer width="100%" height={140}>
@@ -206,25 +192,11 @@ export default function AnalyticsPage() {
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  gold,
-}: {
-  label: string;
-  value: string;
-  gold?: boolean;
-}) {
+function MetricCard({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
   return (
-    <div className="rounded-lg border border-[#e8e6e1] bg-white p-3">
-      <p className="mb-1 text-[10px] text-[#9a9890]">{label}</p>
-      <p
-        className={`text-xl font-medium ${
-          gold ? "text-[#C9A96E]" : "text-[#1a1814]"
-        }`}
-      >
-        {value}
-      </p>
+    <div className="rounded-[14px] border border-black/[0.07] bg-white p-[18px_20px]">
+      <p className="mb-[7px] text-[10.5px] font-medium uppercase tracking-[0.07em] text-[#a8a39c]">{label}</p>
+      <p className={`text-[28px] font-semibold leading-none ${gold ? "text-[#b8892a]" : "text-[#1b1814]"}`}>{value}</p>
     </div>
   );
 }

@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { IconPlus } from "@tabler/icons-react";
 import type { FormField, FieldType } from "@/lib/forms";
 
 interface FormTemplate {
@@ -49,12 +45,15 @@ const emptyForm: FormState = {
 };
 
 function newField(): FormField {
-  return {
-    id: `field_${Date.now()}`,
-    label: "",
-    type: "text",
-    required: true,
-  };
+  return { id: `field_${Date.now()}`, label: "", type: "text", required: true };
+}
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="block text-[11px] font-medium uppercase tracking-[0.06em] text-[#7a756e] mb-1.5">
+      {children}
+    </label>
+  );
 }
 
 export default function FormsPage() {
@@ -80,13 +79,7 @@ export default function FormsPage() {
 
   function startEdit(t: FormTemplate) {
     setEditingId(t.id);
-    setForm({
-      name: t.name,
-      description: t.description ?? "",
-      type: t.type,
-      fields: t.fields,
-      active: t.active,
-    });
+    setForm({ name: t.name, description: t.description ?? "", type: t.type, fields: t.fields, active: t.active });
     setShowEditor(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -117,27 +110,12 @@ export default function FormsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-
-    const payload = {
-      name: form.name,
-      description: form.description || null,
-      type: form.type,
-      fields: form.fields,
-      active: form.active,
-    };
-
+    const payload = { name: form.name, description: form.description || null, type: form.type, fields: form.fields, active: form.active };
     const url = editingId ? `/api/admin/forms/${editingId}` : "/api/admin/forms";
     const method = editingId ? "PATCH" : "POST";
-
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
+    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     if (res.ok) {
       if (!editingId) {
-        // New form created — open it for editing to assign services
         const created = await res.json();
         setEditingId(created.id);
       }
@@ -154,224 +132,262 @@ export default function FormsPage() {
     if (res.ok) fetchForms();
   }
 
-  if (loading) {
-    return <p className="text-sm text-[var(--color-text-light)]">Loading...</p>;
-  }
-
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-[var(--color-text)]">Forms</h2>
+    <div className="flex h-screen flex-col overflow-hidden">
+      {/* Topbar */}
+      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Forms</h1>
         {!showEditor && (
-          <Button onClick={() => setShowEditor(true)}>New Form</Button>
+          <button
+            onClick={() => setShowEditor(true)}
+            className="bg-[#c9a96e] text-[#1b1814] rounded-[9px] px-[18px] py-[9px] text-[13px] font-semibold inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity cursor-pointer border-none"
+          >
+            <IconPlus size={14} /> New Form
+          </button>
         )}
-      </div>
+      </header>
 
-      {error && (
-        <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
-      )}
-
-      {/* Editor */}
-      {showEditor && (
-        <div className="mb-8 rounded-xl border border-[var(--color-border)] bg-white">
-          <form onSubmit={handleSubmit} className="p-6">
-            <p className="mb-4 text-sm font-medium text-[var(--color-text)]">
-              {editingId ? "Edit Form" : "New Form"}
-            </p>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="fName">Form Name *</Label>
-                <Input
-                  id="fName"
-                  value={form.name}
-                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                  required
-                  className="mt-1"
-                  placeholder="e.g. Brazilian Wax Consent Form"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="fType">Type</Label>
-                <select
-                  id="fType"
-                  value={form.type}
-                  onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
-                  className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-                >
-                  <option value="CONSENT">Consent</option>
-                  <option value="INTAKE">Intake</option>
-                  <option value="WAIVER">Waiver</option>
-                  <option value="CUSTOM">Custom</option>
-                </select>
-              </div>
-
-              <div className="sm:col-span-2">
-                <Label htmlFor="fDesc">Description</Label>
-                <Textarea
-                  id="fDesc"
-                  value={form.description}
-                  onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
-                  rows={2}
-                  className="mt-1"
-                  placeholder="Briefly describe this form…"
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  id="fActive"
-                  type="checkbox"
-                  checked={form.active}
-                  onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))}
-                  className="h-4 w-4 rounded border-gray-300"
-                />
-                <Label htmlFor="fActive">Active</Label>
-              </div>
-            </div>
-
-            {/* Field builder */}
-            <div className="mt-6">
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-medium text-[var(--color-text)]">Fields</p>
-                <Button type="button" size="sm" variant="outline" onClick={addField}>
-                  + Add Field
-                </Button>
-              </div>
-
-              {form.fields.length === 0 && (
-                <p className="text-sm text-[var(--color-text-light)]">
-                  No fields yet. Add fields or leave empty for signature-only forms.
-                </p>
-              )}
-
-              <div className="space-y-3">
-                {form.fields.map((field, i) => (
-                  <div key={field.id} className="rounded-lg border border-[var(--color-border)] p-4">
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <Label>Label *</Label>
-                        <Input
-                          value={field.label}
-                          onChange={(e) => updateField(i, { label: e.target.value })}
-                          required
-                          className="mt-1"
-                          placeholder="e.g. Do you have any skin conditions?"
-                        />
-                      </div>
-
-                      <div>
-                        <Label>Type</Label>
-                        <select
-                          value={field.type}
-                          onChange={(e) => updateField(i, { type: e.target.value as FieldType })}
-                          className="mt-1 w-full rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
-                        >
-                          <option value="text">Short Text</option>
-                          <option value="textarea">Long Text</option>
-                          <option value="checkbox">Checkbox (Yes/Agree)</option>
-                          <option value="select">Dropdown</option>
-                          <option value="date">Date</option>
-                          <option value="signature">Signature</option>
-                        </select>
-                      </div>
-
-                      <div className="flex items-center gap-2 pt-5">
-                        <input
-                          type="checkbox"
-                          id={`req-${i}`}
-                          checked={field.required}
-                          onChange={(e) => updateField(i, { required: e.target.checked })}
-                          className="h-4 w-4 rounded border-gray-300"
-                        />
-                        <Label htmlFor={`req-${i}`}>Required</Label>
-                      </div>
-
-                      {field.type !== "checkbox" && field.type !== "signature" && (
-                        <div className="sm:col-span-2">
-                          <Label>Placeholder</Label>
-                          <Input
-                            value={field.placeholder ?? ""}
-                            onChange={(e) => updateField(i, { placeholder: e.target.value })}
-                            className="mt-1"
-                          />
-                        </div>
-                      )}
-
-                      {field.type === "select" && (
-                        <div className="sm:col-span-2">
-                          <Label>Options (one per line)</Label>
-                          <Textarea
-                            value={(field.options ?? []).join("\n")}
-                            onChange={(e) =>
-                              updateField(i, {
-                                options: e.target.value.split("\n").map((o) => o.trim()).filter(Boolean),
-                              })
-                            }
-                            rows={3}
-                            className="mt-1"
-                            placeholder={"Option 1\nOption 2\nOption 3"}
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-3 flex justify-end">
-                      <Button type="button" size="sm" variant="destructive" onClick={() => removeField(i)}>
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-6 flex gap-2">
-              <Button type="submit">{editingId ? "Update Form" : "Create Form"}</Button>
-              <Button type="button" variant="ghost" onClick={resetEditor}>Cancel</Button>
-            </div>
-          </form>
-
-          {/* Service Assignments — only shown when editing an existing form */}
-          {editingId && (
-            <ServiceAssignments formId={editingId} services={services} />
-          )}
-        </div>
-      )}
-
-      {/* Form list */}
-      <div className="space-y-2">
-        {forms.map((t) => (
-          <div key={t.id} className="rounded-lg border border-[var(--color-border)] bg-white p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-medium text-[var(--color-text)]">{t.name}</p>
-                  <Badge variant="outline">{t.type}</Badge>
-                  {!t.active && <Badge variant="outline">Inactive</Badge>}
-                </div>
-                <p className="mt-0.5 text-xs text-[var(--color-text-light)]">
-                  {t.fields.length} field{t.fields.length !== 1 ? "s" : ""} &middot;{" "}
-                  {t._count.serviceAssignments} service{t._count.serviceAssignments !== 1 ? "s" : ""} &middot;{" "}
-                  {t._count.submissions} submission{t._count.submissions !== 1 ? "s" : ""}
-                </p>
-                {t.description && (
-                  <p className="mt-0.5 text-xs text-[var(--color-text-light)]">{t.description}</p>
-                )}
-              </div>
-              <div className="flex shrink-0 gap-1">
-                <Button size="sm" variant="ghost" onClick={() => startEdit(t)}>Edit</Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(t.id)}>Delete</Button>
-              </div>
-            </div>
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-8 py-7 pb-20 md:pb-7">
+        {error && (
+          <div className="mb-4 rounded-[9px] bg-[#fdecea] border border-[#f5c6c2] px-4 py-3 text-[13px] text-[#b53a2e]">
+            {error}
           </div>
-        ))}
+        )}
 
-        {forms.length === 0 && (
-          <p className="text-sm text-[var(--color-text-light)]">
-            No forms yet. Create one above.
-          </p>
+        {/* Editor */}
+        {showEditor && (
+          <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden max-w-2xl mb-7">
+            <form onSubmit={handleSubmit} className="p-6">
+              <p className="text-[15px] font-semibold text-[#1b1814] mb-5">
+                {editingId ? "Edit Form" : "New Form"}
+              </p>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <FieldLabel>Form Name *</FieldLabel>
+                  <input
+                    value={form.name}
+                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                    required
+                    placeholder="e.g. Brazilian Wax Consent Form"
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Type</FieldLabel>
+                  <select
+                    value={form.type}
+                    onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                  >
+                    <option value="CONSENT">Consent</option>
+                    <option value="INTAKE">Intake</option>
+                    <option value="WAIVER">Waiver</option>
+                    <option value="CUSTOM">Custom</option>
+                  </select>
+                </div>
+                <div className="sm:col-span-2">
+                  <FieldLabel>Description</FieldLabel>
+                  <textarea
+                    value={form.description}
+                    onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                    rows={2}
+                    placeholder="Briefly describe this form…"
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors resize-none"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="fActive"
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))}
+                    className="h-4 w-4 rounded border-gray-300 accent-[#c9a96e]"
+                  />
+                  <label htmlFor="fActive" className="text-[13px] font-medium text-[#1b1814] cursor-pointer">Active</label>
+                </div>
+              </div>
+
+              {/* Field builder */}
+              <div className="mt-6">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-[13px] font-semibold text-[#1b1814]">Fields</p>
+                  <button
+                    type="button"
+                    onClick={addField}
+                    className="inline-flex items-center gap-1 rounded-[8px] border border-black/[0.12] bg-white px-3 py-[7px] text-[12px] font-medium text-[#7a756e] hover:bg-[#f8f6f3] transition-colors cursor-pointer"
+                  >
+                    <IconPlus size={12} /> Add Field
+                  </button>
+                </div>
+
+                {form.fields.length === 0 && (
+                  <p className="text-[13px] text-[#a8a39c]">
+                    No fields yet. Add fields or leave empty for signature-only forms.
+                  </p>
+                )}
+
+                <div className="space-y-3">
+                  {form.fields.map((field, i) => (
+                    <div key={field.id} className="rounded-[10px] border border-black/[0.07] p-4 bg-[#faf9f7]">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="sm:col-span-2">
+                          <FieldLabel>Label *</FieldLabel>
+                          <input
+                            value={field.label}
+                            onChange={(e) => updateField(i, { label: e.target.value })}
+                            required
+                            placeholder="e.g. Do you have any skin conditions?"
+                            className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <FieldLabel>Type</FieldLabel>
+                          <select
+                            value={field.type}
+                            onChange={(e) => updateField(i, { type: e.target.value as FieldType })}
+                            className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                          >
+                            <option value="text">Short Text</option>
+                            <option value="textarea">Long Text</option>
+                            <option value="checkbox">Checkbox (Yes/Agree)</option>
+                            <option value="select">Dropdown</option>
+                            <option value="date">Date</option>
+                            <option value="signature">Signature</option>
+                          </select>
+                        </div>
+                        <div className="flex items-center gap-2 pt-6">
+                          <input
+                            type="checkbox"
+                            id={`req-${i}`}
+                            checked={field.required}
+                            onChange={(e) => updateField(i, { required: e.target.checked })}
+                            className="h-4 w-4 rounded border-gray-300 accent-[#c9a96e]"
+                          />
+                          <label htmlFor={`req-${i}`} className="text-[13px] font-medium text-[#1b1814] cursor-pointer">Required</label>
+                        </div>
+                        {field.type !== "checkbox" && field.type !== "signature" && (
+                          <div className="sm:col-span-2">
+                            <FieldLabel>Placeholder</FieldLabel>
+                            <input
+                              value={field.placeholder ?? ""}
+                              onChange={(e) => updateField(i, { placeholder: e.target.value })}
+                              className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                            />
+                          </div>
+                        )}
+                        {field.type === "select" && (
+                          <div className="sm:col-span-2">
+                            <FieldLabel>Options (one per line)</FieldLabel>
+                            <textarea
+                              value={(field.options ?? []).join("\n")}
+                              onChange={(e) =>
+                                updateField(i, {
+                                  options: e.target.value.split("\n").map((o) => o.trim()).filter(Boolean),
+                                })
+                              }
+                              rows={3}
+                              placeholder={"Option 1\nOption 2\nOption 3"}
+                              className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors resize-none"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => removeField(i)}
+                          className="bg-white text-[#b53a2e] border border-black/[0.12] rounded-[7px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#fdecea] transition-colors cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-2">
+                <button
+                  type="submit"
+                  className="bg-[#c9a96e] text-[#1b1814] rounded-[9px] px-[18px] py-[9px] text-[13px] font-semibold hover:opacity-85 transition-opacity cursor-pointer border-none"
+                >
+                  {editingId ? "Update Form" : "Create Form"}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetEditor}
+                  className="bg-white text-[#7a756e] border border-black/[0.12] rounded-[9px] px-[18px] py-2 text-[13px] font-medium hover:bg-[#f8f6f3] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+
+            {editingId && (
+              <ServiceAssignments formId={editingId} services={services} />
+            )}
+          </div>
+        )}
+
+        {/* Form list */}
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-14 animate-pulse rounded-[14px] bg-[#f5f4f2]" />
+            ))}
+          </div>
+        ) : forms.length === 0 ? (
+          <div className="flex items-center justify-center py-20">
+            <p className="text-[14px] text-[#a8a39c]">No forms yet. Create one above.</p>
+          </div>
+        ) : (
+          <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "2fr 80px 80px 80px auto" }}>
+              {["Form", "Type", "Fields", "Uses", ""].map((h) => (
+                <div key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">{h}</div>
+              ))}
+            </div>
+            {forms.map((t) => (
+              <div
+                key={t.id}
+                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+                style={{ gridTemplateColumns: "2fr 80px 80px 80px auto" }}
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[14px] font-medium text-[#1b1814]">{t.name}</span>
+                    {!t.active && (
+                      <span className="bg-[#f5f4f2] text-[#a8a39c] text-[10px] font-semibold px-[8px] py-[2px] rounded-full uppercase tracking-[0.04em]">
+                        Inactive
+                      </span>
+                    )}
+                  </div>
+                  {t.description && (
+                    <p className="mt-0.5 text-[12px] text-[#7a756e] truncate">{t.description}</p>
+                  )}
+                </div>
+                <span className="text-[12px] text-[#7a756e]">{t.type}</span>
+                <span className="text-[13px] text-[#7a756e]">{t.fields.length}</span>
+                <span className="text-[13px] text-[#7a756e]">{t._count.submissions}</span>
+                <div className="flex items-center gap-1 pl-2">
+                  <button
+                    onClick={() => startEdit(t)}
+                    className="bg-white text-[#7a756e] border border-black/[0.12] rounded-[7px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#f8f6f3] transition-colors cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(t.id)}
+                    className="bg-white text-[#b53a2e] border border-black/[0.12] rounded-[7px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#fdecea] transition-colors cursor-pointer"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -419,68 +435,55 @@ function ServiceAssignments({ formId, services }: { formId: string; services: Se
   const available = services.filter((s) => !assignedServiceIds.has(s.id));
 
   return (
-    <div className="border-t border-[var(--color-border)] p-6">
-      <p className="mb-1 text-sm font-medium text-[var(--color-text)]">Assigned Services</p>
-      <p className="mb-4 text-xs text-[var(--color-text-light)]">
+    <div className="border-t border-black/[0.07] p-6">
+      <p className="mb-1 text-[13px] font-semibold text-[#1b1814]">Assigned Services</p>
+      <p className="mb-4 text-[12px] text-[#7a756e]">
         Customers booking these services will be shown this form.
       </p>
-
-      {loading && <p className="text-xs text-[var(--color-text-light)]">Loading…</p>}
-
+      {loading && <p className="text-[12px] text-[#a8a39c]">Loading…</p>}
       {!loading && (
         <>
-          <div className="mb-3 space-y-2">
+          <div className="mb-3 space-y-1.5">
             {assignments.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-subtle,#f9f8f6)] px-3 py-2"
-              >
-                <span className="text-sm text-[var(--color-text)]">{a.service.name}</span>
+              <div key={a.id} className="flex items-center justify-between rounded-[8px] border border-black/[0.07] bg-[#faf9f7] px-3 py-2">
+                <span className="text-[13px] text-[#1b1814]">{a.service.name}</span>
                 <button
                   type="button"
                   onClick={() => handleUnassign(a.serviceId)}
-                  className="text-xs text-red-500 hover:text-red-700"
+                  className="text-[12px] text-[#b53a2e] hover:opacity-75"
                 >
                   Remove
                 </button>
               </div>
             ))}
             {assignments.length === 0 && (
-              <p className="text-xs text-[var(--color-text-light)]">
-                Not assigned to any services yet.
-              </p>
+              <p className="text-[12px] text-[#a8a39c]">Not assigned to any services yet.</p>
             )}
           </div>
-
           {available.length > 0 && (
             <div className="flex gap-2">
               <select
                 value={selectedServiceId}
                 onChange={(e) => setSelectedServiceId(e.target.value)}
-                className="flex-1 rounded-lg border border-[var(--color-border)] px-3 py-2 text-sm outline-none focus:border-[var(--color-primary)]"
+                className="flex-1 px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13px] text-[#1b1814] outline-none focus:border-[#c9a96e]"
               >
                 <option value="">Select a service to assign…</option>
                 {available.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} ({s.category.name})
-                  </option>
+                  <option key={s.id} value={s.id}>{s.name} ({s.category.name})</option>
                 ))}
               </select>
-              <Button
+              <button
                 type="button"
-                size="sm"
                 onClick={handleAssign}
                 disabled={!selectedServiceId || saving}
+                className="bg-[#c9a96e] text-[#1b1814] rounded-[9px] px-[14px] py-[9px] text-[13px] font-semibold hover:opacity-85 transition-opacity border-none cursor-pointer disabled:opacity-40"
               >
                 {saving ? "Assigning…" : "Assign"}
-              </Button>
+              </button>
             </div>
           )}
-
           {available.length === 0 && assignments.length > 0 && (
-            <p className="text-xs text-[var(--color-text-light)]">
-              This form is assigned to all services.
-            </p>
+            <p className="text-[12px] text-[#a8a39c]">This form is assigned to all services.</p>
           )}
         </>
       )}

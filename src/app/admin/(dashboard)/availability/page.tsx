@@ -86,21 +86,21 @@ export default function AvailabilityPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center gap-3 border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Availability</span>
+      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Availability</h1>
         <div className="flex-1" />
         <button
           onClick={() => save.mutate()}
           disabled={save.isPending || isLoading}
-          className="flex h-[26px] items-center rounded-full bg-[#C9A96E] px-3 text-[11px] font-medium text-[#1a1814] disabled:opacity-60 hover:bg-[#b8954f] transition-colors"
+          className="inline-flex items-center rounded-[9px] bg-[#c9a96e] px-[18px] py-[9px] text-[13px] font-semibold text-[#1b1814] hover:opacity-85 transition-opacity disabled:opacity-50 border-none cursor-pointer"
         >
           {save.isPending ? "Saving…" : "Save changes"}
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-4 pb-20 md:pb-4">
-        <p className="mb-4 text-[12px] text-[#9a9890]">
+      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
+        <p className="mb-5 text-[13px] text-[#7a756e]">
           Set your weekly working hours. These control which time slots clients
           see when booking online.
         </p>
@@ -119,7 +119,7 @@ export default function AvailabilityPage() {
             {schedule.map((day) => (
               <div
                 key={day.dayOfWeek}
-                className="flex items-center gap-3 rounded-lg border border-[#e8e6e1] bg-white px-4 py-3"
+                className="flex items-center gap-3 rounded-[10px] border border-black/[0.07] bg-white px-4 py-3"
               >
                 <input
                   type="checkbox"
@@ -178,12 +178,12 @@ export default function AvailabilityPage() {
         {/* Blocked Times */}
         <div className="mt-8 max-w-xl">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-[12px] font-medium text-[#1a1814]">Blocked Times</p>
+            <p className="text-[13px] font-semibold text-[#1b1814]">Blocked Times</p>
             <button
               onClick={() => setShowBlockModal(true)}
-              className="flex h-[26px] items-center gap-1.5 rounded-full border border-[#e8e6e1] px-2.5 text-[11px] text-[#6b6860] hover:border-[#C9A96E] hover:text-[#C9A96E] transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-[9px] border border-black/[0.12] bg-white px-3 py-[7px] text-[12px] font-medium text-[#7a756e] hover:bg-[#f8f6f3] transition-colors cursor-pointer"
             >
-              <IconPlus size={11} />
+              <IconPlus size={13} />
               Block Time
             </button>
           </div>

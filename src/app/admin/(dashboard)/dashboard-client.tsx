@@ -3,40 +3,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import { IconPlus } from "@tabler/icons-react";
-import { SkeletonCard } from "@/components/admin/skeleton-card";
+import { IconPlus, IconChevronRight } from "@tabler/icons-react";
 
 function getCategoryColors(name: string) {
   const n = name.toLowerCase();
-  if (n.includes("brow"))
-    return {
-      dot: "bg-[#C9A96E]",
-      badge: "bg-[#f0e8d4] text-[#7a5c1a]",
-    };
-  if (n.includes("vajacial") || n.includes("hydrojelly") || n.includes("mask"))
-    return {
-      dot: "bg-[#6ea07c]",
-      badge: "bg-[#d4e8d8] text-[#2a5c38]",
-    };
-  return {
-    dot: "bg-[#c97c6e]",
-    badge: "bg-[#f0d4cf] text-[#7a2f22]",
-  };
+  if (n.includes("brow")) return { dot: "bg-[#C9A96E]" };
+  if (n.includes("vajacial") || n.includes("hydrojelly") || n.includes("mask")) return { dot: "bg-[#4ab87a]" };
+  return { dot: "bg-[#e05c4a]" };
 }
 
-export function DashboardClient({
-  greeting,
-  dateLabel,
-  tz,
-}: {
-  greeting: string;
-  dateLabel: string;
-  tz: string;
-}) {
+export function DashboardClient({ greeting, dateLabel, tz }: { greeting: string; dateLabel: string; tz: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["dashboard"],
-    queryFn: () =>
-      fetch("/api/admin/dashboard").then((r) => r.json()),
+    queryFn: () => fetch("/api/admin/dashboard").then((r) => r.json()),
     refetchInterval: 60_000,
   });
 
@@ -45,158 +24,101 @@ export function DashboardClient({
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center border-b border-[#e8e6e1] bg-white px-4 gap-3">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-[#1a1814]">
-            {greeting}, Anisha ✨
+      <div className="flex h-[60px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
+        <div>
+          <p className="text-[11px] text-[#a8a39c]">
+            {dateLabel} · {isLoading ? "…" : `${todayCount} appointment${todayCount !== 1 ? "s" : ""} today`}
           </p>
-          <p className="text-xs text-[#9a9890]">
-            {dateLabel} ·{" "}
-            {isLoading
-              ? "…"
-              : `${todayCount} appointment${todayCount !== 1 ? "s" : ""} today`}
-          </p>
+          <p className="mt-0.5 text-[20px] font-semibold text-[#1b1814]">{greeting}, Anisha ✦</p>
         </div>
-        <button className="flex h-[26px] items-center gap-1 rounded-full bg-[#C9A96E] px-2.5 text-[11px] font-medium text-[#1a1814]">
-          <IconPlus size={11} /> New booking
+        <button className="inline-flex items-center gap-1.5 rounded-[9px] bg-[#c9a96e] px-[18px] py-[9px] text-[13px] font-semibold text-[#1b1814] transition-opacity hover:opacity-85 border-none cursor-pointer">
+          <IconPlus size={16} stroke={2.2} /> New booking
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-3.5 space-y-3 pb-20 md:pb-3.5">
-        {/* Stats row */}
-        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+      <div className="flex-1 overflow-y-auto px-8 py-7 pb-20 md:pb-7">
+
+        {/* Metrics */}
+        <div className="mb-[26px] grid grid-cols-2 gap-[14px] lg:grid-cols-4">
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <SkeletonCard key={i} />
+              <div key={i} className="h-[88px] animate-pulse rounded-[14px] border border-black/[0.07] bg-white" />
             ))
           ) : (
             <>
-              <StatCard
-                label="Today's revenue"
-                value={`$${(data?.todayRevenue ?? 0).toFixed(0)}`}
-                gold
-              />
-              <StatCard
-                label="Bookings this month"
-                value={String(data?.monthBookingCount ?? 0)}
-              />
-              <StatCard
-                label="Cancellations (MTD)"
-                value={String(data?.cancellations ?? 0)}
-              />
-              <StatCard
-                label="MTD revenue"
-                value={`$${(data?.mtdRevenue ?? 0).toFixed(0)}`}
-                gold
-              />
+              <MetricCard label="Today's revenue" value={`$${(data?.todayRevenue ?? 0).toFixed(0)}`} gold />
+              <MetricCard label="Bookings this month" value={String(data?.monthBookingCount ?? 0)} />
+              <MetricCard label="Cancellations (MTD)" value={String(data?.cancellations ?? 0)} />
+              <MetricCard label="MTD revenue" value={`$${(data?.mtdRevenue ?? 0).toFixed(0)}`} gold />
             </>
           )}
         </div>
 
-        {/* Next appointment */}
+        {/* Up next */}
         {isLoading ? (
-          <SkeletonCard tall />
+          <div className="mb-[22px] h-[80px] animate-pulse rounded-[14px] bg-[#d4bb8e]" />
         ) : data?.nextAppt ? (
-          <NextApptCard appt={data.nextAppt} tz={tz} />
+          <UpNextCard appt={data.nextAppt} tz={tz} />
         ) : (
-          <div className="rounded-lg border border-[#e8e6e1] bg-white p-4 text-center">
-            <p className="text-sm text-[#9a9890]">
-              No upcoming appointments — enjoy the break ✨
-            </p>
+          <div className="mb-[22px] rounded-[14px] border border-black/[0.07] bg-white p-5 text-center">
+            <p className="text-[14px] text-[#a8a39c]">No upcoming appointments — enjoy the break ✦</p>
           </div>
         )}
 
-        {/* Today's schedule */}
+        {/* Rest of today */}
         {!isLoading && (data?.todayBookings?.length ?? 0) > 0 && (
-          <div>
-            <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-[#9a9890]">
-              Rest of today
-            </p>
-            <div className="space-y-1">
+          <>
+            <div className="mb-3">
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em] text-[#a8a39c]">Rest of today</span>
+            </div>
+            <div className="overflow-hidden rounded-[14px] border border-black/[0.07] bg-white">
               {data.todayBookings.map((b: any) => {
-                const colors = getCategoryColors(b.service.category.name);
-                const time = format(
-                  toZonedTime(new Date(b.startTimeUtc), tz),
-                  "h:mm a"
-                );
+                const colors = getCategoryColors(b.service.category?.name ?? "");
+                const time = format(toZonedTime(new Date(b.startTimeUtc), tz), "h:mm a");
                 return (
-                  <div
-                    key={b.id}
-                    className="flex items-center gap-2 rounded-lg border border-[#e8e6e1] bg-white px-3 py-1.5"
-                  >
-                    <span
-                      className={`h-[7px] w-[7px] flex-shrink-0 rounded-full ${colors.dot}`}
-                    />
-                    <span className="w-[54px] flex-shrink-0 text-[11px] text-[#9a9890]">
-                      {time}
-                    </span>
-                    <span className="flex-1 text-[12px] font-medium text-[#1a1814]">
-                      {b.customer.fullName}
-                    </span>
-                    <span className="text-[11px] text-[#9a9890]">
-                      {b.service.name}
-                    </span>
+                  <div key={b.id} className="flex cursor-pointer items-center gap-[14px] border-b border-black/[0.07] px-5 py-[14px] last:border-0 transition-colors hover:bg-[#f8f6f3]">
+                    <span className="min-w-[72px] text-[12.5px] tabular-nums text-[#7a756e]">{time}</span>
+                    <span className={`h-[7px] w-[7px] flex-shrink-0 rounded-full ${colors.dot}`} />
+                    <span className="flex-1 text-[14px] font-medium text-[#1b1814]">{b.customer.fullName}</span>
+                    <span className="text-[12.5px] text-[#7a756e]">{b.service.name}</span>
+                    <IconChevronRight size={14} stroke={2} className="text-[#a8a39c]" />
                   </div>
                 );
               })}
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
   );
 }
 
-function StatCard({
-  label,
-  value,
-  gold,
-}: {
-  label: string;
-  value: string;
-  gold?: boolean;
-}) {
+function MetricCard({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
   return (
-    <div className="rounded-lg border border-[#e8e6e1] bg-white p-3">
-      <p className="mb-1 text-[11px] text-[#9a9890]">{label}</p>
-      <p
-        className={`text-xl font-medium leading-none ${
-          gold ? "text-[#C9A96E]" : "text-[#1a1814]"
-        }`}
-      >
-        {value}
-      </p>
+    <div className="rounded-[14px] border border-black/[0.07] bg-white p-[18px_20px]">
+      <p className="mb-[7px] text-[10.5px] font-medium uppercase tracking-[0.07em] text-[#a8a39c]">{label}</p>
+      <p className={`text-[28px] font-semibold leading-none ${gold ? "text-[#b8892a]" : "text-[#1b1814]"}`}>{value}</p>
     </div>
   );
 }
 
-function NextApptCard({ appt, tz }: { appt: any; tz: string }) {
+function UpNextCard({ appt, tz }: { appt: any; tz: string }) {
   const local = toZonedTime(new Date(appt.startTimeUtc), tz);
-  const colors = getCategoryColors(appt.service.category.name);
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-[#e8e6e1] bg-white p-3">
-      <div className="flex min-w-[48px] flex-col items-center justify-center rounded-lg border border-[#C9A96E44] bg-[#C9A96E18] py-1.5 px-2">
-        <span className="text-base font-medium leading-none text-[#C9A96E]">
-          {format(local, "h")}
-        </span>
-        <span className="text-[10px] text-[#C9A96E99]">
-          {format(local, ":mm a")}
-        </span>
+    <div className="mb-[22px] flex items-center gap-[18px] rounded-[14px] bg-[#c9a96e] p-[18px_22px]">
+      <div className="min-w-[58px] rounded-[8px] bg-[rgba(27,24,20,0.17)] px-[14px] py-[10px] text-center">
+        <div className="text-[24px] font-bold leading-none text-[#1b1814]">{format(local, "h")}</div>
+        <div className="mt-[2px] text-[10px] font-semibold tracking-[0.03em] text-[rgba(27,24,20,0.52)]">{format(local, ":mm a")}</div>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-medium text-[#1a1814] truncate">
-          {appt.customer.fullName}
-        </p>
-        <p className="text-[11px] text-[#9a9890] truncate">
-          {appt.service.name} · {appt.service.durationMinutes} min
-        </p>
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-[rgba(27,24,20,0.48)]">Up next</div>
+        <div className="truncate text-[16px] font-semibold text-[#1b1814]">{appt.customer.fullName}</div>
+        <div className="mt-[3px] truncate text-[13px] text-[rgba(27,24,20,0.58)]">{appt.service.name} · {appt.service.durationMinutes} min</div>
       </div>
-      <span
-        className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${colors.badge}`}
-      >
-        {appt.service.category.name}
-      </span>
+      <div className="flex-shrink-0 rounded-[20px] bg-[rgba(27,24,20,0.13)] px-3 py-[5px] text-[11.5px] font-medium text-[#1b1814]">
+        {appt.service.category?.name ?? ""}
+      </div>
     </div>
   );
 }

@@ -306,20 +306,20 @@ export default function CalendarPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center gap-2 border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Calendar</span>
+      <div className="flex h-[60px] flex-shrink-0 items-center gap-2 border-b border-black/[0.07] bg-white px-8">
+        <span className="text-[20px] font-semibold text-[#1b1814] mr-2">Calendar</span>
         <div className="flex-1" />
 
         {/* View toggle */}
-        <div className="flex gap-0.5 rounded-lg border border-[#e8e6e1] bg-[#f5f4f2] p-0.5">
+        <div className="flex gap-0.5 rounded-[9px] border border-black/[0.07] bg-[#edeae5] p-0.5">
           {(["Day", "Week", "Month"] as const).map((v) => (
             <button
               key={v}
               onClick={() => setView(v.toLowerCase() as CalendarView)}
-              className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              className={`rounded-[7px] px-3 py-1.5 text-[12px] font-medium transition-colors ${
                 view === v.toLowerCase()
-                  ? "border border-[#e8e6e1] bg-white text-[#1a1814] shadow-sm"
-                  : "text-[#9a9890] hover:text-[#1a1814]"
+                  ? "bg-white text-[#1b1814] shadow-sm"
+                  : "text-[#a8a39c] hover:text-[#1b1814]"
               }`}
             >
               {v}
@@ -330,22 +330,22 @@ export default function CalendarPage() {
         {/* Nav arrows */}
         <button
           onClick={goBack}
-          className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#e8e6e1] text-[#9a9890] hover:border-[#C9A96E] hover:text-[#C9A96E]"
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-black/[0.07] text-[#a8a39c] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors"
         >
           <IconChevronLeft size={14} />
         </button>
-        <span className="min-w-[140px] text-center text-[11px] font-medium text-[#1a1814]">
+        <span className="min-w-[140px] text-center text-[12px] font-medium text-[#1b1814]">
           {navLabel()}
         </span>
         <button
           onClick={goForward}
-          className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#e8e6e1] text-[#9a9890] hover:border-[#C9A96E] hover:text-[#C9A96E]"
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-black/[0.07] text-[#a8a39c] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors"
         >
           <IconChevronRight size={14} />
         </button>
         <button
           onClick={goToday}
-          className="h-[26px] rounded-full border border-[#e8e6e1] px-2.5 text-[11px] text-[#9a9890] hover:border-[#C9A96E] hover:text-[#C9A96E]"
+          className="h-7 rounded-full border border-black/[0.07] px-3 text-[12px] text-[#a8a39c] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors"
         >
           Today
         </button>
@@ -354,11 +354,11 @@ export default function CalendarPage() {
         <div className="relative">
           <button
             onClick={() => setShowAddMenu((v) => !v)}
-            className="flex h-[26px] items-center gap-1 rounded-full bg-[#C9A96E] px-2.5 text-[11px] font-medium text-[#1a1814] hover:bg-[#b8954f] transition-colors"
+            className="flex h-[34px] items-center gap-1.5 rounded-[9px] bg-[#c9a96e] px-[14px] text-[13px] font-semibold text-[#1b1814] hover:opacity-85 transition-opacity border-none cursor-pointer"
           >
-            <IconPlus size={12} />
+            <IconPlus size={14} />
             Add
-            <IconChevronDown size={11} />
+            <IconChevronDown size={12} />
           </button>
           {showAddMenu && (
             <>

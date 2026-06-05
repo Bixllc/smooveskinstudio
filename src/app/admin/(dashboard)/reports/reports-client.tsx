@@ -67,14 +67,13 @@ export default function ReportsClient({ month, year, summary, rows }: Props) {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center gap-3 border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Reports</span>
+      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Reports</h1>
         <div className="flex-1" />
-        {/* Month / Year selectors */}
         <select
           value={month}
           onChange={(e) => navigate(Number(e.target.value), year)}
-          className="rounded-lg border border-[#e8e6e1] px-2 py-1 text-[11px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
+          className="rounded-[9px] border border-black/[0.07] px-3 py-[7px] text-[13px] text-[#1b1814] outline-none focus:border-[#c9a96e] bg-white"
         >
           {MONTHS.map((m, i) => (
             <option key={i} value={i + 1}>{m}</option>
@@ -83,7 +82,7 @@ export default function ReportsClient({ month, year, summary, rows }: Props) {
         <select
           value={year}
           onChange={(e) => navigate(month, Number(e.target.value))}
-          className="rounded-lg border border-[#e8e6e1] px-2 py-1 text-[11px] text-[#1a1814] outline-none focus:border-[#C9A96E]"
+          className="rounded-[9px] border border-black/[0.07] px-3 py-[7px] text-[13px] text-[#1b1814] outline-none focus:border-[#c9a96e] bg-white"
         >
           {YEARS.map((y) => (
             <option key={y} value={y}>{y}</option>
@@ -91,16 +90,16 @@ export default function ReportsClient({ month, year, summary, rows }: Props) {
         </select>
         <button
           onClick={downloadCSV}
-          className="flex h-[26px] items-center gap-1.5 rounded-full border border-[#e8e6e1] px-3 text-[11px] text-[#6b6860] hover:border-[#C9A96E] hover:text-[#C9A96E] transition-colors"
+          className="inline-flex items-center rounded-[9px] border border-black/[0.07] bg-white px-[18px] py-[9px] text-[13px] font-medium text-[#7a756e] hover:bg-[#f8f6f3] transition-colors"
         >
           Export CSV
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-4 pb-20 md:pb-4 space-y-4">
+      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7 space-y-[22px]">
         {/* Summary cards */}
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-[14px] lg:grid-cols-4">
           <StatCard label="Total Appointments" value={String(summary.totalAppointments)} gold />
           <StatCard label="Revenue" value={`$${summary.revenue.toFixed(2)}`} gold />
           <StatCard label="Cancelled" value={String(summary.cancelled)} />
@@ -108,53 +107,37 @@ export default function ReportsClient({ month, year, summary, rows }: Props) {
         </div>
 
         {/* Table */}
-        <div className="rounded-xl border border-[#e8e6e1] bg-white overflow-hidden">
-          <table className="w-full text-[12px]">
-            <thead>
-              <tr className="border-b border-[#e8e6e1] bg-[#faf9f7]">
-                <th className="px-4 py-2.5 text-left text-[11px] font-medium text-[#9a9890]">Service</th>
-                <th className="px-4 py-2.5 text-right text-[11px] font-medium text-[#9a9890]">Qty</th>
-                <th className="px-4 py-2.5 text-right text-[11px] font-medium text-[#9a9890]">Revenue</th>
-                <th className="px-4 py-2.5 text-right text-[11px] font-medium text-[#9a9890]">Hours</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-[11px] text-[#9a9890]">
-                    No appointments for {MONTHS[month - 1]} {year}
-                  </td>
-                </tr>
-              ) : (
-                rows.map((row) => (
-                  <tr key={row.name} className="border-b border-[#e8e6e1] last:border-b-0 hover:bg-[#faf9f7]">
-                    <td className="px-4 py-2.5 text-[#1a1814]">{row.name}</td>
-                    <td className="px-4 py-2.5 text-right text-[#1a1814]">{row.quantity}</td>
-                    <td className="px-4 py-2.5 text-right text-[#C9A96E] font-medium">
-                      ${row.totalRevenue.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-2.5 text-right text-[#6b6860]">
-                      {(row.totalMinutes / 60).toFixed(1)}h
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-            {rows.length > 0 && (
-              <tfoot>
-                <tr className="bg-[#faf9f7] border-t-2 border-[#e8e6e1]">
-                  <td className="px-4 py-2.5 text-[11px] font-semibold text-[#1a1814]">Total</td>
-                  <td className="px-4 py-2.5 text-right text-[11px] font-semibold text-[#1a1814]">{totalQty}</td>
-                  <td className="px-4 py-2.5 text-right text-[11px] font-semibold text-[#C9A96E]">
-                    ${totalRev.toFixed(2)}
-                  </td>
-                  <td className="px-4 py-2.5 text-right text-[11px] font-semibold text-[#6b6860]">
-                    {(totalHrs / 60).toFixed(1)}h
-                  </td>
-                </tr>
-              </tfoot>
-            )}
-          </table>
+        <div className="rounded-[14px] border border-black/[0.07] bg-white overflow-hidden">
+          {/* Header row */}
+          <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "1fr 80px 100px 80px" }}>
+            {["Service", "Qty", "Revenue", "Hours"].map((h, i) => (
+              <div key={h} className={`text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c] ${i > 0 ? "text-right" : ""}`}>{h}</div>
+            ))}
+          </div>
+          {/* Data rows */}
+          {rows.length === 0 ? (
+            <div className="px-5 py-10 text-center text-[14px] text-[#a8a39c]">
+              No appointments for {MONTHS[month - 1]} {year}
+            </div>
+          ) : (
+            rows.map((row) => (
+              <div key={row.name} className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center" style={{ gridTemplateColumns: "1fr 80px 100px 80px" }}>
+                <span className="text-[14px] font-medium text-[#1b1814] truncate pr-2">{row.name}</span>
+                <span className="text-[13px] text-[#7a756e] text-right">{row.quantity}</span>
+                <span className="text-[13.5px] font-medium text-[#b8892a] text-right">${row.totalRevenue.toFixed(2)}</span>
+                <span className="text-[13px] text-[#7a756e] text-right">{(row.totalMinutes / 60).toFixed(1)}h</span>
+              </div>
+            ))
+          )}
+          {/* Total row */}
+          {rows.length > 0 && (
+            <div className="grid px-5 py-[13px] bg-[#edeae5] items-center" style={{ gridTemplateColumns: "1fr 80px 100px 80px" }}>
+              <span className="text-[12px] font-semibold text-[#1b1814] uppercase tracking-[0.06em]">Total</span>
+              <span className="text-[13px] font-semibold text-[#1b1814] text-right">{totalQty}</span>
+              <span className="text-[13.5px] font-semibold text-[#b8892a] text-right">${totalRev.toFixed(2)}</span>
+              <span className="text-[13px] font-semibold text-[#7a756e] text-right">{(totalHrs / 60).toFixed(1)}h</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -163,11 +146,9 @@ export default function ReportsClient({ month, year, summary, rows }: Props) {
 
 function StatCard({ label, value, gold }: { label: string; value: string; gold?: boolean }) {
   return (
-    <div className="rounded-lg border border-[#e8e6e1] bg-white p-3">
-      <p className="mb-1 text-[10px] text-[#9a9890]">{label}</p>
-      <p className={`text-xl font-medium ${gold ? "text-[#C9A96E]" : "text-[#1a1814]"}`}>
-        {value}
-      </p>
+    <div className="rounded-[14px] border border-black/[0.07] bg-white p-[18px_20px]">
+      <p className="mb-[7px] text-[10.5px] font-medium uppercase tracking-[0.07em] text-[#a8a39c]">{label}</p>
+      <p className={`text-[28px] font-semibold leading-none ${gold ? "text-[#b8892a]" : "text-[#1b1814]"}`}>{value}</p>
     </div>
   );
 }

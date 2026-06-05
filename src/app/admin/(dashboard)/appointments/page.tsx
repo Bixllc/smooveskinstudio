@@ -10,18 +10,17 @@ import { AppointmentDrawer } from "@/components/admin/appointment-drawer";
 type Tab = "upcoming" | "past" | "cancelled";
 
 const STATUS_STYLES: Record<string, string> = {
-  CONFIRMED: "bg-[#eaf3de] text-[#3B6D11]",
-  COMPLETED: "bg-[#eaf3de] text-[#3B6D11]",
-  CANCELLED: "bg-[#fce8e8] text-[#8c2020]",
-  NO_SHOW: "bg-[#f0e8d4] text-[#7a5c1a]",
-  PENDING_PAYMENT:
-    "bg-[#f5f4f2] text-[#9a9890] border border-[#e8e6e1]",
+  CONFIRMED: "bg-[#e8f7ee] text-[#2e7d50]",
+  COMPLETED: "bg-[#e8f7ee] text-[#2e7d50]",
+  CANCELLED: "bg-[#fdecea] text-[#b53a2e]",
+  NO_SHOW: "bg-[#fef3e2] text-[#a0620a]",
+  PENDING_PAYMENT: "bg-[#fef3e2] text-[#a0620a]",
 };
 
 function StatusBadge({ status }: { status: string }) {
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
+      className={`inline-flex items-center px-[10px] py-[3px] rounded-full text-[11px] font-semibold tracking-[0.04em] ${
         STATUS_STYLES[status] ?? "bg-[#f5f4f2] text-[#9a9890]"
       }`}
     >
@@ -49,29 +48,29 @@ export default function AppointmentsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center gap-3 border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Appointments</span>
-        <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-[#e8e6e1] px-2.5 max-w-[220px]">
-          <IconSearch size={12} className="text-[#9a9890]" />
+      <header className="flex h-[60px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Appointments</h1>
+        <div className="flex items-center gap-2 bg-white border border-black/[0.07] rounded-[9px] px-3 h-9">
+          <IconSearch size={15} className="text-[#a8a39c] flex-shrink-0" strokeWidth={1.8} />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search clients…"
-            className="flex-1 bg-transparent text-[12px] text-[#1a1814] outline-none placeholder:text-[#b0aea8]"
+            className="border-none outline-none bg-transparent text-[13px] text-[#1b1814] placeholder:text-[#a8a39c] w-[180px]"
           />
         </div>
-      </div>
+      </header>
 
-      {/* Tabs */}
-      <div className="flex gap-0 border-b border-[#e8e6e1] bg-white px-4">
+      {/* Tab nav */}
+      <div className="flex border-b border-black/[0.07] bg-white px-8">
         {(["upcoming", "past", "cancelled"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`h-[30px] border-b-2 px-3.5 text-[11px] font-medium capitalize transition-colors ${
+            className={`px-[18px] py-[9px] text-[13px] font-medium border-b-2 -mb-px cursor-pointer bg-transparent transition-colors capitalize ${
               tab === t
-                ? "border-[#C9A96E] text-[#C9A96E]"
-                : "border-transparent text-[#9a9890] hover:text-[#1a1814]"
+                ? "text-[#b8892a] border-[#c9a96e]"
+                : "text-[#7a756e] border-transparent hover:text-[#1b1814]"
             }`}
           >
             {t}
@@ -79,81 +78,75 @@ export default function AppointmentsPage() {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="flex-1 overflow-auto pb-20 md:pb-0">
+      {/* Table area */}
+      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
         {isLoading ? (
-          <div className="p-4 space-y-2">
+          <div className="space-y-2">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="h-10 animate-pulse rounded-lg bg-[#f5f4f2]"
+                className="h-12 animate-pulse rounded-[14px] bg-[#f5f4f2]"
               />
             ))}
           </div>
         ) : bookings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <p className="text-sm text-[#9a9890]">
+            <p className="text-[14px] text-[#a8a39c]">
               No {tab} appointments
             </p>
             {tab === "upcoming" && (
-              <p className="mt-1 text-xs text-[#b0aea8]">
-                Enjoy the break ✨
+              <p className="mt-1 text-[13px] text-[#a8a39c]">
+                Enjoy the break ✦
               </p>
             )}
           </div>
         ) : (
-          <table className="w-full border-collapse text-[11px]">
-            <thead>
-              <tr>
-                {[
-                  "Client",
-                  "Service",
-                  "Date & Time",
-                  "Duration",
-                  "Price",
-                  "Status",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="border-b border-[#e8e6e1] bg-white px-3 py-2 text-left text-[10px] font-medium text-[#9a9890] sticky top-0"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((b) => {
-                const local = toZonedTime(new Date(b.startTimeUtc), tz);
-                return (
-                  <tr
-                    key={b.id}
-                    onClick={() => setDrawer(b)}
-                    className="cursor-pointer border-b border-[#e8e6e1] bg-white hover:bg-[#f9f8f6]"
-                  >
-                    <td className="px-3 py-2.5 font-medium text-[#1a1814]">
-                      {b.customer.fullName}
-                    </td>
-                    <td className="px-3 py-2.5 text-[#9a9890] max-w-[140px] truncate">
-                      {b.service.name}
-                    </td>
-                    <td className="px-3 py-2.5 text-[#9a9890] whitespace-nowrap">
-                      {format(local, "MMM d · h:mm a")}
-                    </td>
-                    <td className="px-3 py-2.5 text-[#9a9890]">
-                      {b.service.durationMinutes} min
-                    </td>
-                    <td className="px-3 py-2.5 font-medium text-[#C9A96E]">
-                      ${Number(b.service.price).toFixed(0)}
-                    </td>
-                    <td className="px-3 py-2.5">
-                      <StatusBadge status={b.status} />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
+            {/* Table header */}
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]"
+              style={{ gridTemplateColumns: "1.4fr 1.6fr 1.1fr 80px 80px 120px" }}
+            >
+              {["Client", "Service", "Date & Time", "Duration", "Price", "Status"].map((h) => (
+                <div
+                  key={h}
+                  className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]"
+                >
+                  {h}
+                </div>
+              ))}
+            </div>
+            {/* Data rows */}
+            {bookings.map((b) => {
+              const local = toZonedTime(new Date(b.startTimeUtc), tz);
+              return (
+                <div
+                  key={b.id}
+                  onClick={() => setDrawer(b)}
+                  className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] cursor-pointer items-center transition-colors"
+                  style={{ gridTemplateColumns: "1.4fr 1.6fr 1.1fr 80px 80px 120px" }}
+                >
+                  <div className="text-[14px] font-medium text-[#1b1814] truncate pr-2">
+                    {b.customer.fullName}
+                  </div>
+                  <div className="text-[13px] text-[#7a756e] truncate pr-2">
+                    {b.service.name}
+                  </div>
+                  <div className="text-[13px] text-[#7a756e] whitespace-nowrap pr-2">
+                    {format(local, "MMM d · h:mm a")}
+                  </div>
+                  <div className="text-[13px] text-[#7a756e]">
+                    {b.service.durationMinutes} min
+                  </div>
+                  <div className="text-[13.5px] font-medium text-[#b8892a]">
+                    ${Number(b.service.price).toFixed(0)}
+                  </div>
+                  <div>
+                    <StatusBadge status={b.status} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 

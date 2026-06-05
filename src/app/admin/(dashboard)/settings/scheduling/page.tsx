@@ -58,17 +58,17 @@ export default function SchedulingLimitsPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <div className="flex h-11 flex-shrink-0 items-center gap-2 border-b border-[#e8e6e1] bg-white px-4">
+      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
         <Link
           href="/admin/settings"
-          className="flex h-[26px] w-[26px] items-center justify-center rounded-full border border-[#e8e6e1] text-[#9a9890] hover:border-[#C9A96E] hover:text-[#C9A96E]"
+          className="flex h-7 w-7 items-center justify-center rounded-full border border-black/[0.07] text-[#a8a39c] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors"
         >
           <IconChevronLeft size={14} />
         </Link>
-        <span className="text-sm font-medium text-[#1a1814]">Scheduling Limits</span>
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Scheduling Limits</h1>
       </div>
 
-      <div className="flex-1 overflow-auto p-4 pb-20 md:pb-4">
+      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
         {loading ? (
           <div className="max-w-lg space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -127,7 +127,7 @@ export default function SchedulingLimitsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-[#C9A96E] px-5 py-2 text-[12px] font-medium text-[#1a1814] hover:bg-[#b8954f] transition-colors disabled:opacity-60"
+              className="inline-flex items-center rounded-[9px] bg-[#c9a96e] px-[18px] py-[9px] text-[13px] font-semibold text-[#1b1814] hover:opacity-85 transition-opacity disabled:opacity-60 border-none cursor-pointer"
             >
               {saving ? "Saving…" : "Save limits"}
             </button>

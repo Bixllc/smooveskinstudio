@@ -1,10 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
 interface Coupon {
@@ -120,165 +116,244 @@ export default function CouponsPage() {
   }
 
   if (loading) {
-    return <p className="text-sm text-[var(--color-text-light)]">Loading…</p>;
+    return (
+      <div className="flex h-screen flex-col overflow-hidden">
+        <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+          <h1 className="text-[20px] font-semibold text-[#1b1814]">Coupons</h1>
+        </header>
+        <div className="flex-1 overflow-y-auto p-8 space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-12 animate-pulse rounded-[14px] bg-[#f5f4f2]" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-[var(--color-text)]">Coupons</h2>
+    <div className="flex h-screen flex-col overflow-hidden">
+      {/* Topbar */}
+      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Coupons</h1>
         {!showForm && (
-          <Button onClick={() => setShowForm(true)}>Create Coupon</Button>
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-[#c9a96e] text-[#1b1814] rounded-[9px] px-[18px] py-[9px] text-[13px] font-semibold inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity cursor-pointer border-none"
+          >
+            + Create Coupon
+          </button>
         )}
-      </div>
+      </header>
 
-      {error && (
-        <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
-      )}
-
-      {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="mb-8 rounded-xl border border-[var(--color-border)] bg-white p-6"
-        >
-          <p className="mb-4 text-sm font-medium text-[var(--color-text)]">
-            {editingId ? "Edit Coupon" : "New Coupon"}
-          </p>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="cpCode">Code *</Label>
-              <Input
-                id="cpCode"
-                value={form.code}
-                onChange={(e) => updateForm("code", e.target.value.toUpperCase())}
-                placeholder="SUMMER20"
-                required
-                disabled={!!editingId}
-                className="mt-1 font-mono uppercase"
-              />
-              <p className="mt-1 text-xs text-[var(--color-text-light)]">Uppercase only. Cannot be changed after creation.</p>
-            </div>
-
-            <div>
-              <Label htmlFor="cpName">Label *</Label>
-              <Input
-                id="cpName"
-                value={form.name}
-                onChange={(e) => updateForm("name", e.target.value)}
-                placeholder="Summer 2026 Promo"
-                required
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="cpDiscount">Discount % *</Label>
-              <Input
-                id="cpDiscount"
-                type="number"
-                min="1"
-                max="100"
-                step="0.01"
-                value={form.discountPercent}
-                onChange={(e) => updateForm("discountPercent", e.target.value)}
-                required
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="cpLimit">Usage Limit</Label>
-              <Input
-                id="cpLimit"
-                type="number"
-                min="1"
-                value={form.usageLimit}
-                onChange={(e) => updateForm("usageLimit", e.target.value)}
-                placeholder="Unlimited"
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="cpExpiry">Expiry Date</Label>
-              <Input
-                id="cpExpiry"
-                type="date"
-                value={form.expiresAt}
-                onChange={(e) => updateForm("expiresAt", e.target.value)}
-                className="mt-1"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 pt-6">
-              <input
-                id="cpActive"
-                type="checkbox"
-                checked={form.active}
-                onChange={(e) => updateForm("active", e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <Label htmlFor="cpActive">Active</Label>
-            </div>
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-8">
+        {error && (
+          <div className="mb-4 rounded-[9px] bg-[#fdecea] border border-[#f5c6c2] px-4 py-3 text-[13px] text-[#b53a2e]">
+            {error}
           </div>
+        )}
 
-          <div className="mt-6 flex gap-2">
-            <Button type="submit">{editingId ? "Update Coupon" : "Create Coupon"}</Button>
-            <Button type="button" variant="ghost" onClick={resetForm}>Cancel</Button>
+        {/* Create / Edit form */}
+        {showForm && (
+          <div className="bg-white border border-black/[0.07] rounded-[14px] p-6 max-w-[560px] mb-8">
+            <p className="text-[15px] font-semibold text-[#1b1814] mb-5">
+              {editingId ? "Edit Coupon" : "New Coupon"}
+            </p>
+
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {/* Code */}
+                <div className="mb-4">
+                  <label htmlFor="cpCode" className="block text-[12px] font-medium uppercase tracking-[0.06em] text-[#7a756e] mb-1.5">
+                    Code *
+                  </label>
+                  <input
+                    id="cpCode"
+                    value={form.code}
+                    onChange={(e) => updateForm("code", e.target.value.toUpperCase())}
+                    placeholder="SUMMER20"
+                    required
+                    disabled={!!editingId}
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors font-mono uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  <p className="mt-1 text-[11px] text-[#a8a39c]">Uppercase only. Cannot be changed after creation.</p>
+                </div>
+
+                {/* Label */}
+                <div className="mb-4">
+                  <label htmlFor="cpName" className="block text-[12px] font-medium uppercase tracking-[0.06em] text-[#7a756e] mb-1.5">
+                    Label *
+                  </label>
+                  <input
+                    id="cpName"
+                    value={form.name}
+                    onChange={(e) => updateForm("name", e.target.value)}
+                    placeholder="Summer 2026 Promo"
+                    required
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                  />
+                </div>
+
+                {/* Discount % */}
+                <div className="mb-4">
+                  <label htmlFor="cpDiscount" className="block text-[12px] font-medium uppercase tracking-[0.06em] text-[#7a756e] mb-1.5">
+                    Discount % *
+                  </label>
+                  <input
+                    id="cpDiscount"
+                    type="number"
+                    min="1"
+                    max="100"
+                    step="0.01"
+                    value={form.discountPercent}
+                    onChange={(e) => updateForm("discountPercent", e.target.value)}
+                    required
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                  />
+                </div>
+
+                {/* Usage Limit */}
+                <div className="mb-4">
+                  <label htmlFor="cpLimit" className="block text-[12px] font-medium uppercase tracking-[0.06em] text-[#7a756e] mb-1.5">
+                    Usage Limit
+                  </label>
+                  <input
+                    id="cpLimit"
+                    type="number"
+                    min="1"
+                    value={form.usageLimit}
+                    onChange={(e) => updateForm("usageLimit", e.target.value)}
+                    placeholder="Unlimited"
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                  />
+                </div>
+
+                {/* Expiry Date */}
+                <div className="mb-4">
+                  <label htmlFor="cpExpiry" className="block text-[12px] font-medium uppercase tracking-[0.06em] text-[#7a756e] mb-1.5">
+                    Expiry Date
+                  </label>
+                  <input
+                    id="cpExpiry"
+                    type="date"
+                    value={form.expiresAt}
+                    onChange={(e) => updateForm("expiresAt", e.target.value)}
+                    className="w-full px-3 py-[9px] rounded-[8px] border border-black/[0.12] bg-white text-[13.5px] text-[#1b1814] outline-none focus:border-[#c9a96e] transition-colors"
+                  />
+                </div>
+
+                {/* Active checkbox */}
+                <div className="mb-4 flex items-center gap-2 pt-6">
+                  <input
+                    id="cpActive"
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(e) => updateForm("active", e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 accent-[#c9a96e]"
+                  />
+                  <label htmlFor="cpActive" className="text-[13px] font-medium text-[#1b1814] cursor-pointer">
+                    Active
+                  </label>
+                </div>
+              </div>
+
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="submit"
+                  className="bg-[#c9a96e] text-[#1b1814] rounded-[9px] px-[18px] py-[9px] text-[13px] font-semibold inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity cursor-pointer border-none"
+                >
+                  {editingId ? "Update Coupon" : "Create Coupon"}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="bg-white text-[#7a756e] border border-black/[0.12] rounded-[9px] px-[18px] py-2 text-[13px] font-medium inline-flex items-center gap-1.5 hover:bg-[#f8f6f3] transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
-      )}
+        )}
 
-      <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
-        <table className="w-full text-sm">
-          <thead className="bg-[var(--color-surface)] text-xs uppercase tracking-wide text-[var(--color-text-light)]">
-            <tr>
-              <th className="px-4 py-3 text-left">Code</th>
-              <th className="px-4 py-3 text-left">Label</th>
-              <th className="px-4 py-3 text-left">Discount</th>
-              <th className="px-4 py-3 text-left">Uses</th>
-              <th className="px-4 py-3 text-left">Expires</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-left"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--color-border)] bg-white">
-            {coupons.map((coupon) => (
-              <tr key={coupon.id}>
-                <td className="px-4 py-3 font-mono font-medium text-[var(--color-text)]">{coupon.code}</td>
-                <td className="px-4 py-3 text-[var(--color-text-light)]">{coupon.name}</td>
-                <td className="px-4 py-3 text-[var(--color-text)]">{Number(coupon.discountPercent).toFixed(0)}%</td>
-                <td className="px-4 py-3 text-[var(--color-text-light)]">
-                  {coupon.usageCount} / {coupon.usageLimit ?? "∞"}
-                </td>
-                <td className="px-4 py-3 text-[var(--color-text-light)]">
-                  {coupon.expiresAt ? format(new Date(coupon.expiresAt), "MMM d, yyyy") : "Never"}
-                </td>
-                <td className="px-4 py-3">
-                  <Badge variant={coupon.active ? "default" : "outline"}>
-                    {coupon.active ? "Active" : "Disabled"}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex gap-1">
-                    <Button size="sm" variant="ghost" onClick={() => startEdit(coupon)}>Edit</Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleToggleActive(coupon)}>
-                      {coupon.active ? "Disable" : "Enable"}
-                    </Button>
-                  </div>
-                </td>
-              </tr>
+        {/* Table */}
+        <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
+          {/* Header row */}
+          <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "1fr 1.2fr 0.8fr 0.6fr 1fr 0.8fr auto" }}>
+            {["Code", "Label", "Discount", "Uses", "Expires", "Status", ""].map((h) => (
+              <span key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">
+                {h}
+              </span>
             ))}
-            {coupons.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-[var(--color-text-light)]">
-                  No coupons yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+          </div>
+
+          {/* Data rows */}
+          {coupons.length === 0 ? (
+            <div className="px-5 py-10 text-center text-[14px] text-[#a8a39c]">
+              No coupons yet.
+            </div>
+          ) : (
+            coupons.map((coupon) => (
+              <div
+                key={coupon.id}
+                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+                style={{ gridTemplateColumns: "1fr 1.2fr 0.8fr 0.6fr 1fr 0.8fr auto" }}
+              >
+                {/* Code */}
+                <span className="font-mono font-medium text-[14px] text-[#1b1814]">
+                  {coupon.code}
+                </span>
+
+                {/* Label */}
+                <span className="text-[13px] text-[#7a756e] truncate pr-2">{coupon.name}</span>
+
+                {/* Discount */}
+                <span className="text-[13px] text-[#7a756e]">
+                  {Number(coupon.discountPercent).toFixed(0)}%
+                </span>
+
+                {/* Uses */}
+                <span className="text-[13px] text-[#7a756e]">
+                  {coupon.usageCount} / {coupon.usageLimit ?? "Unlimited"}
+                </span>
+
+                {/* Expires */}
+                <span className="text-[13px] text-[#7a756e]">
+                  {coupon.expiresAt ? format(new Date(coupon.expiresAt), "MMM d, yyyy") : "Never"}
+                </span>
+
+                {/* Status badge */}
+                <div>
+                  {coupon.active ? (
+                    <span className="bg-[#e8f7ee] text-[#2e7d50] inline-flex px-[10px] py-[3px] rounded-full text-[11px] font-semibold">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="bg-[#fdecea] text-[#b53a2e] inline-flex px-[10px] py-[3px] rounded-full text-[11px] font-semibold">
+                      Disabled
+                    </span>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-1 pl-2">
+                  <button
+                    onClick={() => startEdit(coupon)}
+                    className="bg-white text-[#7a756e] border border-black/[0.12] rounded-[9px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#f8f6f3] transition-colors cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleToggleActive(coupon)}
+                    className="bg-white text-[#7a756e] border border-black/[0.12] rounded-[9px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#f8f6f3] transition-colors cursor-pointer"
+                  >
+                    {coupon.active ? "Disable" : "Enable"}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

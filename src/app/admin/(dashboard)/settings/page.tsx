@@ -85,12 +85,20 @@ export default function SettingsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Settings</span>
+      <div className="flex h-[60px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Settings</h1>
+        <button
+          form="settings-form"
+          type="submit"
+          disabled={saving}
+          className="inline-flex items-center rounded-[9px] bg-[#c9a96e] px-[18px] py-[9px] text-[13px] font-semibold text-[#1b1814] hover:opacity-85 transition-opacity disabled:opacity-60 border-none cursor-pointer"
+        >
+          {saving ? "Saving…" : "Save settings"}
+        </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-4 pb-20 md:pb-4">
+      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
         {loading ? (
           <div className="max-w-2xl space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -101,7 +109,7 @@ export default function SettingsPage() {
             ))}
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
+          <form id="settings-form" onSubmit={handleSubmit} className="max-w-2xl space-y-4">
             {/* Business info */}
             <Section title="Business Information">
               <div className="grid gap-3 sm:grid-cols-2">
@@ -181,14 +189,6 @@ export default function SettingsPage() {
               </div>
             </Section>
 
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-lg bg-[#C9A96E] px-5 py-2 text-[12px] font-medium text-[#1a1814] hover:bg-[#b8954f] transition-colors disabled:opacity-60"
-            >
-              {saving ? "Saving…" : "Save settings"}
-            </button>
-
             {/* Sub-settings links */}
             <div className="rounded-xl border border-[#e8e6e1] bg-white overflow-hidden">
               <p className="border-b border-[#e8e6e1] px-5 py-3 text-[12px] font-medium text-[#1a1814]">
@@ -228,8 +228,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-[#e8e6e1] bg-white p-5">
-      <p className="mb-4 text-[12px] font-medium text-[#1a1814]">{title}</p>
+    <div className="rounded-[14px] border border-black/[0.07] bg-white p-6">
+      <p className="mb-4 text-[13px] font-semibold text-[#1b1814]">{title}</p>
       {children}
     </div>
   );

@@ -37,115 +37,110 @@ export default function ClientsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-11 flex-shrink-0 items-center gap-3 border-b border-[#e8e6e1] bg-white px-4">
-        <span className="text-sm font-medium text-[#1a1814]">Clients</span>
-        <div className="flex flex-1 items-center gap-1.5 rounded-lg border border-[#e8e6e1] px-2.5 max-w-[220px]">
-          <IconSearch size={12} className="text-[#9a9890]" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search clients…"
-            className="flex-1 bg-transparent text-[12px] text-[#1a1814] outline-none placeholder:text-[#b0aea8]"
-          />
+      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[20px] font-semibold text-[#1b1814]">Clients</h1>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-white border border-black/[0.07] rounded-[9px] px-3 h-9">
+            <IconSearch size={14} className="text-[#a8a39c] flex-shrink-0" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search clients…"
+              className="border-none outline-none bg-transparent text-[13px] placeholder:text-[#a8a39c] text-[#1b1814] w-[180px]"
+            />
+          </div>
+          <button className="bg-[#c9a96e] text-[#1b1814] rounded-[9px] px-[18px] py-[9px] text-[13px] font-semibold inline-flex items-center gap-1.5 hover:opacity-85 transition-opacity cursor-pointer border-none">
+            <IconUserPlus size={14} /> Add client
+          </button>
         </div>
-        <div className="flex-1" />
-        <button className="flex h-[26px] items-center gap-1 rounded-full bg-[#C9A96E] px-2.5 text-[11px] font-medium text-[#1a1814]">
-          <IconUserPlus size={11} /> Add client
-        </button>
-      </div>
+      </header>
 
-      {/* Table */}
-      <div className="flex-1 overflow-auto pb-20 md:pb-0">
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-8">
         {isLoading ? (
-          <div className="p-4 space-y-2">
+          <div className="space-y-2">
             {Array.from({ length: 7 }).map((_, i) => (
               <div
                 key={i}
-                className="h-10 animate-pulse rounded-lg bg-[#f5f4f2]"
+                className="h-12 animate-pulse rounded-[14px] bg-[#f5f4f2]"
               />
             ))}
           </div>
         ) : clients.length === 0 ? (
           <div className="flex items-center justify-center py-20">
-            <p className="text-sm text-[#9a9890]">No clients found</p>
+            <p className="text-[14px] text-[#a8a39c]">No clients found</p>
           </div>
         ) : (
-          <table className="w-full border-collapse text-[11px]">
-            <thead>
-              <tr>
-                {[
-                  "Client",
-                  "Last visit",
-                  "Visits",
-                  "Total spend",
-                  "Fav service",
-                  "",
-                ].map((h) => (
-                  <th
-                    key={h}
-                    className="border-b border-[#e8e6e1] bg-white px-3 py-2 text-left text-[10px] font-medium text-[#9a9890] sticky top-0"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((c: any, idx: number) => (
-                <tr
-                  key={c.id}
-                  className="border-b border-[#e8e6e1] bg-white hover:bg-[#f9f8f6]"
-                >
-                  <td className="px-3 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`inline-flex h-[22px] w-[22px] flex-shrink-0 items-center justify-center rounded-full text-[9px] font-medium ${
-                          AVATAR_COLORS[idx % AVATAR_COLORS.length]
-                        }`}
-                      >
-                        {initials(c.fullName)}
-                      </span>
-                      <Link
-                        href={`/admin/clients/${c.id}`}
-                        className="font-medium text-[#1a1814] hover:text-[#C9A96E]"
-                      >
-                        {c.fullName}
-                      </Link>
-                      {c.isVip && (
-                        <IconStar
-                          size={10}
-                          className="text-[#C9A96E] fill-[#C9A96E]"
-                          fill="#C9A96E"
-                        />
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2.5 text-[#9a9890]">
-                    {c.lastVisit
-                      ? format(new Date(c.lastVisit), "MMM d")
-                      : "—"}
-                  </td>
-                  <td className="px-3 py-2.5 text-[#1a1814]">
-                    {c.totalVisits}
-                  </td>
-                  <td className="px-3 py-2.5 font-medium text-[#C9A96E]">
-                    ${c.totalSpend.toFixed(0)}
-                  </td>
-                  <td className="px-3 py-2.5 text-[#9a9890] max-w-[120px] truncate">
-                    {c.favService ?? "—"}
-                  </td>
-                  <td className="px-3 py-2.5 text-right">
-                    <Link
-                      href={`/admin/clients/${c.id}`}
-                      className="text-[10px] text-[#9a9890] hover:text-[#C9A96E]"
-                    >
-                      View →
-                    </Link>
-                  </td>
-                </tr>
+          <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
+            {/* Header row */}
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "2fr 100px 80px 110px 1.2fr 60px" }}>
+              {["Client", "Last visit", "Visits", "Total spend", "Fav service", ""].map((h) => (
+                <span key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">
+                  {h}
+                </span>
               ))}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Data rows */}
+            {clients.map((c: any, idx: number) => (
+              <div
+                key={c.id}
+                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] cursor-pointer items-center transition-colors"
+                style={{ gridTemplateColumns: "2fr 100px 80px 110px 1.2fr 60px" }}
+              >
+                {/* Client cell */}
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-semibold flex-shrink-0 ${
+                      AVATAR_COLORS[idx % AVATAR_COLORS.length]
+                    }`}
+                  >
+                    {initials(c.fullName)}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[14px] font-medium text-[#1b1814]">
+                      {c.fullName}
+                    </span>
+                    {c.isVip && (
+                      <IconStar
+                        size={12}
+                        className="text-[#c9a96e] fill-[#c9a96e]"
+                        fill="#c9a96e"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* Last visit */}
+                <span className="text-[13px] text-[#7a756e]">
+                  {c.lastVisit ? format(new Date(c.lastVisit), "MMM d") : "—"}
+                </span>
+
+                {/* Visits */}
+                <span className="text-[13px] text-[#7a756e]">{c.totalVisits}</span>
+
+                {/* Total spend */}
+                <span className="text-[13.5px] font-medium text-[#b8892a]">
+                  ${c.totalSpend.toFixed(0)}
+                </span>
+
+                {/* Fav service */}
+                <span className="text-[13px] text-[#7a756e] truncate pr-2">
+                  {c.favService ?? "—"}
+                </span>
+
+                {/* View link */}
+                <div>
+                  <Link
+                    href={`/admin/clients/${c.id}`}
+                    className="text-[13px] font-medium text-[#c9a96e] hover:opacity-75 transition-opacity"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
