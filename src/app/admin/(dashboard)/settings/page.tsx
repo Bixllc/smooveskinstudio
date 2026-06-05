@@ -85,8 +85,8 @@ export default function SettingsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-[60px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Settings</h1>
+      <div className="flex h-[80px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Settings</h1>
         <button
           form="settings-form"
           type="submit"
@@ -98,7 +98,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
+      <div className="flex-1 overflow-auto px-8 py-8 pb-20 md:pb-8">
         {loading ? (
           <div className="max-w-2xl space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -229,7 +229,7 @@ function Section({
 }) {
   return (
     <div className="rounded-[14px] border border-black/[0.07] bg-white p-6">
-      <p className="mb-4 text-[13px] font-semibold text-[#1b1814]">{title}</p>
+      <p className="mb-4 text-[15px] font-semibold text-[#1b1814]">{title}</p>
       {children}
     </div>
   );

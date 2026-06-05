@@ -37,8 +37,8 @@ export default function ClientsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Clients</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Clients</h1>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 bg-white border border-black/[0.07] rounded-[9px] px-3 h-9">
             <IconSearch size={14} className="text-[#a8a39c] flex-shrink-0" />
@@ -58,7 +58,7 @@ export default function ClientsPage() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-8">
         {isLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Array.from({ length: 7 }).map((_, i) => (
               <div
                 key={i}
@@ -73,7 +73,7 @@ export default function ClientsPage() {
         ) : (
           <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
             {/* Header row */}
-            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "2fr 100px 80px 110px 1.2fr 60px" }}>
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "2fr 100px 80px 110px 1.2fr 60px" }}>
               {["Client", "Last visit", "Visits", "Total spend", "Fav service", ""].map((h) => (
                 <span key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">
                   {h}
@@ -85,7 +85,7 @@ export default function ClientsPage() {
             {clients.map((c: any, idx: number) => (
               <div
                 key={c.id}
-                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] cursor-pointer items-center transition-colors"
+                className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] cursor-pointer items-center transition-colors"
                 style={{ gridTemplateColumns: "2fr 100px 80px 110px 1.2fr 60px" }}
               >
                 {/* Client cell */}
@@ -98,7 +98,7 @@ export default function ClientsPage() {
                     {initials(c.fullName)}
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[14px] font-medium text-[#1b1814]">
+                    <span className="text-[15px] font-medium text-[#1b1814]">
                       {c.fullName}
                     </span>
                     {c.isVip && (
@@ -112,20 +112,20 @@ export default function ClientsPage() {
                 </div>
 
                 {/* Last visit */}
-                <span className="text-[13px] text-[#7a756e]">
+                <span className="text-[14px] text-[#7a756e]">
                   {c.lastVisit ? format(new Date(c.lastVisit), "MMM d") : "—"}
                 </span>
 
                 {/* Visits */}
-                <span className="text-[13px] text-[#7a756e]">{c.totalVisits}</span>
+                <span className="text-[14px] text-[#7a756e]">{c.totalVisits}</span>
 
                 {/* Total spend */}
-                <span className="text-[13.5px] font-medium text-[#b8892a]">
+                <span className="text-[15px] font-medium text-[#b8892a]">
                   ${c.totalSpend.toFixed(0)}
                 </span>
 
                 {/* Fav service */}
-                <span className="text-[13px] text-[#7a756e] truncate pr-2">
+                <span className="text-[14px] text-[#7a756e] truncate pr-2">
                   {c.favService ?? "—"}
                 </span>
 

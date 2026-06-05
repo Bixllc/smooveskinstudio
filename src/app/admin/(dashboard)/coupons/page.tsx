@@ -118,10 +118,10 @@ export default function CouponsPage() {
   if (loading) {
     return (
       <div className="flex h-screen flex-col overflow-hidden">
-        <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-          <h1 className="text-[20px] font-semibold text-[#1b1814]">Coupons</h1>
+        <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+          <h1 className="text-[24px] font-semibold text-[#1b1814]">Coupons</h1>
         </header>
-        <div className="flex-1 overflow-y-auto p-8 space-y-2">
+        <div className="flex-1 overflow-y-auto p-8 space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-12 animate-pulse rounded-[14px] bg-[#f5f4f2]" />
           ))}
@@ -133,8 +133,8 @@ export default function CouponsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Coupons</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Coupons</h1>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
@@ -279,7 +279,7 @@ export default function CouponsPage() {
         {/* Table */}
         <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
           {/* Header row */}
-          <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "1fr 1.2fr 0.8fr 0.6fr 1fr 0.8fr auto" }}>
+          <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "1fr 1.2fr 0.8fr 0.6fr 1fr 0.8fr auto" }}>
             {["Code", "Label", "Discount", "Uses", "Expires", "Status", ""].map((h) => (
               <span key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">
                 {h}
@@ -296,29 +296,29 @@ export default function CouponsPage() {
             coupons.map((coupon) => (
               <div
                 key={coupon.id}
-                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+                className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
                 style={{ gridTemplateColumns: "1fr 1.2fr 0.8fr 0.6fr 1fr 0.8fr auto" }}
               >
                 {/* Code */}
-                <span className="font-mono font-medium text-[14px] text-[#1b1814]">
+                <span className="font-mono font-medium text-[15px] text-[#1b1814]">
                   {coupon.code}
                 </span>
 
                 {/* Label */}
-                <span className="text-[13px] text-[#7a756e] truncate pr-2">{coupon.name}</span>
+                <span className="text-[14px] text-[#7a756e] truncate pr-2">{coupon.name}</span>
 
                 {/* Discount */}
-                <span className="text-[13px] text-[#7a756e]">
+                <span className="text-[14px] text-[#7a756e]">
                   {Number(coupon.discountPercent).toFixed(0)}%
                 </span>
 
                 {/* Uses */}
-                <span className="text-[13px] text-[#7a756e]">
+                <span className="text-[14px] text-[#7a756e]">
                   {coupon.usageCount} / {coupon.usageLimit ?? "Unlimited"}
                 </span>
 
                 {/* Expires */}
-                <span className="text-[13px] text-[#7a756e]">
+                <span className="text-[14px] text-[#7a756e]">
                   {coupon.expiresAt ? format(new Date(coupon.expiresAt), "MMM d, yyyy") : "Never"}
                 </span>
 

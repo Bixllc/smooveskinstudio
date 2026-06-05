@@ -48,8 +48,8 @@ export default function AppointmentsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="flex h-[60px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Appointments</h1>
+      <header className="flex h-[80px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Appointments</h1>
         <div className="flex items-center gap-2 bg-white border border-black/[0.07] rounded-[9px] px-3 h-9">
           <IconSearch size={15} className="text-[#a8a39c] flex-shrink-0" strokeWidth={1.8} />
           <input
@@ -79,9 +79,9 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Table area */}
-      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
+      <div className="flex-1 overflow-auto px-8 py-8 pb-20 md:pb-8">
         {isLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -103,7 +103,7 @@ export default function AppointmentsPage() {
         ) : (
           <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
             {/* Table header */}
-            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]"
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]"
               style={{ gridTemplateColumns: "1.4fr 1.6fr 1.1fr 80px 80px 120px" }}
             >
               {["Client", "Service", "Date & Time", "Duration", "Price", "Status"].map((h) => (
@@ -122,22 +122,22 @@ export default function AppointmentsPage() {
                 <div
                   key={b.id}
                   onClick={() => setDrawer(b)}
-                  className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] cursor-pointer items-center transition-colors"
+                  className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] cursor-pointer items-center transition-colors"
                   style={{ gridTemplateColumns: "1.4fr 1.6fr 1.1fr 80px 80px 120px" }}
                 >
-                  <div className="text-[14px] font-medium text-[#1b1814] truncate pr-2">
+                  <div className="text-[15px] font-medium text-[#1b1814] truncate pr-2">
                     {b.customer.fullName}
                   </div>
-                  <div className="text-[13px] text-[#7a756e] truncate pr-2">
+                  <div className="text-[14px] text-[#7a756e] truncate pr-2">
                     {b.service.name}
                   </div>
-                  <div className="text-[13px] text-[#7a756e] whitespace-nowrap pr-2">
+                  <div className="text-[14px] text-[#7a756e] whitespace-nowrap pr-2">
                     {format(local, "MMM d · h:mm a")}
                   </div>
-                  <div className="text-[13px] text-[#7a756e]">
+                  <div className="text-[14px] text-[#7a756e]">
                     {b.service.durationMinutes} min
                   </div>
-                  <div className="text-[13.5px] font-medium text-[#b8892a]">
+                  <div className="text-[15px] font-medium text-[#b8892a]">
                     ${Number(b.service.price).toFixed(0)}
                   </div>
                   <div>

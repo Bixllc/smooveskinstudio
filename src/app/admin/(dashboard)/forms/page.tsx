@@ -135,8 +135,8 @@ export default function FormsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Forms</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Forms</h1>
         {!showEditor && (
           <button
             onClick={() => setShowEditor(true)}
@@ -148,7 +148,7 @@ export default function FormsPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-8 py-7 pb-20 md:pb-7">
+      <div className="flex-1 overflow-y-auto px-8 py-8 pb-20 md:pb-8">
         {error && (
           <div className="mb-4 rounded-[9px] bg-[#fdecea] border border-[#f5c6c2] px-4 py-3 text-[13px] text-[#b53a2e]">
             {error}
@@ -212,7 +212,7 @@ export default function FormsPage() {
               {/* Field builder */}
               <div className="mt-6">
                 <div className="mb-3 flex items-center justify-between">
-                  <p className="text-[13px] font-semibold text-[#1b1814]">Fields</p>
+                  <p className="text-[15px] font-semibold text-[#1b1814]">Fields</p>
                   <button
                     type="button"
                     onClick={addField}
@@ -333,7 +333,7 @@ export default function FormsPage() {
 
         {/* Form list */}
         {loading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-14 animate-pulse rounded-[14px] bg-[#f5f4f2]" />
             ))}
@@ -344,7 +344,7 @@ export default function FormsPage() {
           </div>
         ) : (
           <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
-            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "2fr 80px 80px 80px auto" }}>
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "2fr 80px 80px 80px auto" }}>
               {["Form", "Type", "Fields", "Uses", ""].map((h) => (
                 <div key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">{h}</div>
               ))}
@@ -352,12 +352,12 @@ export default function FormsPage() {
             {forms.map((t) => (
               <div
                 key={t.id}
-                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+                className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
                 style={{ gridTemplateColumns: "2fr 80px 80px 80px auto" }}
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-medium text-[#1b1814]">{t.name}</span>
+                    <span className="text-[15px] font-medium text-[#1b1814]">{t.name}</span>
                     {!t.active && (
                       <span className="bg-[#f5f4f2] text-[#a8a39c] text-[10px] font-semibold px-[8px] py-[2px] rounded-full uppercase tracking-[0.04em]">
                         Inactive
@@ -369,8 +369,8 @@ export default function FormsPage() {
                   )}
                 </div>
                 <span className="text-[12px] text-[#7a756e]">{t.type}</span>
-                <span className="text-[13px] text-[#7a756e]">{t.fields.length}</span>
-                <span className="text-[13px] text-[#7a756e]">{t._count.submissions}</span>
+                <span className="text-[14px] text-[#7a756e]">{t.fields.length}</span>
+                <span className="text-[14px] text-[#7a756e]">{t._count.submissions}</span>
                 <div className="flex items-center gap-1 pl-2">
                   <button
                     onClick={() => startEdit(t)}
@@ -436,7 +436,7 @@ function ServiceAssignments({ formId, services }: { formId: string; services: Se
 
   return (
     <div className="border-t border-black/[0.07] p-6">
-      <p className="mb-1 text-[13px] font-semibold text-[#1b1814]">Assigned Services</p>
+      <p className="mb-1 text-[15px] font-semibold text-[#1b1814]">Assigned Services</p>
       <p className="mb-4 text-[12px] text-[#7a756e]">
         Customers booking these services will be shown this form.
       </p>

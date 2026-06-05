@@ -86,8 +86,8 @@ export default function AvailabilityPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Availability</h1>
+      <div className="flex h-[80px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Availability</h1>
         <div className="flex-1" />
         <button
           onClick={() => save.mutate()}
@@ -99,14 +99,14 @@ export default function AvailabilityPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
+      <div className="flex-1 overflow-auto px-8 py-8 pb-20 md:pb-8">
         <p className="mb-5 text-[13px] text-[#7a756e]">
           Set your weekly working hours. These control which time slots clients
           see when booking online.
         </p>
 
         {isLoading ? (
-          <div className="max-w-xl space-y-2">
+          <div className="max-w-xl space-y-3">
             {Array.from({ length: 7 }).map((_, i) => (
               <div
                 key={i}
@@ -115,7 +115,7 @@ export default function AvailabilityPage() {
             ))}
           </div>
         ) : (
-          <div className="max-w-xl space-y-2">
+          <div className="max-w-xl space-y-3">
             {schedule.map((day) => (
               <div
                 key={day.dayOfWeek}
@@ -178,7 +178,7 @@ export default function AvailabilityPage() {
         {/* Blocked Times */}
         <div className="mt-8 max-w-xl">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-[13px] font-semibold text-[#1b1814]">Blocked Times</p>
+            <p className="text-[15px] font-semibold text-[#1b1814]">Blocked Times</p>
             <button
               onClick={() => setShowBlockModal(true)}
               className="inline-flex items-center gap-1.5 rounded-[9px] border border-black/[0.12] bg-white px-3 py-[7px] text-[12px] font-medium text-[#7a756e] hover:bg-[#f8f6f3] transition-colors cursor-pointer"

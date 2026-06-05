@@ -37,8 +37,8 @@ export default function AnalyticsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Analytics</h1>
+      <div className="flex h-[80px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Analytics</h1>
         <div className="flex-1" />
         <div className="flex gap-0.5 rounded-[9px] border border-black/[0.07] bg-[#edeae5] p-0.5">
           {DAYS_OPTIONS.map((d) => (
@@ -58,7 +58,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7 space-y-[22px]">
+      <div className="flex-1 overflow-auto px-8 py-8 pb-20 md:pb-8 space-y-[22px]">
         {isLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -71,7 +71,7 @@ export default function AnalyticsPage() {
         ) : (
           <>
             {/* Metric cards */}
-            <div className="grid grid-cols-2 gap-[14px] lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
               <MetricCard label="No-show rate" value={`${data?.noShowRate ?? 0}%`} />
               <MetricCard label="Cancellation rate" value={`${data?.cancellationRate ?? 0}%`} />
               <MetricCard label="New clients" value={String(data?.newClients ?? 0)} gold />
@@ -79,8 +79,8 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Revenue by month */}
-            <div className="rounded-[14px] border border-black/[0.07] bg-white p-5">
-              <p className="mb-4 text-[13px] font-semibold text-[#1b1814]">
+            <div className="rounded-[14px] border border-black/[0.07] bg-white p-6">
+              <p className="mb-4 text-[15px] font-semibold text-[#1b1814]">
                 Revenue by month
               </p>
               {(data?.revenueByMonth?.length ?? 0) === 0 ? (
@@ -120,16 +120,16 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Top services + busiest days */}
-            <div className="grid gap-[14px] sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               {/* Top services */}
-              <div className="rounded-[14px] border border-black/[0.07] bg-white p-5">
-                <p className="mb-3 text-[13px] font-semibold text-[#1b1814]">
+              <div className="rounded-[14px] border border-black/[0.07] bg-white p-6">
+                <p className="mb-3 text-[15px] font-semibold text-[#1b1814]">
                   Top services
                 </p>
                 {(data?.topServices?.length ?? 0) === 0 ? (
                   <p className="text-[11px] text-[#9a9890]">No data</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {data.topServices.map((s: any, i: number) => (
                       <div key={s.name} className="flex items-center gap-2">
                         <span
@@ -152,8 +152,8 @@ export default function AnalyticsPage() {
               </div>
 
               {/* Busiest days */}
-              <div className="rounded-[14px] border border-black/[0.07] bg-white p-5">
-                <p className="mb-3 text-[13px] font-semibold text-[#1b1814]">
+              <div className="rounded-[14px] border border-black/[0.07] bg-white p-6">
+                <p className="mb-3 text-[15px] font-semibold text-[#1b1814]">
                   Busiest days
                 </p>
                 <ResponsiveContainer width="100%" height={140}>

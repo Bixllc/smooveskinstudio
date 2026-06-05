@@ -61,17 +61,17 @@ export default function BookingAlertsPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+      <div className="flex h-[80px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
         <Link
           href="/admin/settings"
           className="flex h-7 w-7 items-center justify-center rounded-full border border-black/[0.07] text-[#a8a39c] hover:border-[#c9a96e] hover:text-[#c9a96e] transition-colors"
         >
           <IconChevronLeft size={14} />
         </Link>
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Booking Alerts</h1>
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Booking Alerts</h1>
       </div>
 
-      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7">
+      <div className="flex-1 overflow-auto px-8 py-8 pb-20 md:pb-8">
         {loading ? (
           <div className="max-w-lg space-y-3">
             {Array.from({ length: 2 }).map((_, i) => (
@@ -80,8 +80,8 @@ export default function BookingAlertsPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
-            <div className="rounded-xl border border-[#e8e6e1] bg-white p-5 space-y-4">
-              <p className="text-[12px] font-medium text-[#1a1814]">Admin Notifications</p>
+            <div className="rounded-xl border border-[#e8e6e1] bg-white p-6 space-y-4">
+              <p className="text-[15px] font-semibold text-[#1a1814]">Admin Notifications</p>
               <p className="text-[11px] text-[#9a9890]">
                 Choose which events trigger an email notification to the admin.
               </p>
@@ -106,8 +106,8 @@ export default function BookingAlertsPage() {
               />
             </div>
 
-            <div className="rounded-xl border border-[#e8e6e1] bg-white p-5 space-y-4">
-              <p className="text-[12px] font-medium text-[#1a1814]">Summary Email</p>
+            <div className="rounded-xl border border-[#e8e6e1] bg-white p-6 space-y-4">
+              <p className="text-[15px] font-semibold text-[#1a1814]">Summary Email</p>
 
               <ToggleField
                 label="Enable summary email"

@@ -108,8 +108,8 @@ export default function CategoriesPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Categories</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Categories</h1>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
@@ -121,7 +121,7 @@ export default function CategoriesPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-8 py-7 pb-20 md:pb-7">
+      <div className="flex-1 overflow-y-auto px-8 py-8 pb-20 md:pb-8">
         {error && (
           <div className="mb-4 rounded-[9px] bg-[#fdecea] border border-[#f5c6c2] px-4 py-3 text-[13px] text-[#b53a2e]">
             {error}
@@ -179,7 +179,7 @@ export default function CategoriesPage() {
 
         {/* List */}
         {loading ? (
-          <div className="space-y-2 max-w-[560px]">
+          <div className="space-y-3 max-w-[560px]">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-14 animate-pulse rounded-[14px] bg-[#f5f4f2]" />
             ))}
@@ -191,7 +191,7 @@ export default function CategoriesPage() {
         ) : (
           <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden max-w-[560px]">
             {/* Header */}
-            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "32px 1fr 1.2fr auto" }}>
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "32px 1fr 1.2fr auto" }}>
               {["", "Name", "Description", ""].map((h, i) => (
                 <div key={i} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">{h}</div>
               ))}
@@ -200,7 +200,7 @@ export default function CategoriesPage() {
             {categories.map((cat, idx) => (
               <div
                 key={cat.id}
-                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+                className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
                 style={{ gridTemplateColumns: "32px 1fr 1.2fr auto" }}
               >
                 {/* Reorder */}
@@ -252,8 +252,8 @@ export default function CategoriesPage() {
                   </>
                 ) : (
                   <>
-                    <span className="text-[14px] font-medium text-[#1b1814] truncate pr-2">{cat.name}</span>
-                    <span className="text-[13px] text-[#7a756e] truncate pr-2">{cat.description ?? "—"}</span>
+                    <span className="text-[15px] font-medium text-[#1b1814] truncate pr-2">{cat.name}</span>
+                    <span className="text-[14px] text-[#7a756e] truncate pr-2">{cat.description ?? "—"}</span>
                     <div className="flex items-center gap-1 pl-3">
                       <button
                         onClick={() => startEdit(cat)}

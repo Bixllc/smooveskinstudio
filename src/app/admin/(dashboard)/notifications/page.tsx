@@ -99,8 +99,8 @@ export default function NotificationsPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      <div className="flex h-[60px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Notifications</h1>
+      <div className="flex h-[80px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Notifications</h1>
         <div className="flex-1" />
         <button
           onClick={saveAll}
@@ -111,19 +111,19 @@ export default function NotificationsPage() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto px-8 py-7 pb-20 md:pb-7 space-y-3">
+      <div className="flex-1 overflow-auto px-8 py-8 pb-20 md:pb-8 space-y-3">
         <p className="text-[13px] text-[#7a756e]">
           Control which emails are sent to customers and customize their subject lines.
         </p>
 
         {loading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-16 animate-pulse rounded-xl bg-[#f5f4f2]" />
             ))}
           </div>
         ) : (
-          <div className="max-w-2xl space-y-2">
+          <div className="max-w-2xl space-y-3">
             {TEMPLATE_TYPES.map((tmpl) => {
               const config = getTemplate(tmpl.key);
               const isExpanded = expanded === tmpl.key;

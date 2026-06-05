@@ -188,8 +188,8 @@ export default function ServicesPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[60px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[20px] font-semibold text-[#1b1814]">Services</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[24px] font-semibold text-[#1b1814]">Services</h1>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
@@ -201,7 +201,7 @@ export default function ServicesPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-8 py-7 pb-20 md:pb-7">
+      <div className="flex-1 overflow-y-auto px-8 py-8 pb-20 md:pb-8">
         {error && (
           <div className="mb-4 rounded-[9px] bg-[#fdecea] border border-[#f5c6c2] px-4 py-3 text-[13px] text-[#b53a2e]">
             {error}
@@ -307,7 +307,7 @@ export default function ServicesPage() {
 
         {/* Service list */}
         {loading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="h-14 animate-pulse rounded-[14px] bg-[#f5f4f2]" />
             ))}
@@ -318,7 +318,7 @@ export default function ServicesPage() {
           </div>
         ) : (
           <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden mb-10">
-            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "2fr 1fr 80px 80px auto" }}>
+            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "2fr 1fr 80px 80px auto" }}>
               {["Service", "Category", "Duration", "Price", ""].map((h) => (
                 <div key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">{h}</div>
               ))}
@@ -326,12 +326,12 @@ export default function ServicesPage() {
             {services.map((service) => (
               <div
                 key={service.id}
-                className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+                className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
                 style={{ gridTemplateColumns: "2fr 1fr 80px 80px auto" }}
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-medium text-[#1b1814]">{service.name}</span>
+                    <span className="text-[15px] font-medium text-[#1b1814]">{service.name}</span>
                     {!service.active && (
                       <span className="bg-[#f5f4f2] text-[#a8a39c] text-[10px] font-semibold px-[8px] py-[2px] rounded-full uppercase tracking-[0.04em]">
                         Inactive
@@ -339,9 +339,9 @@ export default function ServicesPage() {
                     )}
                   </div>
                 </div>
-                <span className="text-[13px] text-[#7a756e] truncate pr-2">{service.category.name}</span>
-                <span className="text-[13px] text-[#7a756e]">{service.durationMinutes} min</span>
-                <span className="text-[13.5px] font-medium text-[#b8892a]">${Number(service.price).toFixed(0)}</span>
+                <span className="text-[14px] text-[#7a756e] truncate pr-2">{service.category.name}</span>
+                <span className="text-[14px] text-[#7a756e]">{service.durationMinutes} min</span>
+                <span className="text-[15px] font-medium text-[#b8892a]">${Number(service.price).toFixed(0)}</span>
                 <div className="flex items-center gap-1 pl-2">
                   <button
                     onClick={() => startEdit(service)}
@@ -412,7 +412,7 @@ function AssignedForms({ serviceId, allForms }: { serviceId: string; allForms: {
 
   return (
     <div className="mt-6 border-t border-black/[0.07] pt-5">
-      <p className="mb-3 text-[13px] font-semibold text-[#1b1814]">Assigned Forms</p>
+      <p className="mb-3 text-[15px] font-semibold text-[#1b1814]">Assigned Forms</p>
       {assignments.length === 0 && (
         <p className="mb-3 text-[12px] text-[#a8a39c]">No forms assigned.</p>
       )}
@@ -687,7 +687,7 @@ function AddOnsSection({ services }: { services: { id: string; name: string }[] 
       )}
 
       {loading ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-14 animate-pulse rounded-[14px] bg-[#f5f4f2]" />
           ))}
@@ -696,7 +696,7 @@ function AddOnsSection({ services }: { services: { id: string; name: string }[] 
         <p className="text-[14px] text-[#a8a39c]">No add-ons yet.</p>
       ) : (
         <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
-          <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-5 py-[11px]" style={{ gridTemplateColumns: "2fr 1fr 80px auto" }}>
+          <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "2fr 1fr 80px auto" }}>
             {["Add-on", "Services", "Price", ""].map((h) => (
               <div key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">{h}</div>
             ))}
@@ -704,23 +704,23 @@ function AddOnsSection({ services }: { services: { id: string; name: string }[] 
           {addOns.map((addOn) => (
             <div
               key={addOn.id}
-              className="grid px-5 py-[13px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+              className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
               style={{ gridTemplateColumns: "2fr 1fr 80px auto" }}
             >
               <div className="flex items-center gap-2">
-                <span className="text-[14px] font-medium text-[#1b1814]">{addOn.name}</span>
+                <span className="text-[15px] font-medium text-[#1b1814]">{addOn.name}</span>
                 {!addOn.active && (
                   <span className="bg-[#f5f4f2] text-[#a8a39c] text-[10px] font-semibold px-[8px] py-[2px] rounded-full uppercase tracking-[0.04em]">
                     Inactive
                   </span>
                 )}
               </div>
-              <span className="text-[13px] text-[#7a756e] truncate pr-2">
+              <span className="text-[14px] text-[#7a756e] truncate pr-2">
                 {addOn.serviceAddOns.length > 0
                   ? addOn.serviceAddOns.map((sa) => sa.service.name).join(", ")
                   : "—"}
               </span>
-              <span className="text-[13.5px] font-medium text-[#b8892a]">${Number(addOn.price).toFixed(0)}</span>
+              <span className="text-[15px] font-medium text-[#b8892a]">${Number(addOn.price).toFixed(0)}</span>
               <div className="flex items-center gap-1 pl-2">
                 <button
                   onClick={() => startEdit(addOn)}
