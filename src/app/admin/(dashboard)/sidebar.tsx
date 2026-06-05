@@ -75,7 +75,7 @@ export function AdminSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-[232px] flex-shrink-0 flex-col bg-[#1b1814]" style={{ minHeight: "100vh" }}>
+      <aside className="hidden md:flex w-[232px] flex-shrink-0 flex-col bg-[#1b1814] h-screen sticky top-0">
         {/* Logo */}
         <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-white/[0.07]">
           <div className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-[9px] bg-[#C9A96E]">
