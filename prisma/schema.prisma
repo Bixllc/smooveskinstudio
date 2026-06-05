@@ -28,6 +28,7 @@ model Client {
   serviceAddOns ServiceAddOn[]
   bookingAddOns BookingAddOn[]
   coupons       Coupon[]
+  invoices      Invoice[]
 }
 
 model BusinessSettings {
@@ -277,6 +278,34 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  CANCELLED
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  clientId      String
+  customerName  String
+  customerEmail String
+  lineItems     Json          @default("[]")
+  subtotal      Decimal       @db.Decimal(10, 2)
+  total         Decimal       @db.Decimal(10, 2)
+  status        InvoiceStatus @default(DRAFT)
+  notes         String?
+  dueDate       DateTime?
+  sentAt        DateTime?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  client        Client        @relation(fields: [clientId], references: [id])
+
+  @@index([clientId])
 }
 
 enum FormType {
