@@ -46,8 +46,14 @@ export async function GET(req: NextRequest) {
             name: true,
             durationMinutes: true,
             price: true,
+            depositAmount: true,
+            paymentType: true,
             category: { select: { name: true } },
           },
+        },
+        payments: {
+          where: { status: "COMPLETED" },
+          select: { amount: true },
         },
       },
       orderBy: {

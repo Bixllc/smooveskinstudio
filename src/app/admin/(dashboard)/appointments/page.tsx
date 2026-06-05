@@ -106,7 +106,7 @@ export default function AppointmentsPage() {
             <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]"
               style={{ gridTemplateColumns: "1.4fr 1.6fr 1.1fr 80px 80px 120px" }}
             >
-              {["Client", "Service", "Date & Time", "Duration", "Price", "Status"].map((h) => (
+              {["Client", "Service", "Date & Time", "Duration", "Paid", "Status"].map((h) => (
                 <div
                   key={h}
                   className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]"
@@ -138,7 +138,7 @@ export default function AppointmentsPage() {
                     {b.service.durationMinutes} min
                   </div>
                   <div className="text-[15px] font-medium text-[#b8892a]">
-                    ${Number(b.service.price).toFixed(0)}
+                    ${(b.payments?.reduce((sum: number, p: any) => sum + Number(p.amount), 0) ?? 0).toFixed(0)}
                   </div>
                   <div>
                     <StatusBadge status={b.status} />

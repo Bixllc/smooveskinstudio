@@ -68,10 +68,7 @@ export function AppointmentDrawer({
             value={`${format(local, "h:mm a")} · ${booking.service.durationMinutes} min`}
           />
           <DrawerRow label="Date" value={format(local, "EEEE, MMM d")} />
-          <DrawerRow
-            label="Status"
-            value={booking.status.replace(/_/g, " ")}
-          />
+          <DrawerRow label="Status" value={booking.status.replace(/_/g, " ")} />
           {booking.customer.email && (
             <DrawerRow label="Email" value={booking.customer.email} />
           )}
@@ -81,34 +78,51 @@ export function AppointmentDrawer({
           {booking.notes && (
             <DrawerRow label="Notes" value={booking.notes} />
           )}
+          {(() => {
+            const amountPaid = (booking.payments ?? []).reduce(
+              (sum: number, p: any) => sum + Number(p.amount),
+              0
+            );
+            const totalPrice = Number(booking.service.price);
+            const amountDue = Math.max(0, totalPrice - amountPaid);
+            if (amountPaid === 0) return null;
+            return (
+              <>
+                <DrawerRow label="Amount Paid" value={`$${amountPaid.toFixed(2)}`} />
+                {amountDue > 0 && (
+                  <DrawerRow label="Amount Due" value={`$${amountDue.toFixed(2)}`} />
+                )}
+              </>
+            );
+          })()}
         </div>
 
         <div className="border-t border-[#e8e6e1] p-4 space-y-2">
           <button
             onClick={() => updateStatus("CONFIRMED")}
-            disabled={loading || booking.status === "CONFIRMED"}
-            className="w-full rounded-lg border border-[#C9A96E55] bg-[#C9A96E18] py-2 text-[12px] font-medium text-[#7a5c1a] disabled:opacity-40"
+            disabled={loading || booking.status === "CONFIRMED" || booking.status === "COMPLETED" || booking.status === "CANCELLED"}
+            className="w-full rounded-lg border border-[#C9A96E55] bg-[#C9A96E18] py-2.5 text-[12px] font-semibold text-[#7a5c1a] disabled:opacity-35 cursor-pointer disabled:cursor-not-allowed hover:bg-[#C9A96E30] transition-colors"
           >
             Confirm
           </button>
           <button
             onClick={() => updateStatus("COMPLETED")}
-            disabled={loading || booking.status === "COMPLETED"}
-            className="w-full rounded-lg border border-[#e8e6e1] py-2 text-[12px] font-medium text-[#1a1814] disabled:opacity-40"
+            disabled={loading || booking.status === "COMPLETED" || booking.status === "CANCELLED"}
+            className="w-full rounded-lg border border-[#e8e6e1] py-2.5 text-[12px] font-semibold text-[#1a1814] disabled:opacity-35 cursor-pointer disabled:cursor-not-allowed hover:bg-[#f5f4f2] transition-colors"
           >
             Mark Complete
           </button>
           <button
             onClick={() => updateStatus("NO_SHOW")}
-            disabled={loading}
-            className="w-full rounded-lg border border-[#e8e6e1] py-2 text-[12px] font-medium text-[#9a9890] disabled:opacity-40"
+            disabled={loading || booking.status === "NO_SHOW" || booking.status === "CANCELLED" || booking.status === "COMPLETED"}
+            className="w-full rounded-lg border border-[#e8e6e1] py-2.5 text-[12px] font-semibold text-[#9a9890] disabled:opacity-35 cursor-pointer disabled:cursor-not-allowed hover:bg-[#f5f4f2] transition-colors"
           >
             Mark No-Show
           </button>
           <button
             onClick={() => updateStatus("CANCELLED")}
-            disabled={loading}
-            className="w-full rounded-lg border border-[#f0c0c0] bg-[#fce8e8] py-2 text-[12px] font-medium text-[#8c2020] disabled:opacity-40"
+            disabled={loading || booking.status === "CANCELLED"}
+            className="w-full rounded-lg border border-[#f0c0c0] bg-[#fce8e8] py-2.5 text-[12px] font-semibold text-[#8c2020] disabled:opacity-35 cursor-pointer disabled:cursor-not-allowed hover:bg-[#f8d0d0] transition-colors"
           >
             Cancel
           </button>
