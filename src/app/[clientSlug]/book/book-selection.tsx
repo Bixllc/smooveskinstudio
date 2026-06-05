@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   format,
   startOfToday,
+  startOfDay,
   isSameDay,
   isBefore,
   isToday,
@@ -48,6 +49,7 @@ interface BusinessSettings {
   phone: string | null;
   address: string | null;
   timezone: string;
+  minBookingLeadHours: number;
   cancellationPolicy: string | null;
   latePolicy: string | null;
   noShowPolicy: string | null;
@@ -197,8 +199,10 @@ function StepIndicator({
 
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function CalendarWidget({ selectedDate, onSelect }: { selectedDate: Date | null; onSelect: (d: Date) => void }) {
+function CalendarWidget({ selectedDate, onSelect, minLeadHours }: { selectedDate: Date | null; onSelect: (d: Date) => void; minLeadHours?: number }) {
   const today = startOfToday();
+  // Earliest selectable date accounts for lead time
+  const minDate = new Date(Date.now() + (minLeadHours ?? 2) * 60 * 60 * 1000);
   const [viewMonth, setViewMonth] = useState(today);
   const days = eachDayOfInterval({
     start: startOfWeek(startOfMonth(viewMonth)),
@@ -210,7 +214,7 @@ function CalendarWidget({ selectedDate, onSelect }: { selectedDate: Date | null;
       <div className="mb-4 flex items-center justify-between">
         <button
           onClick={() => setViewMonth((m) => subMonths(m, 1))}
-          disabled={isSameMonth(viewMonth, today)}
+          disabled={isSameMonth(viewMonth, minDate)}
           className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e8e6e1] bg-white text-[#9a9890] transition-colors hover:border-[#C9A96E] hover:text-[#C9A96E] disabled:cursor-not-allowed disabled:opacity-30"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
@@ -230,7 +234,7 @@ function CalendarWidget({ selectedDate, onSelect }: { selectedDate: Date | null;
       </div>
       <div className="grid grid-cols-7 gap-y-1">
         {days.map((day) => {
-          const isPast = isBefore(day, today);
+          const isPast = isBefore(day, startOfDay(minDate));
           const isCurrentMonth = isSameMonth(day, viewMonth);
           const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
           const isTodayDay = isToday(day);
@@ -490,15 +494,15 @@ function Step2AddOns({
 
 // ─── Step 2 — Calendar ────────────────────────────────────────────────────────
 
-function Step2Calendar({ selectedDate, onDateSelect, slots, slotsLoading, timezone, onSelectSlot }: {
+function Step2Calendar({ selectedDate, onDateSelect, slots, slotsLoading, timezone, onSelectSlot, minLeadHours }: {
   selectedDate: Date | null; onDateSelect: (d: Date) => void; slots: string[];
-  slotsLoading: boolean; timezone: string; onSelectSlot: (s: string) => void;
+  slotsLoading: boolean; timezone: string; onSelectSlot: (s: string) => void; minLeadHours: number;
 }) {
   return (
     <div>
       <h2 className="mb-1 text-xl font-bold text-[#1a1814]">Pick your date & time</h2>
       <p className="mb-5 text-[13px] text-[#9a9890]">Select a date — available times will appear on the right</p>
-      <CalendarWidget selectedDate={selectedDate} onSelect={onDateSelect} />
+      <CalendarWidget selectedDate={selectedDate} onSelect={onDateSelect} minLeadHours={minLeadHours} />
       {selectedDate && (
         <div className="mt-6 lg:hidden">
           <p className="mb-1 text-[13px] font-semibold text-[#1a1814]">{format(selectedDate, "EEEE, MMMM d")}</p>
@@ -1268,7 +1272,7 @@ export function BookSelection({ clientSlug, clientId, categories, businessSettin
                       {formatDuration(service.durationMinutes)} · ${service.price.toFixed(2)}
                     </span>
                   </div>
-                  <Step2Calendar selectedDate={selectedDate} onDateSelect={setSelectedDate} slots={slots} slotsLoading={slotsLoading} timezone={timezone} onSelectSlot={handleSelectSlot} />
+                  <Step2Calendar selectedDate={selectedDate} onDateSelect={setSelectedDate} slots={slots} slotsLoading={slotsLoading} timezone={timezone} onSelectSlot={handleSelectSlot} minLeadHours={businessSettings.minBookingLeadHours} />
                 </>
               )}
 

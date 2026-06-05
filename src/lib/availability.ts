@@ -78,6 +78,11 @@ export async function getAvailableSlots(
   const totalMinutes =
     service.bufferBeforeMinutes + service.durationMinutes + service.bufferAfterMinutes;
 
+  const now = new Date();
+  const minLeadMs = (settings.minBookingLeadHours ?? 2) * 60 * 60 * 1000;
+  const maxDaysOut = settings.maxBookingDaysOut ?? 100;
+  const maxFutureUtc = addDays(now, maxDaysOut);
+
   const slots: string[] = [];
 
   const extraMinutes = params.addOnDurationMinutes ?? 0;
@@ -86,6 +91,11 @@ export async function getAvailableSlots(
     const candidates = generateCandidateSlots(date, rule.startTime, rule.endTime, timezone);
 
     for (const candidateUtc of candidates) {
+      // Filter: must be far enough in the future (minBookingLeadHours)
+      if (candidateUtc.getTime() - now.getTime() < minLeadMs) continue;
+      // Filter: must not exceed maxBookingDaysOut
+      if (isAfter(candidateUtc, maxFutureUtc)) continue;
+
       const blockStart = addMinutes(candidateUtc, -service.bufferBeforeMinutes);
       const blockEnd = addMinutes(candidateUtc, service.durationMinutes + extraMinutes + service.bufferAfterMinutes);
 
