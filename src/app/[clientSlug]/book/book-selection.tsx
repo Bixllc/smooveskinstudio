@@ -33,6 +33,8 @@ interface Service {
   description: string | null;
   durationMinutes: number;
   price: number;
+  depositAmount: number | null;
+  paymentType: string;
 }
 
 interface Category {
@@ -295,9 +297,23 @@ function Sidebar({
           {slot && step > 3 && <button onClick={() => onGoTo(3)} className="shrink-0 text-[11px] font-medium text-[#C9A96E] underline hover:text-[#b8954f]">Change</button>}
         </div>
         {service && (
-          <div className="flex items-baseline justify-between pt-3">
-            <p className="text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
-            <p className="text-xl font-bold text-[#1a1814]">${service.price.toFixed(2)}</p>
+          <div className="pt-3 space-y-1.5">
+            <div className="flex items-baseline justify-between">
+              <p className="text-[12px] text-[#9a9890]">{formatDuration(service.durationMinutes)}</p>
+              <p className="text-xl font-bold text-[#1a1814]">${service.price.toFixed(2)}</p>
+            </div>
+            {service.paymentType === "DEPOSIT" && service.depositAmount && (
+              <>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-[11px] text-[#9a9890]">Due now (deposit)</p>
+                  <p className="text-[13px] font-semibold text-[#C9A96E]">${service.depositAmount.toFixed(2)}</p>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <p className="text-[11px] text-[#9a9890]">Total</p>
+                  <p className="text-[13px] font-medium text-[#1a1814]">${service.price.toFixed(2)}</p>
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>

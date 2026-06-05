@@ -29,6 +29,8 @@ export default async function BookPage({
           description: true,
           durationMinutes: true,
           price: true,
+          depositAmount: true,
+          paymentType: true,
         },
       },
     },
@@ -44,6 +46,8 @@ export default async function BookPage({
       description: s.description,
       durationMinutes: s.durationMinutes,
       price: Number(s.price),
+      depositAmount: s.depositAmount ? Number(s.depositAmount) : null,
+      paymentType: s.paymentType,
     })),
   }));
 
