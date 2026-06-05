@@ -20,7 +20,7 @@ const STATUS_STYLES: Record<string, string> = {
 function StatusBadge({ status }: { status: string }) {
   return (
     <span
-      className={`inline-flex items-center px-[10px] py-[3px] rounded-full text-[11px] font-semibold tracking-[0.04em] ${
+      className={`inline-flex items-center whitespace-nowrap px-[10px] py-[3px] rounded-full text-[11px] font-semibold tracking-[0.04em] ${
         STATUS_STYLES[status] ?? "bg-[#f5f4f2] text-[#9a9890]"
       }`}
     >
