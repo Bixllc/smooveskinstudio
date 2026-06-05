@@ -141,7 +141,7 @@ export default function NotificationsPage() {
                       onClick={() =>
                         updateTemplate(tmpl.key, "enabled", !config.enabled)
                       }
-                      className={`relative h-5 w-9 flex-shrink-0 rounded-full transition-colors ${
+                      className={`relative h-5 w-9 flex-shrink-0 rounded-full overflow-hidden transition-colors ${
                         config.enabled ? "bg-[#C9A96E]" : "bg-[#e8e6e1]"
                       }`}
                     >

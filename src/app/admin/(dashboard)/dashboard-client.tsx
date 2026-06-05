@@ -26,10 +26,7 @@ export function DashboardClient({ greeting, dateLabel, tz }: { greeting: string;
       {/* Topbar */}
       <div className="flex h-[80px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
         <div>
-          <p className="text-[12px] text-[#a8a39c]">
-            {dateLabel} · {isLoading ? "…" : `${todayCount} appointment${todayCount !== 1 ? "s" : ""} today`}
-          </p>
-          <p className="mt-1 text-[26px] font-semibold text-[#1b1814]">{greeting}, Anisha</p>
+          <p className="text-[26px] font-semibold text-[#1b1814]">{greeting}, Anisha</p>
         </div>
         <button className="inline-flex items-center gap-1.5 rounded-[9px] bg-[#c9a96e] px-[20px] py-[11px] text-[14px] font-semibold text-[#1b1814] transition-opacity hover:opacity-85 border-none cursor-pointer">
           <IconPlus size={17} stroke={2.2} /> New booking
@@ -38,6 +35,11 @@ export function DashboardClient({ greeting, dateLabel, tz }: { greeting: string;
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-8 py-8 pb-20 md:pb-8">
+
+        {/* Date + count */}
+        <p className="mb-5 text-[13px] text-[#a8a39c]">
+          {dateLabel} · {isLoading ? "…" : `${todayCount} appointment${todayCount !== 1 ? "s" : ""} today`}
+        </p>
 
         {/* Metrics */}
         <div className="mb-8 grid grid-cols-2 gap-5 lg:grid-cols-4">

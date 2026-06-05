@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import {
   IconLayoutDashboard,
@@ -56,6 +58,28 @@ const navSections = [
 
 const allNavItems = navSections.flatMap((s) => s.items);
 
+function LogoBlock() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-white/[0.07]">
+      <button
+        onClick={() => inputRef.current?.click()}
+        className="relative h-[34px] w-[34px] flex-shrink-0 rounded-[9px] overflow-hidden group"
+      >
+        <Image src="/images/logo.svg" alt="Logo" fill className="object-cover" />
+        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <span className="text-white text-[9px] font-medium">Edit</span>
+        </div>
+      </button>
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" />
+      <div className="flex flex-col">
+        <span className="text-[15px] font-semibold text-white leading-tight">Smoove</span>
+        <span className="text-[11px] text-white/30 mt-0.5">Skin Studio</span>
+      </div>
+    </div>
+  );
+}
+
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -77,15 +101,7 @@ export function AdminSidebar() {
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-[232px] flex-shrink-0 flex-col bg-[#1b1814] h-screen sticky top-0">
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 pt-5 pb-4 border-b border-white/[0.07]">
-          <div className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-[9px] bg-[#C9A96E]">
-            <span className="text-[15px] font-semibold text-[#1b1814]">S</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[15px] font-semibold text-white leading-tight">Smoove</span>
-            <span className="text-[11px] text-white/30 mt-0.5">Skin Studio</span>
-          </div>
-        </div>
+        <LogoBlock />
 
         {/* Nav sections */}
         <nav className="flex-1 overflow-y-auto px-[10px] py-3">
