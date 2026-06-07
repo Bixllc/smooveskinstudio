@@ -118,8 +118,8 @@ export default function CouponsPage() {
   if (loading) {
     return (
       <div className="flex h-screen flex-col overflow-hidden">
-        <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-          <h1 className="text-[24px] font-semibold text-[#1b1814]">Coupons</h1>
+        <header className="h-[80px] bg-white border-b border-black/[0.07] px-4 md:px-8 flex items-center justify-between flex-shrink-0">
+          <h1 className="text-[18px] md:text-[24px] font-semibold text-[#1b1814]">Coupons</h1>
         </header>
         <div className="flex-1 overflow-y-auto p-8 space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -133,8 +133,8 @@ export default function CouponsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[24px] font-semibold text-[#1b1814]">Coupons</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-4 md:px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[18px] md:text-[24px] font-semibold text-[#1b1814]">Coupons</h1>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
@@ -146,7 +146,7 @@ export default function CouponsPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 md:py-8 pb-20 md:pb-8">
         {error && (
           <div className="mb-4 rounded-[9px] bg-[#fdecea] border border-[#f5c6c2] px-4 py-3 text-[13px] text-[#b53a2e]">
             {error}
@@ -277,7 +277,7 @@ export default function CouponsPage() {
         )}
 
         {/* Table */}
-        <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
+        <div className="hidden md:block bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
           {/* Header row */}
           <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "1fr 1.2fr 0.8fr 0.6fr 1fr 0.8fr auto" }}>
             {["Code", "Label", "Discount", "Uses", "Expires", "Status", ""].map((h) => (
@@ -353,6 +353,45 @@ export default function CouponsPage() {
               </div>
             ))
           )}
+        </div>
+
+        {/* Mobile cards */}
+        <div className="md:hidden space-y-2">
+          {coupons.length === 0 ? (
+            <div className="text-center py-10 text-[14px] text-[#a8a39c]">No coupons yet.</div>
+          ) : coupons.map((coupon) => (
+            <div key={coupon.id} className="bg-white border border-black/[0.07] rounded-[14px] px-4 py-4">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <span className="font-mono font-semibold text-[16px] text-[#1b1814]">{coupon.code}</span>
+                {coupon.active ? (
+                  <span className="bg-[#e8f7ee] text-[#2e7d50] inline-flex px-[10px] py-[3px] rounded-full text-[11px] font-semibold flex-shrink-0">Active</span>
+                ) : (
+                  <span className="bg-[#fdecea] text-[#b53a2e] inline-flex px-[10px] py-[3px] rounded-full text-[11px] font-semibold flex-shrink-0">Disabled</span>
+                )}
+              </div>
+              <p className="text-[13px] text-[#7a756e] mb-2">{coupon.name} · {Number(coupon.discountPercent).toFixed(0)}% off</p>
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] text-[#a8a39c]">
+                  {coupon.usageCount}/{coupon.usageLimit ?? "∞"} uses
+                  {coupon.expiresAt ? ` · Expires ${format(new Date(coupon.expiresAt), "MMM d, yyyy")}` : ""}
+                </span>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => startEdit(coupon)}
+                    className="bg-white text-[#7a756e] border border-black/[0.12] rounded-[8px] px-3 py-1 text-[12px] font-medium"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleToggleActive(coupon)}
+                    className="bg-white text-[#7a756e] border border-black/[0.12] rounded-[8px] px-3 py-1 text-[12px] font-medium"
+                  >
+                    {coupon.active ? "Disable" : "Enable"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
