@@ -50,6 +50,7 @@ export async function PATCH(request: NextRequest) {
     "summaryEmailTime",
     "summaryEmailFrequency",
     "emailTemplateSettings",
+    "reminderLeadHours",
   ];
 
   const data: Record<string, unknown> = {};

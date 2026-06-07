@@ -12,6 +12,7 @@ interface SchedulingForm {
   allowClientCancel: boolean;
   allowClientReschedule: boolean;
   latestBookingTime: string;
+  reminderLeadHours: number;
 }
 
 export default function SchedulingLimitsPage() {
@@ -22,6 +23,7 @@ export default function SchedulingLimitsPage() {
     allowClientCancel: true,
     allowClientReschedule: true,
     latestBookingTime: "",
+    reminderLeadHours: 24,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -37,6 +39,7 @@ export default function SchedulingLimitsPage() {
           allowClientCancel: data.allowClientCancel ?? true,
           allowClientReschedule: data.allowClientReschedule ?? true,
           latestBookingTime: data.latestBookingTime ?? "",
+          reminderLeadHours: data.reminderLeadHours ?? 24,
         });
       })
       .finally(() => setLoading(false));
@@ -134,6 +137,19 @@ export default function SchedulingLimitsPage() {
                 checked={form.allowClientReschedule}
                 onChange={(v) => setForm((f) => ({ ...f, allowClientReschedule: v }))}
               />
+            </div>
+
+            <div className="rounded-xl border border-[#e8e6e1] bg-white p-6 space-y-4">
+              <p className="text-[15px] font-semibold text-[#1a1814]">Reminders</p>
+
+              <Field label="Reminder lead time (hours)" hint="How many hours before the appointment to send the reminder SMS & email">
+                <NumberInput
+                  value={form.reminderLeadHours}
+                  onChange={(v) => setForm((f) => ({ ...f, reminderLeadHours: v }))}
+                  min={1}
+                  max={168}
+                />
+              </Field>
             </div>
 
             <button
