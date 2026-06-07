@@ -24,11 +24,11 @@ model Client {
   services          Service[]
   formTemplates     FormTemplate[]
   formSubmissions   FormSubmission[]
-  addOns        AddOn[]
-  serviceAddOns ServiceAddOn[]
-  bookingAddOns BookingAddOn[]
-  coupons       Coupon[]
-  invoices      Invoice[]
+  addOns            AddOn[]
+  serviceAddOns     ServiceAddOn[]
+  bookingAddOns     BookingAddOn[]
+  coupons           Coupon[]
+  invoices          Invoice[]
 }
 
 model BusinessSettings {
@@ -44,17 +44,18 @@ model BusinessSettings {
   noShowPolicy                String?
   depositPolicy               String?
   minBookingLeadHours         Int      @default(2)
-  maxBookingDaysOut            Int      @default(100)
+  maxBookingDaysOut           Int      @default(100)
   cancelRescheduleWindowHours Int      @default(24)
   allowClientCancel           Boolean  @default(true)
   allowClientReschedule       Boolean  @default(true)
-  latestBookingTime           String?  // "HH:MM" in client timezone, e.g. "21:00"
+  latestBookingTime           String? // "HH:MM" in client timezone, e.g. "21:00"
   alertNewBooking             Boolean  @default(true)
   alertCancellation           Boolean  @default(true)
   alertReschedule             Boolean  @default(true)
   summaryEmailEnabled         Boolean  @default(false)
   summaryEmailTime            String   @default("17:00")
   summaryEmailFrequency       String   @default("daily")
+  reminderLeadHours           Int      @default(24)
   emailTemplateSettings       Json?
   updatedAt                   DateTime @updatedAt
   client                      Client   @relation(fields: [clientId], references: [id])
@@ -74,21 +75,21 @@ model Category {
 }
 
 model Service {
-  id                  String      @id @default(uuid())
+  id                  String                  @id @default(uuid())
   clientId            String
   categoryId          String
   name                String
   description         String?
   durationMinutes     Int
-  price               Decimal     @db.Decimal(10, 2)
-  depositAmount       Decimal?    @db.Decimal(10, 2)
-  paymentType         PaymentType @default(FULL)
-  bufferBeforeMinutes Int         @default(0)
-  bufferAfterMinutes  Int         @default(0)
-  active              Boolean     @default(true)
+  price               Decimal                 @db.Decimal(10, 2)
+  depositAmount       Decimal?                @db.Decimal(10, 2)
+  paymentType         PaymentType             @default(FULL)
+  bufferBeforeMinutes Int                     @default(0)
+  bufferAfterMinutes  Int                     @default(0)
+  active              Boolean                 @default(true)
   bookings            Booking[]
-  category            Category    @relation(fields: [categoryId], references: [id])
-  client              Client      @relation(fields: [clientId], references: [id])
+  category            Category                @relation(fields: [categoryId], references: [id])
+  client              Client                  @relation(fields: [clientId], references: [id])
   formAssignments     ServiceFormAssignment[]
   serviceAddOns       ServiceAddOn[]
 
@@ -97,13 +98,13 @@ model Service {
 }
 
 model Customer {
-  id       String    @id @default(uuid())
-  clientId String
-  fullName String
-  email    String
-  phone    String?
+  id              String           @id @default(uuid())
+  clientId        String
+  fullName        String
+  email           String
+  phone           String?
   notes           String?
-  isVip           Boolean   @default(false)
+  isVip           Boolean          @default(false)
   adminNotes      String?
   bookings        Booking[]
   client          Client           @relation(fields: [clientId], references: [id])
@@ -114,26 +115,27 @@ model Customer {
 }
 
 model Booking {
-  id                      String        @id @default(uuid())
+  id                      String           @id @default(uuid())
   clientId                String
   serviceId               String
   customerId              String
   startTimeUtc            DateTime
   endTimeUtc              DateTime
-  status                  BookingStatus @default(PENDING_PAYMENT)
-  paymentStatus           PaymentStatus @default(UNPAID)
+  status                  BookingStatus    @default(PENDING_PAYMENT)
+  paymentStatus           PaymentStatus    @default(UNPAID)
   paymentProvider         String?
   paymentId               String?
   confirmationEmailSentAt DateTime?
   reminderEmailSentAt     DateTime?
+  reminderSmsSentAt       DateTime?
   notes                   String?
   couponId                String?
-  discountAmount          Decimal?      @db.Decimal(10, 2)
-  addOnsTotalAmount       Decimal?      @db.Decimal(10, 2)
-  totalAmount             Decimal?      @db.Decimal(10, 2)
-  manageToken             String?       @unique
-  createdAt               DateTime      @default(now())
-  updatedAt               DateTime      @updatedAt
+  discountAmount          Decimal?         @db.Decimal(10, 2)
+  addOnsTotalAmount       Decimal?         @db.Decimal(10, 2)
+  totalAmount             Decimal?         @db.Decimal(10, 2)
+  manageToken             String?          @unique
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
   client                  Client           @relation(fields: [clientId], references: [id])
   customer                Customer         @relation(fields: [customerId], references: [id])
   service                 Service          @relation(fields: [serviceId], references: [id])
@@ -304,7 +306,7 @@ model Invoice {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  client        Client        @relation(fields: [clientId], references: [id])
+  client Client @relation(fields: [clientId], references: [id])
 
   @@index([clientId])
 }
@@ -317,15 +319,15 @@ enum FormType {
 }
 
 model FormTemplate {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   clientId    String
   name        String
   description String?
-  type        FormType  @default(INTAKE)
-  fields      Json      @default("[]")
-  active      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  type        FormType @default(INTAKE)
+  fields      Json     @default("[]")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   client             Client                  @relation(fields: [clientId], references: [id])
   serviceAssignments ServiceFormAssignment[]
