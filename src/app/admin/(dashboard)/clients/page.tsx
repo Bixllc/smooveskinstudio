@@ -37,10 +37,10 @@ export default function ClientsPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[24px] font-semibold text-[#1b1814]">Clients</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-4 md:px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[18px] md:text-[24px] font-semibold text-[#1b1814]">Clients</h1>
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 bg-white border border-black/[0.07] rounded-[9px] px-3 h-9">
+          <div className="hidden md:flex items-center gap-2 bg-white border border-black/[0.07] rounded-[9px] px-3 h-9">
             <IconSearch size={14} className="text-[#a8a39c] flex-shrink-0" />
             <input
               value={search}
@@ -56,7 +56,7 @@ export default function ClientsPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-8">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 md:py-8 pb-20 md:pb-8">
         {isLoading ? (
           <div className="space-y-3">
             {Array.from({ length: 7 }).map((_, i) => (
@@ -71,7 +71,8 @@ export default function ClientsPage() {
             <p className="text-[14px] text-[#a8a39c]">No clients found</p>
           </div>
         ) : (
-          <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
+          <>
+          <div className="hidden md:block bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
             {/* Header row */}
             <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]" style={{ gridTemplateColumns: "2fr 100px 80px 110px 1.2fr 60px" }}>
               {["Client", "Last visit", "Visits", "Total spend", "Fav service", ""].map((h) => (
@@ -141,6 +142,37 @@ export default function ClientsPage() {
               </div>
             ))}
           </div>
+
+          {/* Mobile cards */}
+          <div className="md:hidden space-y-2">
+            {clients.map((c: any, idx: number) => (
+              <Link
+                key={c.id}
+                href={`/admin/clients/${c.id}`}
+                className="flex items-center gap-3 bg-white border border-black/[0.07] rounded-[14px] px-4 py-4 active:bg-[#f8f6f3] transition-colors"
+              >
+                <span
+                  className={`w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold flex-shrink-0 ${
+                    AVATAR_COLORS[idx % AVATAR_COLORS.length]
+                  }`}
+                >
+                  {initials(c.fullName)}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[15px] font-semibold text-[#1b1814] truncate">{c.fullName}</span>
+                    {c.isVip && <IconStar size={12} className="text-[#c9a96e] fill-[#c9a96e] flex-shrink-0" fill="#c9a96e" />}
+                  </div>
+                  <p className="text-[12px] text-[#a8a39c]">
+                    {c.totalVisits} visit{c.totalVisits !== 1 ? "s" : ""}
+                    {c.lastVisit ? ` · Last ${format(new Date(c.lastVisit), "MMM d")}` : ""}
+                  </p>
+                </div>
+                <span className="text-[14px] font-semibold text-[#b8892a] flex-shrink-0">${c.totalSpend.toFixed(0)}</span>
+              </Link>
+            ))}
+          </div>
+          </>
         )}
       </div>
     </div>

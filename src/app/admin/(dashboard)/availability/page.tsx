@@ -86,8 +86,8 @@ export default function AvailabilityPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <div className="flex h-[80px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-8">
-        <h1 className="text-[24px] font-semibold text-[#1b1814]">Availability</h1>
+      <div className="flex h-[80px] flex-shrink-0 items-center gap-3 border-b border-black/[0.07] bg-white px-4 md:px-8">
+        <h1 className="text-[18px] md:text-[24px] font-semibold text-[#1b1814]">Availability</h1>
         <div className="flex-1" />
         <button
           onClick={() => save.mutate()}
@@ -99,7 +99,7 @@ export default function AvailabilityPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto px-8 py-8 pb-20 md:pb-8">
+      <div className="flex-1 overflow-auto px-4 md:px-8 py-6 md:py-8 pb-20 md:pb-8">
         <p className="mb-5 text-[13px] text-[#7a756e]">
           Set your weekly working hours. These control which time slots clients
           see when booking online.

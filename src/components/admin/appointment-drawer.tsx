@@ -48,7 +48,7 @@ export function AppointmentDrawer({
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 z-50 flex h-full w-[280px] flex-col bg-white shadow-xl">
+      <div className="fixed right-0 top-0 z-50 flex h-full w-full md:w-[280px] flex-col bg-white shadow-xl">
         <div className="flex items-center justify-between border-b border-[#e8e6e1] px-4 py-3">
           <p className="text-[13px] font-medium text-[#1a1814]">
             {booking.customer.fullName}

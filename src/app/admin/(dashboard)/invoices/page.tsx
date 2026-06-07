@@ -123,8 +123,8 @@ export default function InvoicesPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="flex h-[80px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-8">
-        <h1 className="text-[24px] font-semibold text-[#1b1814]">Invoices</h1>
+      <header className="flex h-[80px] flex-shrink-0 items-center justify-between border-b border-black/[0.07] bg-white px-4 md:px-8">
+        <h1 className="text-[18px] md:text-[24px] font-semibold text-[#1b1814]">Invoices</h1>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
@@ -135,7 +135,7 @@ export default function InvoicesPage() {
         )}
       </header>
 
-      <div className="flex-1 overflow-y-auto px-8 py-8 pb-20 md:pb-8 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 md:py-8 pb-20 md:pb-8 space-y-6">
 
         {/* Create form */}
         {showForm && (
@@ -308,58 +308,106 @@ export default function InvoicesPage() {
             <p className="text-[13px] text-[#a8a39c]">Create one to get started.</p>
           </div>
         ) : invoices.length > 0 ? (
-          <div className="bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
-            {/* Header */}
-            <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]"
-              style={{ gridTemplateColumns: "1.5fr 1.5fr 90px 80px 100px 120px" }}>
-              {["Customer", "Email", "Total", "Due", "Status", ""].map((h) => (
-                <div key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">{h}</div>
+          <>
+            {/* Desktop table */}
+            <div className="hidden md:block bg-white border border-black/[0.07] rounded-[14px] overflow-hidden">
+              {/* Header */}
+              <div className="grid bg-[#edeae5] border-b border-black/[0.07] px-6 py-[14px]"
+                style={{ gridTemplateColumns: "1.5fr 1.5fr 90px 80px 100px 120px" }}>
+                {["Customer", "Email", "Total", "Due", "Status", ""].map((h) => (
+                  <div key={h} className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a8a39c]">{h}</div>
+                ))}
+              </div>
+              {invoices.map((inv) => (
+                <div
+                  key={inv.id}
+                  className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
+                  style={{ gridTemplateColumns: "1.5fr 1.5fr 90px 80px 100px 120px" }}
+                >
+                  <div className="text-[15px] font-medium text-[#1b1814] truncate pr-2">{inv.customerName}</div>
+                  <div className="text-[14px] text-[#7a756e] truncate pr-2">{inv.customerEmail}</div>
+                  <div className="text-[15px] font-semibold text-[#b8892a]">${Number(inv.total).toFixed(2)}</div>
+                  <div className="text-[13px] text-[#7a756e]">
+                    {inv.dueDate ? format(new Date(inv.dueDate), "MMM d") : "—"}
+                  </div>
+                  <div>
+                    <span className={`inline-flex items-center whitespace-nowrap px-[10px] py-[3px] rounded-full text-[11px] font-semibold ${STATUS_STYLES[inv.status] ?? ""}`}>
+                      {inv.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {inv.status === "DRAFT" && (
+                      <button
+                        onClick={() => updateStatus(inv.id, "SENT")}
+                        className="bg-[#1b1814] text-white rounded-[7px] px-3 py-1.5 text-[11px] font-semibold hover:opacity-80 transition-opacity cursor-pointer border-none"
+                      >
+                        Send
+                      </button>
+                    )}
+                    {inv.status === "SENT" && (
+                      <button
+                        onClick={() => updateStatus(inv.id, "PAID")}
+                        className="bg-[#e8f7ee] text-[#2e7d50] border border-[#2e7d5030] rounded-[7px] px-3 py-1.5 text-[11px] font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+                      >
+                        Mark Paid
+                      </button>
+                    )}
+                    <button
+                      onClick={() => deleteInvoice(inv.id)}
+                      className="flex items-center justify-center h-[30px] w-[30px] text-[#a8a39c] hover:text-[#b53a2e] transition-colors"
+                    >
+                      <IconTrash size={14} />
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
-            {invoices.map((inv) => (
-              <div
-                key={inv.id}
-                className="grid px-6 py-[16px] border-b border-black/[0.07] last:border-0 hover:bg-[#f8f6f3] items-center transition-colors"
-                style={{ gridTemplateColumns: "1.5fr 1.5fr 90px 80px 100px 120px" }}
-              >
-                <div className="text-[15px] font-medium text-[#1b1814] truncate pr-2">{inv.customerName}</div>
-                <div className="text-[14px] text-[#7a756e] truncate pr-2">{inv.customerEmail}</div>
-                <div className="text-[15px] font-semibold text-[#b8892a]">${Number(inv.total).toFixed(2)}</div>
-                <div className="text-[13px] text-[#7a756e]">
-                  {inv.dueDate ? format(new Date(inv.dueDate), "MMM d") : "—"}
+
+            {/* Mobile cards */}
+            <div className="md:hidden space-y-2">
+              {invoices.map((inv) => (
+                <div key={inv.id} className="bg-white border border-black/[0.07] rounded-[14px] px-4 py-4">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <span className="text-[15px] font-semibold text-[#1b1814] leading-tight">{inv.customerName}</span>
+                    <span className={`inline-flex items-center whitespace-nowrap px-[10px] py-[3px] rounded-full text-[11px] font-semibold flex-shrink-0 ${STATUS_STYLES[inv.status] ?? ""}`}>
+                      {inv.status}
+                    </span>
+                  </div>
+                  <p className="text-[12px] text-[#a8a39c] mb-2">
+                    {inv.customerEmail}
+                    {inv.dueDate ? ` · Due ${format(new Date(inv.dueDate), "MMM d")}` : ""}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[16px] font-semibold text-[#b8892a]">${Number(inv.total).toFixed(2)}</span>
+                    <div className="flex items-center gap-1">
+                      {inv.status === "DRAFT" && (
+                        <button
+                          onClick={() => updateStatus(inv.id, "SENT")}
+                          className="bg-[#1b1814] text-white rounded-[7px] px-3 py-1.5 text-[11px] font-semibold border-none cursor-pointer"
+                        >
+                          Send
+                        </button>
+                      )}
+                      {inv.status === "SENT" && (
+                        <button
+                          onClick={() => updateStatus(inv.id, "PAID")}
+                          className="bg-[#e8f7ee] text-[#2e7d50] border border-[#2e7d5030] rounded-[7px] px-3 py-1.5 text-[11px] font-semibold cursor-pointer"
+                        >
+                          Mark Paid
+                        </button>
+                      )}
+                      <button
+                        onClick={() => deleteInvoice(inv.id)}
+                        className="flex items-center justify-center h-[30px] w-[30px] text-[#a8a39c] hover:text-[#b53a2e] transition-colors"
+                      >
+                        <IconTrash size={14} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span className={`inline-flex items-center whitespace-nowrap px-[10px] py-[3px] rounded-full text-[11px] font-semibold ${STATUS_STYLES[inv.status] ?? ""}`}>
-                    {inv.status}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  {inv.status === "DRAFT" && (
-                    <button
-                      onClick={() => updateStatus(inv.id, "SENT")}
-                      className="bg-[#1b1814] text-white rounded-[7px] px-3 py-1.5 text-[11px] font-semibold hover:opacity-80 transition-opacity cursor-pointer border-none"
-                    >
-                      Send
-                    </button>
-                  )}
-                  {inv.status === "SENT" && (
-                    <button
-                      onClick={() => updateStatus(inv.id, "PAID")}
-                      className="bg-[#e8f7ee] text-[#2e7d50] border border-[#2e7d5030] rounded-[7px] px-3 py-1.5 text-[11px] font-semibold hover:opacity-80 transition-opacity cursor-pointer"
-                    >
-                      Mark Paid
-                    </button>
-                  )}
-                  <button
-                    onClick={() => deleteInvoice(inv.id)}
-                    className="flex items-center justify-center h-[30px] w-[30px] text-[#a8a39c] hover:text-[#b53a2e] transition-colors"
-                  >
-                    <IconTrash size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         ) : null}
       </div>
     </div>
