@@ -108,8 +108,8 @@ export default function CategoriesPage() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       {/* Topbar */}
-      <header className="h-[80px] bg-white border-b border-black/[0.07] px-8 flex items-center justify-between flex-shrink-0">
-        <h1 className="text-[24px] font-semibold text-[#1b1814]">Categories</h1>
+      <header className="h-[80px] bg-white border-b border-black/[0.07] px-4 md:px-8 flex items-center justify-between flex-shrink-0">
+        <h1 className="text-[18px] md:text-[24px] font-semibold text-[#1b1814]">Categories</h1>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
@@ -121,7 +121,7 @@ export default function CategoriesPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-8 py-8 pb-20 md:pb-8">
+      <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 md:py-8 pb-20 md:pb-8">
         {error && (
           <div className="mb-4 rounded-[9px] bg-[#fdecea] border border-[#f5c6c2] px-4 py-3 text-[13px] text-[#b53a2e]">
             {error}
