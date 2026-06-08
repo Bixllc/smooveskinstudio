@@ -29,8 +29,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.refresh();
-    router.push("/admin/bookings");
+    window.location.href = "/admin/bookings";
   }
 
   async function handleForgot(e: React.FormEvent) {
