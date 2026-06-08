@@ -32,7 +32,8 @@ export async function updateSession(request: NextRequest) {
   // Protect /admin routes — redirect to login if unauthenticated
   if (
     request.nextUrl.pathname.startsWith("/admin") &&
-    !request.nextUrl.pathname.startsWith("/admin/login")
+    !request.nextUrl.pathname.startsWith("/admin/login") &&
+    !request.nextUrl.pathname.startsWith("/admin/reset-password")
   ) {
     if (!user) {
       const url = request.nextUrl.clone();
