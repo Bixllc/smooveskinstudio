@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    router.push("/admin/bookings");
+    router.push("/admin/login");
   }
 
   return (

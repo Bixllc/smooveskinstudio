@@ -29,8 +29,8 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push("/admin/bookings");
     router.refresh();
+    router.push("/admin/bookings");
   }
 
   async function handleForgot(e: React.FormEvent) {
