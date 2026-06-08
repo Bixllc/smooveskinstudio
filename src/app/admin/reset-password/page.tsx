@@ -11,6 +11,7 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -18,7 +19,13 @@ export default function ResetPasswordPage() {
     // PKCE flow: Supabase sends ?code= in the URL — exchange it for a session first.
     const code = new URLSearchParams(window.location.search).get("code");
     if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(() => setReady(true));
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) {
+          setLinkError("This reset link has expired or already been used. Please request a new one.");
+        } else {
+          setReady(true);
+        }
+      });
       return;
     }
 
@@ -65,7 +72,14 @@ export default function ResetPasswordPage() {
           <p className="mt-1 text-[13px] text-[#a8a39c]">Choose a new password for your account.</p>
         </div>
 
-        {!ready ? (
+        {linkError ? (
+          <div className="space-y-4">
+            <p className="text-center text-[13px] text-[#b53a2e]">{linkError}</p>
+            <a href="/admin/login" className="block w-full text-center rounded-[9px] bg-[#1b1814] py-[10px] text-[13px] font-semibold text-white hover:opacity-85 transition-opacity">
+              Back to Login
+            </a>
+          </div>
+        ) : !ready ? (
           <p className="text-center text-[13px] text-[#a8a39c]">Verifying reset link…</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
