@@ -13,9 +13,16 @@ export default function ResetPasswordPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Supabase processes the recovery token from the URL hash automatically.
-    // Wait for the PASSWORD_RECOVERY event to confirm the session is active.
     const supabase = createClient();
+
+    // PKCE flow: Supabase sends ?code= in the URL — exchange it for a session first.
+    const code = new URLSearchParams(window.location.search).get("code");
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(() => setReady(true));
+      return;
+    }
+
+    // Implicit flow fallback: listen for PASSWORD_RECOVERY event from hash token.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setReady(true);
     });
