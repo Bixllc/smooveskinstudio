@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
 
     const supabase = createClient();
     const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://smooveskinstudio.com/admin/reset-password",
+      redirectTo: "https://smooveskinstudio.com/api/auth/callback?next=/admin/reset-password",
     });
 
     setLoading(false);

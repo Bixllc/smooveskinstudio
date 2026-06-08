@@ -11,29 +11,15 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
-  const [linkError, setLinkError] = useState<string | null>(null);
+  const linkError = null;
 
   useEffect(() => {
+    // Session is already established server-side by /api/auth/callback.
+    // Just verify the user is authenticated before showing the form.
     const supabase = createClient();
-
-    // PKCE flow: Supabase sends ?code= in the URL — exchange it for a session first.
-    const code = new URLSearchParams(window.location.search).get("code");
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) {
-          setLinkError("This reset link has expired or already been used. Please request a new one.");
-        } else {
-          setReady(true);
-        }
-      });
-      return;
-    }
-
-    // Implicit flow fallback: listen for PASSWORD_RECOVERY event from hash token.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") setReady(true);
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setReady(true);
     });
-    return () => subscription.unsubscribe();
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
