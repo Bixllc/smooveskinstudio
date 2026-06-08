@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    window.location.href = "/admin/bookings";
+    window.location.href = "/admin";
   }
 
   async function handleForgot(e: React.FormEvent) {
