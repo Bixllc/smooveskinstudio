@@ -52,7 +52,9 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    router.push("/admin/login");
+    // Sign out to clear the recovery session before redirecting to login
+    await supabase.auth.signOut();
+    window.location.href = "/admin/login";
   }
 
   return (
