@@ -14,12 +14,24 @@ export default function ResetPasswordPage() {
   const linkError = null;
 
   useEffect(() => {
-    // Session is already established server-side by /api/auth/callback.
-    // Just verify the user is authenticated before showing the form.
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setReady(true);
+
+    // Check existing session (set server-side by /api/auth/callback)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setReady(true);
+        return;
+      }
     });
+
+    // Also listen for PASSWORD_RECOVERY event (implicit flow fallback)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        setReady(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
