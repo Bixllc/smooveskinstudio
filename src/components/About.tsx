@@ -97,7 +97,7 @@ export default function About() {
             <div ref={imageRef} className="about-img">
               <div className="rounded-2xl overflow-hidden">
                 <Image
-                  src="/images/anisha.jpg"
+                  src="/images/about-anisha.png"
                   alt="Anisha, licensed esthetician at Smoove Skin Studio"
                   width={600}
                   height={750}
