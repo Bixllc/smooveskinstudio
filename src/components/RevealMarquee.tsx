@@ -18,17 +18,17 @@ export default function RevealMarquee() {
         marginTop: "-60px",
         paddingTop: "36px",
         paddingBottom: "36px",
-        backgroundColor: "var(--color-bg-light)",
+        backgroundColor: "#E8DDD1",
       }}
     >
       {/* Fade masks */}
       <div
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20"
-        style={{ background: "linear-gradient(to right, var(--color-bg-light), transparent)" }}
+        style={{ background: "linear-gradient(to right, #E8DDD1, transparent)" }}
       />
       <div
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20"
-        style={{ background: "linear-gradient(to left, var(--color-bg-light), transparent)" }}
+        style={{ background: "linear-gradient(to left, #E8DDD1, transparent)" }}
       />
 
       {/* Partner logos */}
