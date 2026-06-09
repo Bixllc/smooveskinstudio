@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 type Service = {
   id: string;
@@ -23,7 +23,7 @@ type ServicesProps = {
   clientSlug: string;
 };
 
-const CATEGORY_META: Record<string, { icon: JSX.Element; description: string }> = {
+const CATEGORY_META: Record<string, { icon: ReactNode; description: string }> = {
   "Body & Face Waxing": {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
