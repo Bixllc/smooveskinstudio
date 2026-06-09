@@ -48,7 +48,7 @@ export default function Hero() {
             than ever.
           </p>
 
-          <p className="mt-5 text-sm font-medium tracking-wider text-[var(--color-primary-dark)] uppercase">
+          <p className="mt-5 text-sm font-bold tracking-wider text-[var(--color-primary-dark)] uppercase">
             Full Body Brazilian Waxing in the DFW Area
           </p>
 
