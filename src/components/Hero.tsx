@@ -100,7 +100,7 @@ export default function Hero() {
               style={{ borderRadius: "24px", boxShadow: "0 24px 64px rgba(0,0,0,0.10)" }}
             >
               <Image
-                src="/images/hero-facial.png"
+                src="/images/hero-main.png"
                 alt="Anisha performing a waxing treatment at Smoove Skin Studio"
                 width={900}
                 height={1100}
