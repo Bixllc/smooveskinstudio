@@ -89,7 +89,7 @@ export default function About() {
         }
       `}</style>
 
-      <section id="about" ref={sectionRef} className="py-24 bg-[var(--color-bg)]">
+      <section id="about" ref={sectionRef} className="py-24 bg-[var(--color-bg-light)]">
         <div className="max-w-[1320px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
@@ -110,7 +110,7 @@ export default function About() {
             <div ref={textRef} className="about-text">
               {/* Eyebrow */}
               <span
-                className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]"
+                className="inline-block px-5 py-2 rounded-full bg-white text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]"
               >
                 About Anisha
               </span>
@@ -146,7 +146,7 @@ export default function About() {
                   >
                     <div
                       className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-[var(--color-primary)]"
-                      style={{ backgroundColor: "var(--color-bg-light)" }}
+                      style={{ backgroundColor: "white" }}
                     >
                       {point.icon}
                     </div>
