@@ -38,7 +38,7 @@ const trustPoints = [
 
 export default function Hero() {
   return (
-    <section className="pt-28 pb-0 bg-[var(--color-bg)]">
+    <section className="pt-28 pb-16 bg-[var(--color-bg)]">
       <div className="max-w-[1320px] mx-auto px-6 md:px-10">
 
         {/* Two-column layout */}
@@ -94,7 +94,7 @@ export default function Hero() {
           </div>
 
           {/* Right — Image */}
-          <div className="relative">
+          <div className="relative mt-8 lg:mt-16">
             <div
               className="overflow-hidden"
               style={{ borderRadius: "24px", boxShadow: "0 24px 64px rgba(0,0,0,0.10)" }}
