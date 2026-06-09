@@ -9,6 +9,7 @@ import MeetAnisha from "@/components/MeetAnisha";
 import ReserveCTA from "@/components/ReserveCTA";
 import Testimonials from "@/components/Testimonials";
 import FAQAccordion from "@/components/FAQAccordion";
+import Partners from "@/components/Partners";
 import CommunityPartners from "@/components/CommunityPartners";
 import TikTokSection from "@/components/TikTokSection";
 import Footer from "@/components/Footer";
@@ -78,6 +79,7 @@ export default async function Home() {
       <ReserveCTA clientSlug={CLIENT_SLUG} />
       <Testimonials />
       <FAQAccordion />
+      <Partners />
       <CommunityPartners />
       <TikTokSection />
       <Footer categories={categories} clientSlug={CLIENT_SLUG} />
