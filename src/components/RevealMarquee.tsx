@@ -14,21 +14,21 @@ export default function RevealMarquee() {
     <div
       className="relative z-10 overflow-hidden"
       style={{
-        borderRadius: "32px 32px 0 0",
-        marginTop: "-40px",
-        paddingTop: "32px",
-        paddingBottom: "32px",
-        backgroundColor: "#1C1814",
+        borderRadius: "64px 64px 0 0",
+        marginTop: "-60px",
+        paddingTop: "36px",
+        paddingBottom: "36px",
+        backgroundColor: "var(--color-bg-light)",
       }}
     >
       {/* Fade masks */}
       <div
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20"
-        style={{ background: "linear-gradient(to right, #1C1814, transparent)" }}
+        style={{ background: "linear-gradient(to right, var(--color-bg-light), transparent)" }}
       />
       <div
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20"
-        style={{ background: "linear-gradient(to left, #1C1814, transparent)" }}
+        style={{ background: "linear-gradient(to left, var(--color-bg-light), transparent)" }}
       />
 
       {/* Partner logos */}
