@@ -3,8 +3,8 @@ export default function Hero() {
     <>
       <style>{`
         @keyframes kenBurns {
-          from { transform: scale(1.0); }
-          to   { transform: scale(1.06); }
+          from { transform: scale(0.82); }
+          to   { transform: scale(0.88); }
         }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
@@ -24,12 +24,12 @@ export default function Hero() {
         style={{ height: "100vh" }}
       >
         {/* Background image with Ken Burns zoom */}
-        {/* TODO: Replace with real image — hero background photo */}
         <div
-          className="hero-bg absolute inset-0 bg-center bg-cover"
+          className="hero-bg absolute inset-0 bg-cover"
           style={{
             backgroundImage: "url('/images/hero.jpg')",
             backgroundColor: "#c8bdb5",
+            backgroundPosition: "center 30%",
           }}
         />
 
@@ -42,10 +42,7 @@ export default function Hero() {
             {/* Eyebrow */}
             <p
               className="fade-up text-white/70 tracking-widest uppercase font-medium"
-              style={{
-                fontSize: "0.8rem",
-                animationDelay: "0.1s",
-              }}
+              style={{ fontSize: "0.8rem", animationDelay: "0.1s" }}
             >
               Watauga, TX · Solo Esthetician Studio
             </p>
@@ -75,12 +72,9 @@ export default function Hero() {
             </p>
 
             {/* CTA */}
-            <div
-              className="fade-up mt-9"
-              style={{ animationDelay: "0.7s" }}
-            >
+            <div className="fade-up mt-9" style={{ animationDelay: "0.7s" }}>
               <a
-                href="/book"
+                href="/smooveskinstudio/book"
                 className="inline-flex items-center justify-center px-9 py-4 rounded-full text-sm font-medium tracking-wide transition-all duration-300 hover:opacity-90 hover:scale-[1.03]"
                 style={{
                   backgroundColor: "var(--color-primary)",
