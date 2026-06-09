@@ -1,9 +1,38 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+
+const slides = [
+  {
+    src: "/images/hero-image.webp",
+    alt: "Smoove Skin Studio — professional waxing salon in Watauga, Fort Worth TX",
+  },
+  {
+    src: "/images/studio.jpg",
+    alt: "Treatment room at Smoove Skin Studio — gold waxing bed and neon sign",
+  },
+  {
+    src: "/images/anisha.jpg",
+    alt: "Anisha performing a skin treatment at Smoove Skin Studio",
+  },
+];
 
 export default function Hero() {
+  const [current, setCurrent] = useState(0);
+
+  // Auto-advance every 4s
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrent((i) => (i + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="pt-16 md:pt-20 min-h-screen flex items-center">
       <div className="max-w-[1320px] mx-auto px-4 md:px-10 py-10 md:py-15 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-15 items-center max-lg:text-center">
+
         {/* Content */}
         <div>
           <h1 className="font-light text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight text-[var(--color-text)]">
@@ -33,17 +62,47 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Visual */}
+        {/* Image slider */}
         <div className="relative max-lg:max-w-[500px] max-lg:mx-auto">
-          <Image
-            src="/images/hero-image.webp"
-            alt="Smoove Skin Studio — professional waxing salon in Watauga, Fort Worth TX"
-            width={600}
-            height={500}
-            className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
-            priority
-          />
+          <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
+            {slides.map((slide, i) => (
+              <div
+                key={slide.src}
+                className="absolute inset-0 transition-opacity duration-700"
+                style={{ opacity: i === current ? 1 : 0 }}
+              >
+                <Image
+                  src={slide.src}
+                  alt={slide.alt}
+                  fill
+                  className="object-cover"
+                  priority={i === 0}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Dot indicators */}
+          <div className="flex justify-center gap-2 mt-4">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === current ? "20px" : "8px",
+                  height: "8px",
+                  backgroundColor:
+                    i === current
+                      ? "var(--color-primary)"
+                      : "var(--color-border)",
+                }}
+              />
+            ))}
+          </div>
         </div>
+
       </div>
     </section>
   );
