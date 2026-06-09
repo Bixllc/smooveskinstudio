@@ -1,15 +1,5 @@
 import Image from "next/image";
 
-const items = [
-  "As Seen On TikTok",
-  "Watauga's Favorite Studio",
-  "Organic Products Only",
-  "Private 1-on-1 Sessions",
-  "Trusted by 200+ Clients",
-  "Licensed & Certified Esthetician",
-  "Clean Beauty Always",
-];
-
 const partners = [
   { name: "BushBalm Pro", logo: "/images/partners/bushbalm.png" },
   { name: "Honeycomb Wax", logo: "/images/partners/honeycombwax.png" },
@@ -26,11 +16,11 @@ export default function RevealMarquee() {
       style={{
         borderRadius: "32px 32px 0 0",
         marginTop: "-40px",
-        paddingTop: "28px",
+        paddingTop: "32px",
         paddingBottom: "32px",
       }}
     >
-      {/* Fade masks — cover both rows */}
+      {/* Fade masks */}
       <div
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20"
         style={{ background: "linear-gradient(to right, var(--color-bg), transparent)" }}
@@ -40,56 +30,21 @@ export default function RevealMarquee() {
         style={{ background: "linear-gradient(to left, var(--color-bg), transparent)" }}
       />
 
-      {/* Row 1 — Text marquee */}
-      <div className="flex overflow-hidden">
-        <div className="animate-marquee-homepage flex items-center gap-0">
-          {[...items, ...items].map((item, i) => (
-            <span
-              key={i}
-              className="flex items-center whitespace-nowrap"
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "0.8rem",
-                fontVariant: "small-caps",
-                letterSpacing: "0.12em",
-                color: "var(--color-text-light)",
-                padding: "0 2rem",
-              }}
-            >
-              <span style={{ color: "var(--color-primary)", marginRight: "2rem" }}>✦</span>
-              {item}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div
-        className="mx-auto mt-6 mb-6"
-        style={{
-          height: "1px",
-          backgroundColor: "var(--color-border)",
-          width: "calc(100% - 80px)",
-          opacity: 0.6,
-        }}
-      />
-
-      {/* Row 2 — Partner logos */}
+      {/* Partner logos */}
       <div className="flex overflow-hidden">
         <div className="animate-marquee-homepage flex items-center gap-0">
           {[...partners, ...partners].map((partner, i) => (
             <div
               key={i}
               className="flex-shrink-0 flex items-center justify-center"
-              style={{ padding: "0 40px", height: "48px" }}
+              style={{ padding: "0 48px", height: "52px" }}
             >
               <Image
                 src={partner.logo}
                 alt={partner.name}
-                width={100}
-                height={40}
-                className="max-h-[36px] w-auto object-contain"
-                style={{ opacity: 0.55, filter: "grayscale(100%)" }}
+                width={110}
+                height={44}
+                className="max-h-[40px] w-auto object-contain"
               />
             </div>
           ))}
