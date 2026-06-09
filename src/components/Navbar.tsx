@@ -24,14 +24,15 @@ export default function Navbar() {
         }}
       >
         <div
-          className="flex items-center justify-between gap-4 px-5 py-3"
+          className="flex items-center justify-between gap-6 px-6 py-3"
           style={{
             borderRadius: "9999px",
-            background: "rgba(20, 20, 20, 0.55)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid rgba(255,255,255,0.10)",
-            minWidth: "min(820px, calc(100vw - 32px))",
+            background: "rgba(18, 15, 13, 0.28)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            border: "1px solid rgba(255,255,255,0.14)",
+            minWidth: "min(860px, calc(100vw - 32px))",
+            boxShadow: "0 4px 32px rgba(0,0,0,0.18)",
           }}
         >
           {/* Left — Nav links (hidden on mobile) */}
@@ -70,9 +71,9 @@ export default function Navbar() {
             <Image
               src="/images/logo-transparent.avif"
               alt="Smoove Skin Studio"
-              width={130}
-              height={52}
-              className="h-8 w-auto brightness-0 invert"
+              width={180}
+              height={72}
+              className="h-14 w-auto brightness-0 invert"
               priority
             />
           </Link>
@@ -113,10 +114,10 @@ export default function Navbar() {
           className="fixed z-40 left-4 right-4 rounded-2xl overflow-hidden"
           style={{
             top: "90px",
-            background: "rgba(20, 20, 20, 0.95)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid rgba(255,255,255,0.10)",
+            background: "rgba(18, 15, 13, 0.75)",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            border: "1px solid rgba(255,255,255,0.14)",
           }}
         >
           <ul className="flex flex-col py-4">
