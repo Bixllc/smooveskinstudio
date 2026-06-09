@@ -5,16 +5,16 @@ import { useEffect, useState } from "react";
 
 const slides = [
   {
-    src: "/images/hero-image.webp",
-    alt: "Smoove Skin Studio — professional waxing salon in Watauga, Fort Worth TX",
+    src: "/images/hero-waxing.png",
+    alt: "Anisha performing a waxing treatment at Smoove Skin Studio",
   },
   {
-    src: "/images/studio.jpg",
+    src: "/images/hero-facial.png",
+    alt: "Anisha performing a facial treatment at Smoove Skin Studio",
+  },
+  {
+    src: "/images/hero-studio.png",
     alt: "Treatment room at Smoove Skin Studio — gold waxing bed and neon sign",
-  },
-  {
-    src: "/images/anisha.jpg",
-    alt: "Anisha performing a skin treatment at Smoove Skin Studio",
   },
 ];
 
