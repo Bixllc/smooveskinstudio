@@ -12,22 +12,23 @@ const partners = [
 export default function RevealMarquee() {
   return (
     <div
-      className="relative z-10 bg-[var(--color-bg)] overflow-hidden"
+      className="relative z-10 overflow-hidden"
       style={{
         borderRadius: "32px 32px 0 0",
         marginTop: "-40px",
         paddingTop: "32px",
         paddingBottom: "32px",
+        backgroundColor: "#1C1814",
       }}
     >
       {/* Fade masks */}
       <div
         className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20"
-        style={{ background: "linear-gradient(to right, var(--color-bg), transparent)" }}
+        style={{ background: "linear-gradient(to right, #1C1814, transparent)" }}
       />
       <div
         className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20"
-        style={{ background: "linear-gradient(to left, var(--color-bg), transparent)" }}
+        style={{ background: "linear-gradient(to left, #1C1814, transparent)" }}
       />
 
       {/* Partner logos */}
