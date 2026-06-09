@@ -108,13 +108,6 @@ export default function About() {
 
             {/* Text */}
             <div ref={textRef} className="about-text">
-              {/* Eyebrow */}
-              <span
-                className="inline-block px-5 py-2 rounded-full bg-white text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]"
-              >
-                About Anisha
-              </span>
-
               {/* Headline */}
               <h2
                 className="mt-6 font-light tracking-tight text-[var(--color-text)]"
