@@ -1,115 +1,194 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 const testimonials = [
   {
     name: "Khloe Langston",
+    service: "Brazilian Wax",
     text: "Anisha is absolutely amazing! I used to go to European wax and saw several different people and she is by far the best!",
-    rating: 5,
-  },
-  {
-    name: "Phylicia Durman",
-    text: "Overall quick and great service",
-    rating: 5,
-  },
-  {
-    name: "Mikala",
-    text: "Anisha is truly everything. She took her time and didn't leave no hair behind. Anisha, Thank you for your positive vibes. Ladies, Anisha is the truth and she has found herself a forever client!",
-    rating: 5,
   },
   {
     name: "Lyndsey",
-    text: "Anisha has amazing customer service. Her space was really clean and organized. She kept me engaged the whole time before snatching my soul and getting me ready for my date night. She made me feel very comfortable in her space. Truly glad I found her.",
-    rating: 5,
+    service: "Full Body Wax",
+    text: "Anisha has amazing customer service. Her space was really clean and organized. She made me feel very comfortable in her space. Truly glad I found her.",
+  },
+  {
+    name: "Mikala",
+    service: "Brazilian Wax",
+    text: "Anisha is truly everything. She took her time and didn't leave no hair behind. Ladies, Anisha is the truth and she has found herself a forever client!",
   },
   {
     name: "Nakeisha Sealey",
-    text: "She's the best! Love going to Smoove Skin Studio. I've noticed a major difference right away compared to other waxing businesses. The owner really cares about your skin and makes sure you're well taken care of. Ever since going here I've seen no ingrown.",
-    rating: 5,
+    service: "Waxing",
+    text: "She's the best! I've noticed a major difference right away compared to other waxing businesses. The owner really cares about your skin. Ever since going here I've seen no ingrown.",
   },
   {
     name: "Ebony Porter",
+    service: "Waxing",
     text: "Anisha was very great at making you feel comfortable during the process!",
-    rating: 5,
+  },
+  {
+    name: "Phylicia Durman",
+    service: "Skin Treatment",
+    text: "Overall quick and great service.",
   },
 ];
 
-function TestimonialCard({
-  name,
-  text,
-  rating,
-}: {
-  name: string;
-  text: string;
-  rating: number;
-}) {
-  return (
-    <div className="flex-shrink-0 w-[280px] sm:w-[320px] md:w-[340px] bg-white rounded-2xl p-6 md:p-8 shadow-sm flex flex-col">
-      <div className="flex gap-1.5 mb-5">
-        {[...Array(rating)].map((_, i) => (
-          <span
-            key={i}
-            className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]"
-          />
-        ))}
-      </div>
-      <p className="text-sm text-[var(--color-text-light)] leading-relaxed italic flex-1">
-        &ldquo;{text}&rdquo;
-      </p>
-      <div className="mt-6 pt-5 border-t border-[var(--color-border)]">
-        <p className="text-sm font-medium text-[var(--color-text)]">{name}</p>
-        <p className="text-xs text-[var(--color-text-light)] mt-0.5">
-          Verified Client
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export default function Testimonials() {
-  // Double the testimonials for seamless infinite loop
-  const doubled = [...testimonials, ...testimonials];
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.style.opacity = "1";
+          el.style.transform = "translateY(0)";
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const prev = () =>
+    setActiveIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
+  const next = () =>
+    setActiveIndex((i) => (i + 1) % testimonials.length);
 
   return (
-    <section id="reviews" className="py-24 bg-[var(--color-bg)] overflow-hidden">
-      <div className="max-w-[1320px] mx-auto px-4 md:px-10">
-        {/* Header */}
+    <section id="reviews" className="py-24 bg-[var(--color-bg)]">
+      <div className="max-w-[900px] mx-auto px-6 md:px-10">
+        {/* Wordplay heading */}
         <div className="text-center mb-16">
           <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]">
             Testimonials
           </span>
-          <h2 className="mt-6 font-light text-2xl sm:text-3xl md:text-5xl tracking-tight text-[var(--color-text)]">
-            What Our{" "}
-            <span className="text-[var(--color-primary)] italic">Clients</span>{" "}
-            Say
+          <h2
+            className="mt-6 font-light tracking-tight text-[var(--color-text)]"
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(1.6rem, 3.5vw, 2.8rem)",
+              lineHeight: 1.2,
+            }}
+          >
+            What Leaving Smoo
+            {/* "the" with hand-drawn SVG brush stroke — not CSS text-decoration */}
+            <span className="relative inline-block">
+              the
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 48 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "-2px",
+                  width: "calc(100% + 4px)",
+                  height: "14px",
+                  transform: "translateY(-50%)",
+                  pointerEvents: "none",
+                }}
+              >
+                <path
+                  d="M2,8 C6,4 11,11 17,7 C22,3 27,10 33,7 C38,4 42,9 46,6"
+                  stroke="#C4A882"
+                  strokeWidth="2.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </span>
+            ve Skin Studio Feels Like
           </h2>
-          <p className="mt-5 text-base text-[var(--color-text-light)] max-w-2xl mx-auto leading-relaxed">
-            Don&apos;t just take our word for it. Hear from our valued clients
-            about their transformative experiences with Anisha at Smoove Skin
-            Studio.
-          </p>
         </div>
-      </div>
 
-      {/* Infinite Carousel */}
-      <div className="relative">
-        <div className="flex gap-6 animate-scroll">
-          {doubled.map((t, i) => (
-            <TestimonialCard key={i} name={t.name} text={t.text} rating={t.rating} />
-          ))}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="text-center mt-16">
-        <p className="text-base text-[var(--color-text-light)] mb-5">
-          Ready to experience the Smoove difference?
-        </p>
-        <a
-          href="#book"
-          className="inline-flex items-center justify-center px-6 sm:px-10 py-3 sm:py-4 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
+        {/* Card */}
+        <div
+          ref={sectionRef}
+          style={{
+            opacity: 0,
+            transform: "translateY(20px)",
+            transition: "opacity 0.6s ease-out, transform 0.6s ease-out",
+          }}
         >
-          Book Your Appointment
-        </a>
+          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm min-h-[220px] flex flex-col justify-between">
+            <p
+              className="text-[var(--color-text-light)] leading-relaxed italic"
+              style={{ fontSize: "clamp(1rem, 2vw, 1.15rem)" }}
+            >
+              &ldquo;{testimonials[activeIndex].text}&rdquo;
+            </p>
+            <div className="mt-8 flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[var(--color-text)]">
+                  {testimonials[activeIndex].name}
+                </p>
+                <p className="text-sm text-[var(--color-text-light)] mt-0.5">
+                  {testimonials[activeIndex].service}
+                </p>
+              </div>
+              <div className="flex gap-1.5">
+                {[...Array(5)].map((_, i) => (
+                  <span
+                    key={i}
+                    className="w-2 h-2 rounded-full bg-[var(--color-primary)]"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div className="mt-8 flex items-center justify-center gap-6">
+            <button
+              onClick={prev}
+              className="w-10 h-10 rounded-full border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-light)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+              aria-label="Previous"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+
+            {/* Dots */}
+            <div className="flex gap-2">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveIndex(i)}
+                  className="rounded-full transition-all duration-300"
+                  style={{
+                    width: i === activeIndex ? "20px" : "8px",
+                    height: "8px",
+                    backgroundColor:
+                      i === activeIndex
+                        ? "var(--color-primary)"
+                        : "var(--color-border)",
+                  }}
+                  aria-label={`Go to testimonial ${i + 1}`}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={next}
+              className="w-10 h-10 rounded-full border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-light)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+              aria-label="Next"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

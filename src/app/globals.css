@@ -59,6 +59,16 @@ body {
   animation-play-state: paused;
 }
 
+@keyframes marquee-homepage {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee-homepage {
+  animation: marquee-homepage 40s linear infinite;
+  width: max-content;
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
