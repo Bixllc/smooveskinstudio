@@ -3,8 +3,8 @@ export default function Hero() {
     <>
       <style>{`
         @keyframes kenBurns {
-          from { transform: scale(0.82); }
-          to   { transform: scale(0.88); }
+          from { transform: scale(1.0); }
+          to   { transform: scale(1.04); }
         }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
@@ -29,7 +29,8 @@ export default function Hero() {
           style={{
             backgroundImage: "url('/images/hero.jpg')",
             backgroundColor: "#c8bdb5",
-            backgroundPosition: "center 30%",
+            backgroundSize: "auto 110%",
+            backgroundPosition: "center center",
           }}
         />
 
