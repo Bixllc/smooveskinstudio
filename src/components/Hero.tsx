@@ -1,94 +1,71 @@
+import Image from "next/image";
+
 export default function Hero() {
   return (
-    <>
-      <style>{`
-        @keyframes kenBurns {
-          from { transform: scale(1.0); }
-          to   { transform: scale(1.04); }
-        }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .hero-bg {
-          animation: kenBurns 8s ease-out forwards;
-        }
-        .fade-up {
-          opacity: 0;
-          animation: fadeUp 0.5s ease-out forwards;
-        }
-      `}</style>
-
-      <section
-        className="relative w-full overflow-hidden"
-        style={{ height: "100vh" }}
-      >
-        {/* Background image with Ken Burns zoom */}
-        <div
-          className="hero-bg absolute inset-0 bg-cover"
-          style={{
-            backgroundImage: "url('/images/hero.jpg')",
-            backgroundColor: "#c8bdb5",
-            backgroundSize: "auto 110%",
-            backgroundPosition: "center center",
-          }}
-        />
-
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/38" />
-
+    <section className="pt-16 md:pt-20 min-h-screen flex items-center">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-10 py-10 md:py-15 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-15 items-center max-lg:text-center">
         {/* Content */}
-        <div className="relative z-10 flex h-full items-center justify-center px-6 text-center">
-          <div className="max-w-2xl">
-            {/* Eyebrow */}
-            <p
-              className="fade-up text-white/70 tracking-widest uppercase font-medium"
-              style={{ fontSize: "0.8rem", animationDelay: "0.1s" }}
-            >
-              Watauga, TX · Solo Esthetician Studio
-            </p>
+        <div>
+          <h1 className="font-light text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight text-[var(--color-text)]">
+            <span className="block">Smoove</span>
+            <span className="block text-[var(--color-primary)] italic">Skin</span>
+            <span className="block">Studio</span>
+          </h1>
 
-            {/* Headline */}
-            <h1
-              className="fade-up mt-5 font-light text-white leading-tight"
-              style={{
-                fontSize: "clamp(2.4rem, 6vw, 4rem)",
-                letterSpacing: "-0.02em",
-                animationDelay: "0.3s",
-              }}
-            >
-              Your Skin Deserves Intentional Care.
-            </h1>
+          <p className="mt-5 md:mt-7 text-[0.95rem] md:text-[1.05rem] font-light leading-[1.7] text-[var(--color-text-light)] max-w-[460px] max-lg:mx-auto">
+            Get waxed by an award-winning specialist with precision, care, and
+            results you can feel. At Smoove Skin Studio, every service is
+            designed to leave your skin smoother, cleaner, and more confident
+            than ever.
+          </p>
 
-            {/* Subtext */}
-            <p
-              className="fade-up mt-5 text-white/75 font-light leading-relaxed"
-              style={{
-                fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
-                animationDelay: "0.5s",
-              }}
-            >
-              Personalized facials and skin treatments by Anisha — in a calm,
-              private studio built just for you.
-            </p>
+          <p className="mt-5 text-sm font-medium tracking-wider text-[var(--color-primary-dark)] uppercase">
+            Full Body Brazilian Waxing in the DFW Area
+          </p>
 
-            {/* CTA */}
-            <div className="fade-up mt-9" style={{ animationDelay: "0.7s" }}>
-              <a
-                href="/smooveskinstudio/book"
-                className="inline-flex items-center justify-center px-9 py-4 rounded-full text-sm font-medium tracking-wide transition-all duration-300 hover:opacity-90 hover:scale-[1.03]"
-                style={{
-                  backgroundColor: "var(--color-primary)",
-                  color: "white",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
-                }}
-              >
-                Book Your Session
-              </a>
-            </div>
+          <div className="mt-10 flex gap-4 flex-wrap max-lg:justify-center">
+            <a
+              href="#services"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-lg border-[1.5px] border-[var(--color-primary)] text-[var(--color-primary)] text-[0.938rem] font-medium tracking-[0.01em] hover:bg-[var(--color-primary)] hover:text-white transition-colors"
+            >
+              Explore Services
+            </a>
           </div>
         </div>
-      </section>
-    </>
+
+        {/* Visual */}
+        <div className="relative max-lg:max-w-[500px] max-lg:mx-auto max-lg:pb-24">
+          <div className="relative rounded-2xl">
+            <Image
+              src="/images/hero-image.webp"
+              alt="Smoove Skin Studio — professional waxing salon in Watauga, Fort Worth TX"
+              width={600}
+              height={500}
+              className="w-full h-[300px] sm:h-[400px] md:h-[500px] object-cover rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.08)]"
+              priority
+            />
+          </div>
+
+          {/* Testimonial Card */}
+          <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 bg-white rounded-xl px-5 py-5 sm:px-7 sm:py-6 shadow-[0_8px_40px_rgba(0,0,0,0.08)] max-w-[300px] sm:max-w-[320px] w-[90%]">
+            <div className="flex gap-1.5 mb-3">
+              {[...Array(6)].map((_, i) => (
+                <span
+                  key={i}
+                  className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]"
+                />
+              ))}
+            </div>
+            <p className="text-sm text-[var(--color-text-light)] leading-relaxed italic">
+              &ldquo;Anisha is amazing and always makes me feel
+              comfortable&rdquo;
+            </p>
+            <p className="mt-2 text-[0.85rem] text-[var(--color-primary-dark)] font-medium">
+              &mdash; Tammy
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
