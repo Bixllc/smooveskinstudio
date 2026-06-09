@@ -23,6 +23,37 @@ type ServicesProps = {
   clientSlug: string;
 };
 
+const CATEGORY_META: Record<string, { icon: JSX.Element; description: string }> = {
+  "Body & Face Waxing": {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+        <line x1="9" y1="9" x2="9.01" y2="9"/>
+        <line x1="15" y1="9" x2="15.01" y2="9"/>
+      </svg>
+    ),
+    description: "Smooth, precise waxing head to toe",
+  },
+  "Brow Services": {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 12c3-4 5-5 10-5s7 1 10 5"/>
+        <path d="M2 17c3-4 5-5 10-5s7 1 10 5"/>
+      </svg>
+    ),
+    description: "Defined, sculpted brows done right",
+  },
+  "Vajacial & Hydrojelly Masks": {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+    ),
+    description: "Targeted skin treatments & masking",
+  },
+};
+
 function ServiceCard({
   service,
   clientSlug,
@@ -37,7 +68,6 @@ function ServiceCard({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // Reset then animate
     el.style.opacity = "0";
     el.style.transform = "translateY(24px)";
     const timer = setTimeout(() => {
@@ -54,18 +84,16 @@ function ServiceCard({
       style={{
         opacity: 0,
         transform: "translateY(24px)",
-        transition: "opacity 0.5s ease-out, transform 0.5s ease-out, box-shadow 0.3s ease, translateY 0.3s ease",
+        transition: "opacity 0.5s ease-out, transform 0.5s ease-out, box-shadow 0.3s ease",
         boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
       }}
       onMouseEnter={(e) => {
-        const el = e.currentTarget;
-        el.style.transform = "translateY(-4px)";
-        el.style.boxShadow = "0 12px 32px rgba(0,0,0,0.10)";
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.10)";
       }}
       onMouseLeave={(e) => {
-        const el = e.currentTarget;
-        el.style.transform = "translateY(0)";
-        el.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
       }}
     >
       <div className="p-6 sm:p-8 flex flex-col flex-1">
@@ -101,8 +129,17 @@ function ServiceCard({
   );
 }
 
+const DISPLAY_CATEGORIES = [
+  "Body & Face Waxing",
+  "Brow Services",
+  "Vajacial & Hydrojelly Masks",
+];
+
 export default function Services({ services, categories, clientSlug }: ServicesProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Map display name → category id from DB
+  const categoryByName = Object.fromEntries(categories.map((c) => [c.name, c.id]));
 
   const filtered = activeCategory
     ? services.filter((s) => s.categoryId === activeCategory)
@@ -113,11 +150,8 @@ export default function Services({ services, categories, clientSlug }: ServicesP
       <div className="max-w-[1320px] mx-auto px-6 md:px-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]">
-            Treatments
-          </span>
           <h2
-            className="mt-6 font-light tracking-tight text-[var(--color-text)]"
+            className="font-light tracking-tight text-[var(--color-text)]"
             style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(2rem, 4vw, 3.2rem)", lineHeight: 1.1 }}
           >
             Every Service,{" "}
@@ -128,38 +162,61 @@ export default function Services({ services, categories, clientSlug }: ServicesP
           </p>
         </div>
 
-        {/* Category filter tabs */}
-        {categories.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            <button
-              onClick={() => setActiveCategory(null)}
-              className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200"
-              style={{
-                backgroundColor: activeCategory === null ? "var(--color-primary)" : "transparent",
-                color: activeCategory === null ? "white" : "var(--color-text-light)",
-                border: activeCategory === null ? "1.5px solid transparent" : "1.5px solid var(--color-border)",
-              }}
-            >
-              All
-            </button>
-            {categories.map((cat) => (
+        {/* Category cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+          {DISPLAY_CATEGORIES.map((name) => {
+            const catId = categoryByName[name] ?? null;
+            const isActive = activeCategory === catId;
+            const meta = CATEGORY_META[name];
+            const count = catId ? services.filter((s) => s.categoryId === catId).length : 0;
+
+            return (
               <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200"
+                key={name}
+                onClick={() => setActiveCategory(isActive ? null : catId)}
+                className="text-left rounded-2xl p-6 transition-all duration-300"
                 style={{
-                  backgroundColor: activeCategory === cat.id ? "var(--color-primary)" : "transparent",
-                  color: activeCategory === cat.id ? "white" : "var(--color-text-light)",
-                  border: activeCategory === cat.id ? "1.5px solid transparent" : "1.5px solid var(--color-border)",
+                  backgroundColor: isActive ? "var(--color-primary)" : "var(--color-bg-light)",
+                  border: isActive ? "1.5px solid transparent" : "1.5px solid var(--color-border)",
+                  boxShadow: isActive ? "0 8px 24px rgba(196,168,130,0.25)" : "none",
+                  color: isActive ? "white" : "var(--color-text)",
                 }}
               >
-                {cat.name}
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                  style={{
+                    backgroundColor: isActive ? "rgba(255,255,255,0.2)" : "white",
+                    color: isActive ? "white" : "var(--color-primary)",
+                  }}
+                >
+                  {meta?.icon}
+                </div>
+                <p
+                  className="font-medium text-base leading-snug"
+                  style={{ color: isActive ? "white" : "var(--color-text)" }}
+                >
+                  {name}
+                </p>
+                <p
+                  className="mt-1 text-sm"
+                  style={{ color: isActive ? "rgba(255,255,255,0.75)" : "var(--color-text-light)" }}
+                >
+                  {meta?.description}
+                </p>
+                {count > 0 && (
+                  <p
+                    className="mt-3 text-xs font-medium tracking-wide"
+                    style={{ color: isActive ? "rgba(255,255,255,0.6)" : "var(--color-primary-dark)" }}
+                  >
+                    {count} service{count !== 1 ? "s" : ""}
+                  </p>
+                )}
               </button>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
 
-        {/* Cards — 3-col desktop */}
+        {/* Service cards — 3-col desktop */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-md:hidden">
           {filtered.map((service, i) => (
             <ServiceCard key={service.id} service={service} clientSlug={clientSlug} index={i} />
