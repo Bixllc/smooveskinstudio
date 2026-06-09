@@ -27,12 +27,10 @@ export default function Navbar() {
           className="flex items-center justify-between gap-6 px-6 py-3"
           style={{
             borderRadius: "9999px",
-            background: "rgba(18, 15, 13, 0.28)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
-            border: "1px solid rgba(255,255,255,0.14)",
+            background: "#FFFFFF",
+            border: "1px solid var(--color-border)",
             minWidth: "min(860px, calc(100vw - 32px))",
-            boxShadow: "0 4px 32px rgba(0,0,0,0.18)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
           }}
         >
           {/* Left — Nav links (hidden on mobile) */}
@@ -46,7 +44,8 @@ export default function Navbar() {
               <li key={item.label}>
                 <a
                   href={item.href}
-                  className="text-white/75 hover:text-white transition-colors"
+                  className="transition-colors"
+                  style={{ color: "var(--color-primary)" }}
                   style={{ fontSize: "0.85rem", letterSpacing: "0.01em" }}
                 >
                   {item.label}
@@ -61,9 +60,9 @@ export default function Navbar() {
             aria-label="Toggle menu"
             onClick={() => setMenuOpen((o) => !o)}
           >
-            <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-            <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`block w-5 h-0.5 bg-white transition-all ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+            <span className={`block w-5 h-0.5 transition-all`} style={{ backgroundColor: "var(--color-primary)", transform: menuOpen ? "rotate(45deg) translateY(7px)" : "" }} />
+            <span className={`block w-5 h-0.5 transition-all`} style={{ backgroundColor: "var(--color-primary)", opacity: menuOpen ? 0 : 1 }} />
+            <span className={`block w-5 h-0.5 transition-all`} style={{ backgroundColor: "var(--color-primary)", transform: menuOpen ? "rotate(-45deg) translateY(-7px)" : "" }} />
           </button>
 
           {/* Center — Logo */}
@@ -73,7 +72,7 @@ export default function Navbar() {
               alt="Smoove Skin Studio"
               width={180}
               height={72}
-              className="h-14 w-auto brightness-0 invert"
+              className="h-14 w-auto"
               priority
             />
           </Link>
@@ -82,7 +81,8 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <a
               href="tel:+16822412984"
-              className="hidden md:flex items-center gap-1.5 text-white/60 hover:text-white transition-colors"
+              className="hidden md:flex items-center gap-1.5 transition-colors"
+              style={{ color: "var(--color-primary)" }}
               style={{ fontSize: "0.8rem" }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -96,7 +96,8 @@ export default function Navbar() {
               className="flex items-center gap-1 px-5 py-2 text-[var(--color-text)] font-medium transition-all duration-200 hover:brightness-95"
               style={{
                 borderRadius: "9999px",
-                backgroundColor: "white",
+                backgroundColor: "var(--color-primary)",
+                color: "white",
                 fontSize: "0.82rem",
                 letterSpacing: "0.01em",
               }}
@@ -114,10 +115,8 @@ export default function Navbar() {
           className="fixed z-40 left-4 right-4 rounded-2xl overflow-hidden"
           style={{
             top: "90px",
-            background: "rgba(18, 15, 13, 0.75)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
-            border: "1px solid rgba(255,255,255,0.14)",
+            background: "#FFFFFF",
+            border: "1px solid var(--color-border)",
           }}
         >
           <ul className="flex flex-col py-4">
@@ -131,7 +130,8 @@ export default function Navbar() {
                 <a
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block px-6 py-3.5 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                  className="block px-6 py-3.5 hover:bg-[var(--color-bg-light)] transition-colors"
+                  style={{ color: "var(--color-primary)" }}
                   style={{ fontSize: "0.95rem" }}
                 >
                   {item.label}
