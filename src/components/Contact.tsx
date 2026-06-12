@@ -1,157 +1,148 @@
+"use client";
+
+import Image from "next/image";
+import { useState } from "react";
+
+const CLIENT_SLUG = process.env.NEXT_PUBLIC_CLIENT_SLUG ?? "smooveskinstudio";
+
 export default function Contact() {
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Contact form submitted:", form);
+  };
+
   return (
-    <section id="contact" className="py-24 bg-[var(--color-bg)]">
-      <div className="max-w-[1320px] mx-auto px-4 md:px-10">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <span className="inline-block px-5 py-2 rounded-full bg-[var(--color-bg-light)] text-xs font-medium tracking-widest uppercase text-[var(--color-primary-dark)]">
-            Contact
-          </span>
-          <h2 className="mt-6 font-light text-2xl sm:text-3xl md:text-5xl tracking-tight text-[var(--color-text)]">
-            Visit Our{" "}
-            <span className="text-[var(--color-primary)] italic">Studio</span>
-          </h2>
-          <p className="mt-5 text-base text-[var(--color-text-light)] max-w-2xl mx-auto leading-relaxed">
-            Ready to experience the ultimate in professional skin care? Contact
-            us to book your appointment or learn more about our services.
-          </p>
-        </div>
-
-        {/* Get in Touch Card */}
-        <div className="bg-[var(--color-bg-light)] rounded-3xl py-10 px-5 sm:py-14 sm:px-10 mb-10">
-          <h3 className="text-xl sm:text-2xl font-medium text-[var(--color-text)] tracking-tight text-center">
-            Get in Touch
-          </h3>
-          <p className="mt-3 text-base text-[var(--color-text-light)] text-center">
-            We&apos;d love to hear from you. Reach out for appointments,
-            questions, or consultations.
-          </p>
-
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
-            {/* Visit Us */}
-            <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-[var(--color-border)] flex items-center justify-center mx-auto mb-4">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="var(--color-primary-dark)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-              </div>
-              <h3 className="text-base font-medium text-[var(--color-text)]">
-                Visit Us
-              </h3>
-              <p className="mt-2 text-sm text-[var(--color-text-light)] leading-relaxed">
-                7600 Denton Hwy, Suite #139
-                <br />
-                Watauga, Texas
-              </p>
-              <p className="mt-1 text-sm text-[var(--color-text-light)] italic">
-                Located inside Mattison Avenue
-                <br />
-                Salon Suites &amp; Spa
-              </p>
-            </div>
-
-            {/* Phone */}
-            <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-[var(--color-border)] flex items-center justify-center mx-auto mb-4">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dark)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.73h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.4a16 16 0 0 0 5.7 5.7l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.07 17.5l-.15-.58z" />
-                </svg>
-              </div>
-              <h3 className="text-base font-medium text-[var(--color-text)]">
-                Call Us
-              </h3>
-              <a
-                href="tel:+16822412984"
-                className="mt-2 inline-block text-sm text-[var(--color-text-light)] underline hover:text-[var(--color-primary)] transition-colors"
+    <section id="contact" className="py-24" style={{ backgroundColor: "var(--color-bg)" }}>
+      <div className="max-w-[1320px] mx-auto px-6 md:px-10">
+        <div
+          className="rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-2"
+          style={{ boxShadow: "0 4px 40px rgba(0,0,0,0.12)" }}
+        >
+          {/* Left — Studio image */}
+          <div className="relative hidden lg:block" style={{ minHeight: "620px" }}>
+            <Image
+              src="/images/studio.jpg"
+              alt="Smoove Skin Studio"
+              fill
+              className="object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.45), transparent 60%)" }}
+            />
+            <div className="absolute bottom-8 left-8 text-white">
+              <p
+                className="text-xs tracking-widest uppercase mb-2"
+                style={{ color: "rgba(255,255,255,0.55)" }}
               >
-                (682) 241-2984
-              </a>
-            </div>
-
-            {/* Email Us */}
-            <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-[var(--color-border)] flex items-center justify-center mx-auto mb-4">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="var(--color-primary-dark)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect width="20" height="16" x="2" y="4" rx="2" />
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" />
-                </svg>
-              </div>
-              <h3 className="text-base font-medium text-[var(--color-text)]">
-                Email Us
-              </h3>
-              <a
-                href="mailto:info@smooveskinstudio.com"
-                className="mt-2 inline-block text-sm text-[var(--color-text-light)] underline hover:text-[var(--color-primary)] transition-colors"
-              >
-                info@smooveskinstudio.com
-              </a>
-            </div>
-
-            {/* Hours */}
-            <div className="text-center">
-              <div className="w-14 h-14 rounded-full bg-[var(--color-border)] flex items-center justify-center mx-auto mb-4">
-                <svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="var(--color-primary-dark)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-              </div>
-              <h3 className="text-base font-medium text-[var(--color-text)]">
-                Hours
-              </h3>
-              <p className="mt-2 text-sm text-[var(--color-text-light)] leading-relaxed">
-                Mon - Fri: 9:00 AM - 7:00 PM
-                <br />
-                Saturday: 9:00 AM - 6:00 PM
-                <br />
-                Sunday: 11:00 AM - 5:00 PM
+                Address
               </p>
+              <p className="text-sm font-medium">7600 Denton Hwy, Suite #139</p>
+              <p className="text-sm">Watauga, Texas</p>
+              <p className="text-sm mt-2" style={{ color: "rgba(255,255,255,0.65)" }}>
+                Tue–Sat · 10am–6pm
+              </p>
+              <p className="text-sm mt-1 font-medium">(682) 241-2984</p>
             </div>
           </div>
-        </div>
 
-        {/* Book Online CTA */}
-        <div id="book" className="bg-white rounded-3xl shadow-sm py-10 px-5 sm:py-14 sm:px-10 text-center">
-          <h3 className="text-xl sm:text-2xl font-medium text-[var(--color-text)] tracking-tight">
-            Ready to Book Your Experience?
-          </h3>
-          <p className="mt-4 text-base text-[var(--color-text-light)] leading-relaxed max-w-xl mx-auto">
-            Schedule your appointment online for the fastest booking experience.
-            We look forward to welcoming you to our studio.
-          </p>
-          <a
-            href="/smooveskinstudio/book"
-            className="mt-8 inline-flex items-center justify-center px-6 sm:px-10 py-3 sm:py-4 rounded-full bg-[var(--color-primary)] text-white text-sm sm:text-base font-medium tracking-[0.01em] hover:bg-[var(--color-primary-dark)] transition-colors"
-          >
-            Book Online Now
-          </a>
+          {/* Right — Form */}
+          <div className="p-10 md:p-14" style={{ backgroundColor: "#2E1F17" }}>
+            <h2
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(2rem, 3.5vw, 2.8rem)",
+                fontWeight: 300,
+                color: "#FAF8F5",
+                lineHeight: 1.1,
+              }}
+            >
+              Send us a message
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed" style={{ color: "rgba(250,248,245,0.6)" }}>
+              Experience personalized care in a calm, private studio — designed for your comfort.
+            </p>
+
+            <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  value={form.firstName}
+                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+                  style={{
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "#FAF8F5",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={form.lastName}
+                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+                  style={{
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "#FAF8F5",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                  }}
+                />
+              </div>
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  color: "#FAF8F5",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  color: "#FAF8F5",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                }}
+              />
+              <textarea
+                placeholder="Tell us what you're looking for..."
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                rows={4}
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  color: "#FAF8F5",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                }}
+              />
+              <a
+                href={`/${CLIENT_SLUG}/book`}
+                className="mt-2 w-full py-4 rounded-full text-sm font-medium text-center text-white transition-all hover:opacity-90 block"
+                style={{ backgroundColor: "#C4A882" }}
+              >
+                Book Your Session →
+              </a>
+            </form>
+          </div>
         </div>
       </div>
     </section>

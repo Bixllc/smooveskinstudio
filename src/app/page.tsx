@@ -5,13 +5,10 @@ import Hero from "@/components/Hero";
 import RevealMarquee from "@/components/RevealMarquee";
 import About from "@/components/About";
 import Services from "@/components/Services";
-import MeetAnisha from "@/components/MeetAnisha";
-import ReserveCTA from "@/components/ReserveCTA";
 import Testimonials from "@/components/Testimonials";
-import FAQAccordion from "@/components/FAQAccordion";
-import Partners from "@/components/Partners";
 import CommunityPartners from "@/components/CommunityPartners";
 import TikTokSection from "@/components/TikTokSection";
+import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -23,7 +20,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Configure via CLIENT_SLUG env var; defaults to smooveskinstudio
 const CLIENT_SLUG = process.env.CLIENT_SLUG ?? "smooveskinstudio";
 
 export default async function Home() {
@@ -39,11 +35,7 @@ export default async function Home() {
           select: {
             id: true,
             name: true,
-            description: true,
-            durationMinutes: true,
-            price: true,
             categoryId: true,
-            category: { select: { name: true } },
           },
         }),
         prisma.category.findMany({
@@ -54,34 +46,17 @@ export default async function Home() {
       ])
     : [[], []];
 
-  const mappedServices = services.map((s) => ({
-    id: s.id,
-    name: s.name,
-    description: s.description,
-    durationMinutes: s.durationMinutes,
-    price: Number(s.price),
-    categoryId: s.categoryId,
-    categoryName: s.category.name,
-  }));
-
   return (
     <>
       <Navbar />
       <Hero />
       <RevealMarquee />
       <About />
-      <Services
-        services={mappedServices}
-        categories={categories}
-        clientSlug={CLIENT_SLUG}
-      />
-      <MeetAnisha clientSlug={CLIENT_SLUG} />
-      <ReserveCTA clientSlug={CLIENT_SLUG} />
+      <Services services={services} categories={categories} clientSlug={CLIENT_SLUG} />
       <Testimonials />
-      <FAQAccordion />
-      <Partners />
       <CommunityPartners />
       <TikTokSection />
+      <Contact />
       <Footer categories={categories} clientSlug={CLIENT_SLUG} />
     </>
   );

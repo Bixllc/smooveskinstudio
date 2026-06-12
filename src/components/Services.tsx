@@ -1,136 +1,33 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState, type ReactNode } from "react";
-
-type Service = {
-  id: string;
-  name: string;
-  description: string | null;
-  durationMinutes: number;
-  price: number;
-  categoryId: string;
-  categoryName: string;
-};
-
-type Category = {
-  id: string;
-  name: string;
-};
 
 type ServicesProps = {
-  services: Service[];
-  categories: Category[];
+  services: { id: string; name: string; categoryId: string }[];
+  categories: { id: string; name: string }[];
   clientSlug: string;
 };
 
-const CATEGORY_META: Record<string, { icon: ReactNode; description: string; image?: string }> = {
+const CATEGORY_META: Record<string, { image: string; shortName: string; description: string }> = {
   "Body & Face Waxing": {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-        <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-        <line x1="9" y1="9" x2="9.01" y2="9"/>
-        <line x1="15" y1="9" x2="15.01" y2="9"/>
-      </svg>
-    ),
-    description: "Smooth, precise waxing head to toe",
     image: "/images/cat-brow-services.jpg",
+    shortName: "Body & Face Waxing",
+    description:
+      "Smooth, precise waxing from head to toe — Brazilians, legs, arms, underarms, and the full-body Smoove finish.",
   },
   "Brow Services": {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M2 12c3-4 5-5 10-5s7 1 10 5"/>
-        <path d="M2 17c3-4 5-5 10-5s7 1 10 5"/>
-      </svg>
-    ),
-    description: "Defined, sculpted brows done right",
+    image: "/images/service-brows.avif",
+    shortName: "Brow Services",
+    description:
+      "Defined, sculpted brows done right — precision wax, tint, and the brow wax & tint combo for a polished finish.",
   },
   "Vajacial & Hydrojelly Masks": {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-    ),
-    description: "Targeted skin treatments & masking",
     image: "/images/vajacial-services.jpg",
+    shortName: "Vajacial & Hydrojelly",
+    description:
+      "Targeted skin treatments and masking that soothe, brighten, and care for skin after your wax.",
   },
 };
-
-function ServiceCard({
-  service,
-  clientSlug,
-  index,
-}: {
-  service: Service;
-  clientSlug: string;
-  index: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.opacity = "0";
-    el.style.transform = "translateY(24px)";
-    const timer = setTimeout(() => {
-      el.style.opacity = "1";
-      el.style.transform = "translateY(0)";
-    }, index * 80);
-    return () => clearTimeout(timer);
-  }, [index, service.id]);
-
-  return (
-    <div
-      ref={ref}
-      className="bg-white rounded-2xl overflow-hidden flex flex-col"
-      style={{
-        opacity: 0,
-        transform: "translateY(24px)",
-        transition: "opacity 0.5s ease-out, transform 0.5s ease-out, box-shadow 0.3s ease",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.10)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
-      }}
-    >
-      <div className="p-6 sm:p-8 flex flex-col flex-1">
-        <h3 className="font-medium text-[var(--color-text)] tracking-tight" style={{ fontSize: "1.05rem" }}>
-          {service.name}
-        </h3>
-        {service.description && (
-          <p className="mt-3 text-sm text-[var(--color-text-light)] leading-relaxed flex-1">
-            {service.description}
-          </p>
-        )}
-        <div className="mt-5 flex items-center gap-4 text-sm text-[var(--color-text-light)]">
-          <span className="flex items-center gap-1.5">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-            </svg>
-            {service.durationMinutes} min
-          </span>
-          <span className="text-[var(--color-border)]">·</span>
-          <span className="font-medium text-[var(--color-primary-dark)]">
-            From ${Number(service.price).toFixed(0)}
-          </span>
-        </div>
-        <a
-          href={`/${clientSlug}/book/${service.id}`}
-          className="mt-6 block w-full text-center py-3.5 rounded-full text-sm font-medium tracking-wide transition-all duration-300 hover:opacity-90"
-          style={{ backgroundColor: "var(--color-primary)", color: "white" }}
-        >
-          Book This
-        </a>
-      </div>
-    </div>
-  );
-}
 
 const DISPLAY_CATEGORIES = [
   "Body & Face Waxing",
@@ -138,138 +35,113 @@ const DISPLAY_CATEGORIES = [
   "Vajacial & Hydrojelly Masks",
 ];
 
-export default function Services({ services, categories, clientSlug }: ServicesProps) {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
-  // Map display name → category id from DB
-  const categoryByName = Object.fromEntries(categories.map((c) => [c.name, c.id]));
-
-  const filtered = activeCategory
-    ? services.filter((s) => s.categoryId === activeCategory)
-    : services;
-
+export default function Services({ clientSlug }: ServicesProps) {
   return (
-    <section id="services" className="py-24 bg-[var(--color-bg)]">
+    <section id="services" className="py-24" style={{ backgroundColor: "var(--color-bg)" }}>
       <div className="max-w-[1320px] mx-auto px-6 md:px-10">
+
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-14">
           <h2
-            className="font-light tracking-tight text-[var(--color-text)]"
-            style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(2rem, 4vw, 3.2rem)", lineHeight: 1.1 }}
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(2rem, 4vw, 3.2rem)",
+              lineHeight: 1.1,
+              fontWeight: 300,
+              color: "#2E1F17",
+            }}
           >
-            Every Service,{" "}
-            <span className="text-[var(--color-primary)] italic">Tailored to You.</span>
+            Every service, tailored to you.
           </h2>
-          <p className="mt-5 text-base text-[var(--color-text-light)] max-w-xl mx-auto leading-relaxed">
-            From clarifying facials to targeted skin treatments — each session is customized on the day.
+          <p className="mt-4 text-base max-w-xl mx-auto leading-relaxed" style={{ color: "#6B5F54" }}>
+            From precise body and face waxing to sculpted brows and targeted skin treatments —
+            three focused categories, all customized on the day.
           </p>
         </div>
 
-        {/* Category cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+        {/* 3 Category cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {DISPLAY_CATEGORIES.map((name) => {
-            const catId = categoryByName[name] ?? null;
-            const isActive = activeCategory === catId;
             const meta = CATEGORY_META[name];
-            const count = catId ? services.filter((s) => s.categoryId === catId).length : 0;
-
             return (
-              <button
+              <div
                 key={name}
-                onClick={() => setActiveCategory(isActive ? null : catId)}
-                className="text-left rounded-2xl overflow-hidden transition-all duration-300 relative"
+                className="bg-white rounded-2xl overflow-hidden flex flex-col group"
                 style={{
-                  border: isActive ? "1.5px solid transparent" : "1.5px solid var(--color-border)",
-                  boxShadow: isActive ? "0 8px 24px rgba(196,168,130,0.25)" : "none",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,0,0,0.10)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
                 }}
               >
-                {meta?.image ? (
-                  <>
-                    <div className="relative h-44 w-full">
-                      <Image
-                        src={meta.image}
-                        alt={name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, 33vw"
-                      />
-                      <div
-                        className="absolute inset-0"
-                        style={{ backgroundColor: isActive ? "rgba(196,168,130,0.55)" : "rgba(0,0,0,0.18)" }}
-                      />
-                    </div>
-                    <div
-                      className="p-6"
-                      style={{ backgroundColor: isActive ? "var(--color-primary)" : "var(--color-bg-light)" }}
-                    >
-                      <p className="font-medium text-base leading-snug" style={{ color: isActive ? "white" : "var(--color-text)" }}>
-                        {name}
-                      </p>
-                      <p className="mt-1 text-sm" style={{ color: isActive ? "rgba(255,255,255,0.75)" : "var(--color-text-light)" }}>
-                        {meta?.description}
-                      </p>
-                      {count > 0 && (
-                        <p className="mt-3 text-xs font-medium tracking-wide" style={{ color: isActive ? "rgba(255,255,255,0.6)" : "var(--color-primary-dark)" }}>
-                          {count} service{count !== 1 ? "s" : ""}
-                        </p>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div
-                    className="p-6"
-                    style={{ backgroundColor: isActive ? "var(--color-primary)" : "var(--color-bg-light)" }}
+                {/* Image */}
+                <div className="relative overflow-hidden" style={{ height: "260px" }}>
+                  {meta?.image ? (
+                    <Image
+                      src={meta.image}
+                      alt={name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full" style={{ backgroundColor: "#E8DDD1" }} />
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="p-8 flex flex-col flex-1">
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "1.7rem",
+                      fontWeight: 300,
+                      color: "#2E1F17",
+                      lineHeight: 1.2,
+                    }}
                   >
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                      style={{ backgroundColor: isActive ? "rgba(255,255,255,0.2)" : "white", color: isActive ? "white" : "var(--color-primary)" }}
-                    >
-                      {meta?.icon}
-                    </div>
-                    <p className="font-medium text-base leading-snug" style={{ color: isActive ? "white" : "var(--color-text)" }}>
-                      {name}
-                    </p>
-                    <p className="mt-1 text-sm" style={{ color: isActive ? "rgba(255,255,255,0.75)" : "var(--color-text-light)" }}>
-                      {meta?.description}
-                    </p>
-                    {count > 0 && (
-                      <p className="mt-3 text-xs font-medium tracking-wide" style={{ color: isActive ? "rgba(255,255,255,0.6)" : "var(--color-primary-dark)" }}>
-                        {count} service{count !== 1 ? "s" : ""}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </button>
+                    {meta?.shortName ?? name}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed flex-1" style={{ color: "#6B5F54" }}>
+                    {meta?.description}
+                  </p>
+                  <a
+                    href={`/${clientSlug}/book`}
+                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium self-start transition-all duration-300"
+                    style={{ border: "1.5px solid #2E1F17", color: "#2E1F17" }}
+                    onMouseEnter={(e) => {
+                      const el = e.currentTarget as HTMLAnchorElement;
+                      el.style.backgroundColor = "#2E1F17";
+                      el.style.color = "white";
+                    }}
+                    onMouseLeave={(e) => {
+                      const el = e.currentTarget as HTMLAnchorElement;
+                      el.style.backgroundColor = "transparent";
+                      el.style.color = "#2E1F17";
+                    }}
+                  >
+                    Book Now <span>→</span>
+                  </a>
+                </div>
+              </div>
             );
           })}
         </div>
 
-        {/* Service cards — 3-col desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-md:hidden">
-          {filtered.map((service, i) => (
-            <ServiceCard key={service.id} service={service} clientSlug={clientSlug} index={i} />
-          ))}
-        </div>
-
-        {/* Mobile: horizontal scroll */}
-        <div className="flex gap-5 overflow-x-auto pb-4 md:hidden snap-x snap-mandatory">
-          {filtered.map((service, i) => (
-            <div key={service.id} className="min-w-[280px] snap-start flex-shrink-0">
-              <ServiceCard service={service} clientSlug={clientSlug} index={i} />
-            </div>
-          ))}
-        </div>
-
         {/* CTA */}
-        <div className="mt-12 text-center">
+        <div className="mt-14 text-center">
           <a
             href={`/${clientSlug}/book`}
-            className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-primary-dark)] hover:text-[var(--color-primary)] transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-medium text-white transition-all hover:opacity-90"
+            style={{ backgroundColor: "#2E1F17" }}
           >
-            View All Services
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+            View All Services <span>→</span>
           </a>
         </div>
       </div>

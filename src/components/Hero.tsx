@@ -5,139 +5,131 @@ import Link from "next/link";
 
 const CLIENT_SLUG = process.env.NEXT_PUBLIC_CLIENT_SLUG ?? "smooveskinstudio";
 
-const trustPoints = [
-  {
-    label: "Award-Winning Care",
-    description: "Trusted expertise with exceptional results.",
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Premium Products & Hygiene",
-    description: "High-quality products in a clean, comfortable space.",
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6.5 6.5c0-2.5 2-4 5.5-4s5.5 1.5 5.5 4c0 4-5.5 11-5.5 11S6.5 10.5 6.5 6.5z"/>
-        <path d="M12 2.5v15"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Comfort Meets Confidence",
-    description: "Care designed to help you feel confident in your skin.",
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-      </svg>
-    ),
-  },
-];
-
 export default function Hero() {
   return (
-    <section className="pt-28 pb-16 bg-[var(--color-bg)]">
-      <div className="max-w-[1320px] mx-auto px-6 md:px-10">
-
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+    <section
+      style={{ backgroundColor: "var(--color-bg)", minHeight: "100vh", paddingTop: "90px" }}
+      className="relative overflow-hidden"
+    >
+      <div
+        className="max-w-[1320px] mx-auto px-6 md:px-10 flex items-center"
+        style={{ minHeight: "calc(100vh - 90px)" }}
+      >
+        <div className="grid grid-cols-1 lg:grid-cols-2 w-full gap-8 items-center">
 
           {/* Left — Text */}
-          <div>
+          <div className="py-16">
             <h1
-              className="font-light tracking-tight text-[var(--color-text)]"
-              style={{ fontSize: "clamp(3.2rem, 7vw, 6rem)", lineHeight: 1.0 }}
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(3rem, 5.5vw, 5rem)",
+                lineHeight: 1.05,
+                fontWeight: 300,
+                color: "#2E1F17",
+                letterSpacing: "-0.02em",
+              }}
             >
-              <span className="block">Smoove</span>
-              <span className="block text-[var(--color-primary)] italic" style={{ fontFamily: "var(--font-heading)" }}>
-                Skin
+              <span className="block">Smooth skin,</span>
+              <span>
+                <em style={{ color: "#9A6A4E", fontStyle: "italic" }}>refined</em>{" "}to you.
               </span>
-              <span className="block">Studio</span>
             </h1>
 
-            {/* Divider */}
-            <div
-              className="mt-6 mb-7"
-              style={{ width: "48px", height: "2px", backgroundColor: "var(--color-primary)" }}
-            />
-
-            <p className="text-base leading-relaxed text-[var(--color-text-light)] max-w-[420px]">
-              Award-winning waxing care in DFW with precision, comfort, and results
-              that leave your skin smoother, cleaner, and more confident.
+            <p
+              className="mt-6 leading-relaxed"
+              style={{ fontSize: "1rem", color: "#6B5F54", maxWidth: "440px" }}
+            >
+              Precision waxing and skin care in the DFW area — built on comfort, hygiene, and results
+              that leave you smoother, cleaner, and more confident in your skin.
             </p>
 
-            <p className="mt-6 text-xs font-bold tracking-[0.15em] text-[var(--color-primary-dark)] uppercase">
-              Full Body Brazilian Waxing&nbsp;•&nbsp;DFW Area
-            </p>
+            <Link
+              href={`/${CLIENT_SLUG}/book`}
+              className="mt-10 inline-flex items-center gap-2 rounded-full text-sm font-medium text-white transition-all hover:opacity-90"
+              style={{ backgroundColor: "#2E1F17", padding: "14px 32px" }}
+            >
+              Book Your Session <span>→</span>
+            </Link>
 
-            <div className="mt-8 flex items-center gap-4 flex-wrap">
-              <Link
-                href={`/${CLIENT_SLUG}/book`}
-                className="inline-flex items-center gap-1.5 px-7 py-3.5 rounded-lg text-sm font-medium tracking-wide text-white transition-all duration-200 hover:brightness-95"
-                style={{ backgroundColor: "var(--color-primary)" }}
-              >
-                Book Your Session <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>›</span>
-              </Link>
-              <a
-                href="#services"
-                className="inline-flex items-center px-7 py-3.5 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 hover:bg-[var(--color-bg-light)]"
-                style={{
-                  border: "1.5px solid var(--color-primary)",
-                  color: "var(--color-primary-dark)",
-                }}
-              >
-                Explore Services
-              </a>
+            {/* Trust bar */}
+            <div className="mt-14 pt-8" style={{ borderTop: "1px solid #D9D0C5" }}>
+              <div className="flex items-start gap-8 flex-wrap">
+                <div>
+                  <div style={{ color: "#C4A56B", fontSize: "1rem", letterSpacing: "3px" }}>★★★★★</div>
+                  <p className="text-sm mt-1" style={{ color: "#6B5F54" }}>Loved by 500+ DFW clients</p>
+                </div>
+                <div className="hidden sm:block w-px self-stretch" style={{ backgroundColor: "#D9D0C5" }} />
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: "#2E1F17" }}>Award-Winning</p>
+                  <p className="text-sm mt-1" style={{ color: "#6B5F54" }}>Wax Specialist</p>
+                </div>
+                <div className="hidden sm:block w-px self-stretch" style={{ backgroundColor: "#D9D0C5" }} />
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: "#2E1F17" }}>Clean</p>
+                  <p className="text-sm mt-1" style={{ color: "#6B5F54" }}>Organic products only</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right — Image */}
-          <div className="relative mt-8 lg:mt-16">
+          {/* Right — Image composition */}
+          <div
+            className="relative hidden lg:block"
+            style={{ height: "calc(100vh - 90px)", minHeight: "620px" }}
+          >
+            {/* Pink circle bg */}
             <div
-              className="overflow-hidden"
-              style={{ borderRadius: "24px", boxShadow: "0 24px 64px rgba(0,0,0,0.10)" }}
+              className="absolute"
+              style={{
+                width: "520px",
+                height: "520px",
+                borderRadius: "50%",
+                backgroundColor: "#F2B8C0",
+                top: "20px",
+                right: "-80px",
+              }}
+            />
+
+            {/* Main arch image */}
+            <div
+              className="absolute z-10 overflow-hidden"
+              style={{
+                width: "460px",
+                height: "100%",
+                top: 0,
+                right: 0,
+                borderRadius: "9999px 9999px 0 0",
+              }}
             >
               <Image
-                src="/images/hero-main.png"
-                alt="Anisha performing a waxing treatment at Smoove Skin Studio"
-                width={900}
-                height={1100}
-                className="w-full object-cover object-top"
-                style={{ maxHeight: "620px" }}
+                src="/images/hero-waxing.png"
+                alt="Precision brow waxing at Smoove Skin Studio"
+                fill
+                className="object-cover object-center"
                 priority
               />
             </div>
-          </div>
-        </div>
 
-        {/* Trust bar */}
-        <div
-          className="mt-12 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[var(--color-border)]"
-          style={{
-            border: "1px solid var(--color-border)",
-            borderRadius: "16px",
-            overflow: "hidden",
-          }}
-        >
-          {trustPoints.map((point) => (
-            <div key={point.label} className="flex items-start gap-5 px-8 py-7 bg-[var(--color-bg)]">
-              <div className="flex-shrink-0 text-[var(--color-primary)] mt-0.5">
-                {point.icon}
-              </div>
-              <div>
-                <p className="text-xs font-bold tracking-[0.12em] uppercase text-[var(--color-text)]">
-                  {point.label}
-                </p>
-                <p className="mt-1.5 text-sm text-[var(--color-text-light)] leading-relaxed">
-                  {point.description}
-                </p>
-              </div>
+            {/* Floating secondary photo */}
+            <div
+              className="absolute z-20 overflow-hidden rounded-2xl shadow-xl"
+              style={{
+                width: "185px",
+                height: "235px",
+                bottom: "130px",
+                left: "20px",
+              }}
+            >
+              <Image
+                src="/images/anisha.jpg"
+                alt="Anisha at Smoove Skin Studio"
+                fill
+                className="object-cover"
+              />
             </div>
-          ))}
-        </div>
+          </div>
 
+        </div>
       </div>
     </section>
   );

@@ -3,39 +3,9 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
-const trustPoints = [
-  {
-    label: "Licensed & Certified",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Organic & Clean Products",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-      </svg>
-    ),
-  },
-  {
-    label: "Private Studio — No Distractions",
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-    ),
-  },
-];
-
 export default function About() {
-  const sectionRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const trustRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -49,47 +19,21 @@ export default function About() {
       },
       { threshold: 0.15 }
     );
-
     if (imageRef.current) observer.observe(imageRef.current);
     if (textRef.current) observer.observe(textRef.current);
-    trustRefs.current.forEach((el) => { if (el) observer.observe(el); });
-
     return () => observer.disconnect();
   }, []);
 
   return (
     <>
       <style>{`
-        .about-img {
-          opacity: 0;
-          transform: translateX(-30px);
-          transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-        }
-        .about-img.in-view {
-          opacity: 1;
-          transform: translateX(0);
-        }
-        .about-text {
-          opacity: 0;
-          transform: translateX(30px);
-          transition: opacity 0.7s ease-out 0.1s, transform 0.7s ease-out 0.1s;
-        }
-        .about-text.in-view {
-          opacity: 1;
-          transform: translateX(0);
-        }
-        .trust-item {
-          opacity: 0;
-          transform: translateY(12px);
-          transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-        }
-        .trust-item.in-view {
-          opacity: 1;
-          transform: translateY(0);
-        }
+        .about-img { opacity: 0; transform: translateX(-30px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
+        .about-img.in-view { opacity: 1; transform: translateX(0); }
+        .about-text { opacity: 0; transform: translateX(30px); transition: opacity 0.7s ease-out 0.1s, transform 0.7s ease-out 0.1s; }
+        .about-text.in-view { opacity: 1; transform: translateX(0); }
       `}</style>
 
-      <section id="about" ref={sectionRef} className="py-24" style={{ backgroundColor: "#E8DDD1" }}>
+      <section id="about" className="py-24" style={{ backgroundColor: "#E8DDD1" }}>
         <div className="max-w-[1320px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
@@ -101,64 +45,81 @@ export default function About() {
                   alt="Anisha, licensed esthetician at Smoove Skin Studio"
                   width={600}
                   height={750}
-                  className="w-full h-[420px] sm:h-[560px] lg:h-[680px] object-cover object-top rounded-2xl"
+                  className="w-full object-cover object-top"
+                  style={{ height: "clamp(420px, 65vh, 720px)" }}
                 />
               </div>
             </div>
 
             {/* Text */}
             <div ref={textRef} className="about-text">
-              {/* Headline */}
-              <h2
-                className="mt-6 font-light tracking-tight text-[var(--color-text)]"
+              <p
                 style={{
                   fontFamily: "var(--font-heading)",
-                  fontSize: "clamp(2rem, 4vw, 3.2rem)",
-                  lineHeight: 1.1,
+                  fontSize: "1.05rem",
+                  fontStyle: "italic",
+                  color: "#9A6A4E",
                 }}
               >
-                Skin Care That Actually{" "}
-                <span className="text-[var(--color-primary)] italic">Listens.</span>
-              </h2>
-
-              {/* Body */}
-              <p className="mt-7 text-base leading-relaxed text-[var(--color-text-light)]">
-                Smoove Skin Studio isn&apos;t a chain. It&apos;s a private, one-on-one experience
-                with an esthetician who takes the time to understand your skin — not just your
-                appointment slot. Every treatment is customized, every visit is intentional.
+                Hi, I&apos;m Anisha —
               </p>
 
-              {/* Trust points */}
-              <div className="mt-10 flex flex-col gap-4">
-                {trustPoints.map((point, i) => (
-                  <div
-                    key={point.label}
-                    ref={(el) => { trustRefs.current[i] = el; }}
-                    className="trust-item flex items-center gap-4"
-                    style={{ transitionDelay: `${0.3 + i * 0.1}s` }}
-                  >
-                    <div
-                      className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-[var(--color-primary)]"
-                      style={{ backgroundColor: "rgba(255,255,255,0.6)" }}
+              <h2
+                className="mt-3 tracking-tight"
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "clamp(2.2rem, 4vw, 3.4rem)",
+                  lineHeight: 1.1,
+                  fontWeight: 300,
+                  color: "#2E1F17",
+                }}
+              >
+                Skin care that{" "}
+                <em style={{ color: "#9A6A4E", fontStyle: "italic" }}>actually</em>{" "}
+                listens.
+              </h2>
+
+              <p className="mt-6 text-base leading-relaxed" style={{ color: "#6B5F54" }}>
+                Smoove isn&apos;t a chain. It&apos;s a private, one-on-one experience with an
+                esthetician who takes the time to understand your skin — not just your appointment
+                slot. Every treatment is customized, every visit intentional.
+              </p>
+
+              <hr className="my-8" style={{ borderColor: "rgba(196,165,107,0.35)" }} />
+
+              {/* Numbered stats */}
+              <div className="grid grid-cols-3 gap-6">
+                {[
+                  { num: "01", text: "Licensed & certified esthetician" },
+                  { num: "02", text: "Organic & clean products only" },
+                  { num: "03", text: "Private studio, no distractions" },
+                ].map((stat) => (
+                  <div key={stat.num}>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-heading)",
+                        fontSize: "1.4rem",
+                        color: "#C4A56B",
+                        fontWeight: 400,
+                      }}
                     >
-                      {point.icon}
-                    </div>
-                    <span className="text-sm font-medium text-[var(--color-text)]">
-                      {point.label}
-                    </span>
+                      {stat.num}
+                    </p>
+                    <p className="mt-2 text-sm leading-snug" style={{ color: "#6B5F54" }}>
+                      {stat.text}
+                    </p>
                   </div>
                 ))}
               </div>
 
-              {/* Link */}
+              <hr className="my-8" style={{ borderColor: "rgba(196,165,107,0.35)" }} />
+
               <a
-                href="#"
-                className="inline-flex items-center gap-2 mt-10 text-sm font-medium text-[var(--color-primary-dark)] hover:text-[var(--color-primary)] transition-colors"
+                href="#services"
+                className="inline-flex items-center gap-2 rounded-full text-sm font-medium text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: "#2E1F17", padding: "14px 28px" }}
               >
-                Learn More About the Studio
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
+                Experience Smoove <span>→</span>
               </a>
             </div>
 
