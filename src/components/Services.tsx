@@ -24,7 +24,7 @@ type ServicesProps = {
   clientSlug: string;
 };
 
-const CATEGORY_META: Record<string, { icon: ReactNode; description: string }> = {
+const CATEGORY_META: Record<string, { icon: ReactNode; description: string; image?: string }> = {
   "Body & Face Waxing": {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -35,6 +35,7 @@ const CATEGORY_META: Record<string, { icon: ReactNode; description: string }> = 
       </svg>
     ),
     description: "Smooth, precise waxing head to toe",
+    image: "/images/cat-brow-services.jpg",
   },
   "Brow Services": {
     icon: (
@@ -52,6 +53,7 @@ const CATEGORY_META: Record<string, { icon: ReactNode; description: string }> = 
       </svg>
     ),
     description: "Targeted skin treatments & masking",
+    image: "/images/vajacial-services.jpg",
   },
 };
 
@@ -175,42 +177,67 @@ export default function Services({ services, categories, clientSlug }: ServicesP
               <button
                 key={name}
                 onClick={() => setActiveCategory(isActive ? null : catId)}
-                className="text-left rounded-2xl p-6 transition-all duration-300"
+                className="text-left rounded-2xl overflow-hidden transition-all duration-300 relative"
                 style={{
-                  backgroundColor: isActive ? "var(--color-primary)" : "var(--color-bg-light)",
                   border: isActive ? "1.5px solid transparent" : "1.5px solid var(--color-border)",
                   boxShadow: isActive ? "0 8px 24px rgba(196,168,130,0.25)" : "none",
-                  color: isActive ? "white" : "var(--color-text)",
                 }}
               >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{
-                    backgroundColor: isActive ? "rgba(255,255,255,0.2)" : "white",
-                    color: isActive ? "white" : "var(--color-primary)",
-                  }}
-                >
-                  {meta?.icon}
-                </div>
-                <p
-                  className="font-medium text-base leading-snug"
-                  style={{ color: isActive ? "white" : "var(--color-text)" }}
-                >
-                  {name}
-                </p>
-                <p
-                  className="mt-1 text-sm"
-                  style={{ color: isActive ? "rgba(255,255,255,0.75)" : "var(--color-text-light)" }}
-                >
-                  {meta?.description}
-                </p>
-                {count > 0 && (
-                  <p
-                    className="mt-3 text-xs font-medium tracking-wide"
-                    style={{ color: isActive ? "rgba(255,255,255,0.6)" : "var(--color-primary-dark)" }}
+                {meta?.image ? (
+                  <>
+                    <div className="relative h-44 w-full">
+                      <Image
+                        src={meta.image}
+                        alt={name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, 33vw"
+                      />
+                      <div
+                        className="absolute inset-0"
+                        style={{ backgroundColor: isActive ? "rgba(196,168,130,0.55)" : "rgba(0,0,0,0.18)" }}
+                      />
+                    </div>
+                    <div
+                      className="p-6"
+                      style={{ backgroundColor: isActive ? "var(--color-primary)" : "var(--color-bg-light)" }}
+                    >
+                      <p className="font-medium text-base leading-snug" style={{ color: isActive ? "white" : "var(--color-text)" }}>
+                        {name}
+                      </p>
+                      <p className="mt-1 text-sm" style={{ color: isActive ? "rgba(255,255,255,0.75)" : "var(--color-text-light)" }}>
+                        {meta?.description}
+                      </p>
+                      {count > 0 && (
+                        <p className="mt-3 text-xs font-medium tracking-wide" style={{ color: isActive ? "rgba(255,255,255,0.6)" : "var(--color-primary-dark)" }}>
+                          {count} service{count !== 1 ? "s" : ""}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    className="p-6"
+                    style={{ backgroundColor: isActive ? "var(--color-primary)" : "var(--color-bg-light)" }}
                   >
-                    {count} service{count !== 1 ? "s" : ""}
-                  </p>
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                      style={{ backgroundColor: isActive ? "rgba(255,255,255,0.2)" : "white", color: isActive ? "white" : "var(--color-primary)" }}
+                    >
+                      {meta?.icon}
+                    </div>
+                    <p className="font-medium text-base leading-snug" style={{ color: isActive ? "white" : "var(--color-text)" }}>
+                      {name}
+                    </p>
+                    <p className="mt-1 text-sm" style={{ color: isActive ? "rgba(255,255,255,0.75)" : "var(--color-text-light)" }}>
+                      {meta?.description}
+                    </p>
+                    {count > 0 && (
+                      <p className="mt-3 text-xs font-medium tracking-wide" style={{ color: isActive ? "rgba(255,255,255,0.6)" : "var(--color-primary-dark)" }}>
+                        {count} service{count !== 1 ? "s" : ""}
+                      </p>
+                    )}
+                  </div>
                 )}
               </button>
             );
