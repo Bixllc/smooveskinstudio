@@ -37,15 +37,22 @@ export default function About() {
         <div className="max-w-[1320px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-            {/* Image */}
+            {/* Image — white card container matches reference design */}
             <div ref={imageRef} className="about-img">
-              <div className="rounded-2xl overflow-hidden">
+              <div
+                className="rounded-2xl overflow-hidden"
+                style={{
+                  backgroundColor: "#fff",
+                  padding: "16px 16px 0 16px",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+                }}
+              >
                 <Image
                   src="/images/about-anisha.png"
                   alt="Anisha, licensed esthetician at Smoove Skin Studio"
                   width={600}
                   height={750}
-                  className="w-full object-cover object-top"
+                  className="w-full object-cover object-top rounded-xl"
                   style={{ height: "clamp(420px, 65vh, 720px)" }}
                 />
               </div>

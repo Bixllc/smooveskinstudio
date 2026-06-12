@@ -102,7 +102,7 @@ export default function Hero() {
               }}
             >
               <Image
-                src="/images/hero-waxing.png"
+                src="/images/cat-brow-services.jpg"
                 alt="Precision brow waxing at Smoove Skin Studio"
                 fill
                 className="object-cover object-center"
@@ -121,10 +121,10 @@ export default function Hero() {
               }}
             >
               <Image
-                src="/images/anisha.jpg"
+                src="/images/hero-waxing.png"
                 alt="Anisha at Smoove Skin Studio"
                 fill
-                className="object-cover"
+                className="object-cover object-top"
               />
             </div>
           </div>

@@ -80,9 +80,9 @@ export default function Contact() {
                   onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none"
                   style={{
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    color: "#FAF8F5",
-                    border: "1px solid rgba(255,255,255,0.15)",
+                    backgroundColor: "#fff",
+                    color: "#2E1F17",
+                    border: "none",
                   }}
                 />
                 <input
@@ -92,36 +92,38 @@ export default function Contact() {
                   onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none"
                   style={{
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    color: "#FAF8F5",
-                    border: "1px solid rgba(255,255,255,0.15)",
+                    backgroundColor: "#fff",
+                    color: "#2E1F17",
+                    border: "none",
                   }}
                 />
               </div>
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  color: "#FAF8F5",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                }}
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  color: "#FAF8F5",
-                  border: "1px solid rgba(255,255,255,0.15)",
-                }}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+                  style={{
+                    backgroundColor: "#fff",
+                    color: "#2E1F17",
+                    border: "none",
+                  }}
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+                  style={{
+                    backgroundColor: "#fff",
+                    color: "#2E1F17",
+                    border: "none",
+                  }}
+                />
+              </div>
               <textarea
                 placeholder="Tell us what you're looking for..."
                 value={form.message}
@@ -129,9 +131,9 @@ export default function Contact() {
                 rows={4}
                 className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none"
                 style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  color: "#FAF8F5",
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  backgroundColor: "#fff",
+                  color: "#2E1F17",
+                  border: "none",
                 }}
               />
               <a

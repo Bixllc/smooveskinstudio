@@ -64,7 +64,7 @@ export default function Testimonials() {
           {/* Photo */}
           <div className="relative hidden lg:block" style={{ minHeight: "500px" }}>
             <Image
-              src="/images/anisha-3.jpg"
+              src="/images/anisha.jpg"
               alt="Anisha performing a treatment at Smoove Skin Studio"
               fill
               className="object-cover object-top"
