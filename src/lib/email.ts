@@ -65,6 +65,30 @@ export async function sendAdminNotificationEmail(data: AdminNotificationData): P
   });
 }
 
+interface InvoiceEmailData {
+  customerName: string;
+  customerEmail: string;
+  invoiceId: string;
+  lineItems: { description: string; quantity: number; unitPrice: number }[];
+  subtotal: number;
+  total: number;
+  dueDate?: string | null;
+  notes?: string | null;
+  businessName?: string;
+}
+
+export async function sendInvoiceEmail(data: InvoiceEmailData): Promise<void> {
+  if (!process.env.RESEND_API_KEY) return;
+  const from = process.env.RESEND_FROM_EMAIL || "bookings@smooveskinstudio.com";
+
+  await getResend().emails.send({
+    from,
+    to: data.customerEmail,
+    subject: `Invoice from ${data.businessName ?? "Smoove Skin Studio"}`,
+    html: buildInvoiceHtml(data),
+  });
+}
+
 export async function sendReminderEmail(data: ReminderEmailData): Promise<void> {
   if (!process.env.RESEND_API_KEY) return;
   const from = process.env.RESEND_FROM_EMAIL || "bookings@smooveskinstudio.com";
@@ -178,6 +202,53 @@ function buildAdminNotificationHtml(data: AdminNotificationData): string {
       ${detailRow("Date &amp; Time", data.dateTime)}
       ${detailRow("Booking ID", `<code style="font-size:11px;">${data.bookingId}</code>`)}
     </table>
+  `);
+}
+
+function buildInvoiceHtml(data: InvoiceEmailData): string {
+  const firstName = data.customerName.split(" ")[0];
+  const lineRows = data.lineItems
+    .map(
+      (item) => `
+    <tr>
+      <td style="padding:10px 0;border-bottom:1px dashed ${BRAND.border};font-size:13px;color:${BRAND.dark};">${item.description}</td>
+      <td style="padding:10px 0;border-bottom:1px dashed ${BRAND.border};font-size:12px;color:${BRAND.text};text-align:center;">${item.quantity}</td>
+      <td style="padding:10px 0;border-bottom:1px dashed ${BRAND.border};font-size:13px;color:${BRAND.dark};text-align:right;">$${(item.unitPrice).toFixed(2)}</td>
+      <td style="padding:10px 0;border-bottom:1px dashed ${BRAND.border};font-size:13px;font-weight:600;color:${BRAND.dark};text-align:right;">$${(item.quantity * item.unitPrice).toFixed(2)}</td>
+    </tr>`
+    )
+    .join("");
+
+  return wrapper(`
+    <h2 style="margin:0 0 4px;font-size:22px;font-weight:700;color:${BRAND.dark};">Invoice for ${firstName}</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:${BRAND.text};">Please review your invoice below.${data.dueDate ? ` Payment is due by <strong style="color:${BRAND.dark};">${data.dueDate}</strong>.` : ""}</p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+      <tr>
+        <td style="padding-bottom:8px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.text};">Description</td>
+        <td style="padding-bottom:8px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.text};text-align:center;">Qty</td>
+        <td style="padding-bottom:8px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.text};text-align:right;">Unit</td>
+        <td style="padding-bottom:8px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.text};text-align:right;">Total</td>
+      </tr>
+      ${lineRows}
+    </table>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr>
+        <td style="padding:12px 0 4px;font-size:13px;color:${BRAND.text};">Subtotal</td>
+        <td style="padding:12px 0 4px;font-size:13px;color:${BRAND.dark};text-align:right;">$${data.subtotal.toFixed(2)}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 0 0;font-size:15px;font-weight:700;color:${BRAND.dark};">Total Due</td>
+        <td style="padding:4px 0 0;font-size:15px;font-weight:700;color:${BRAND.dark};text-align:right;">$${data.total.toFixed(2)}</td>
+      </tr>
+    </table>
+
+    ${data.notes ? `
+    <div style="background:${BRAND.bg};border-radius:10px;padding:16px;margin-bottom:24px;">
+      <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.text};">Notes</p>
+      <p style="margin:0;font-size:13px;color:${BRAND.dark};">${data.notes}</p>
+    </div>` : ""}
   `);
 }
 
