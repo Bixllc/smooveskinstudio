@@ -11,126 +11,211 @@ export default function Hero() {
       style={{ backgroundColor: "var(--color-bg)", minHeight: "100vh", paddingTop: "90px" }}
       className="relative overflow-hidden"
     >
+      {/* Pink ambient glow, top-right — pure CSS, no asset */}
       <div
-        className="max-w-[1320px] mx-auto px-6 md:px-10 flex items-center"
-        style={{ minHeight: "calc(100vh - 90px)" }}
+        style={{
+          position: "absolute",
+          top: -180,
+          right: -120,
+          width: 620,
+          height: 620,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(244,201,208,0.55) 0%, rgba(244,201,208,0) 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Gold ambient glow, bottom-left — pure CSS, no asset */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: -220,
+          left: -160,
+          width: 560,
+          height: 560,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(200,165,107,0.30) 0%, rgba(200,165,107,0) 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        className="max-w-[1340px] mx-auto px-12 hero-grid"
+        style={{
+          paddingTop: 18,
+          paddingBottom: 80,
+          display: "grid",
+          gridTemplateColumns: "1.12fr 0.88fr",
+          gap: 48,
+          alignItems: "center",
+          minHeight: "calc(100vh - 90px)",
+          position: "relative",
+        }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 w-full gap-8 items-center">
+        {/* Left — Text */}
+        <div style={{ maxWidth: 560 }}>
+          <h1
+            style={{
+              fontFamily: "var(--home-font-serif), serif",
+              fontSize: "clamp(44px, 4vw, 60px)",
+              lineHeight: 1.02,
+              letterSpacing: "-0.5px",
+              fontWeight: 500,
+              color: "#2E1F17",
+              marginBottom: 26,
+            }}
+          >
+            <span className="block">Smooth skin,</span>
+            <span>
+              <em style={{ color: "#9A6A4E", fontStyle: "italic" }}>refined</em>{" "}to you.
+            </span>
+          </h1>
 
-          {/* Left — Text */}
-          <div className="py-16">
-            <h1
-              style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "clamp(3rem, 5.5vw, 5rem)",
-                lineHeight: 1.05,
-                fontWeight: 300,
-                color: "#2E1F17",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              <span className="block">Smooth skin,</span>
-              <span>
-                <em style={{ color: "#9A6A4E", fontStyle: "italic" }}>refined</em>{" "}to you.
-              </span>
-            </h1>
+          <p
+            style={{
+              fontSize: 17.5,
+              fontWeight: 300,
+              lineHeight: 1.65,
+              color: "#5A463A",
+              maxWidth: 460,
+              marginBottom: 38,
+            }}
+          >
+            Precision waxing and skin care in the DFW area — built on comfort, hygiene, and results
+            that leave you smoother, cleaner, and more confident in your skin.
+          </p>
 
-            <p
-              className="mt-6 leading-relaxed"
-              style={{ fontSize: "1rem", color: "#6B5F54", maxWidth: "440px" }}
-            >
-              Precision waxing and skin care in the DFW area — built on comfort, hygiene, and results
-              that leave you smoother, cleaner, and more confident in your skin.
-            </p>
+          <Link
+            href={`/${CLIENT_SLUG}/book`}
+            className="smoove-hero-cta inline-flex items-center"
+            style={{
+              gap: 12,
+              fontSize: 15,
+              fontWeight: 300,
+              color: "#F4EDE2",
+              backgroundColor: "#3A281E",
+              padding: "18px 32px",
+              borderRadius: 44,
+              textDecoration: "none",
+              transition: "background 150ms ease",
+            }}
+          >
+            Book Your Session <span style={{ fontSize: 17, lineHeight: 1 }}>→</span>
+          </Link>
 
-            <Link
-              href={`/${CLIENT_SLUG}/book`}
-              className="mt-10 inline-flex items-center gap-2 rounded-full text-sm font-medium text-white transition-all hover:opacity-90"
-              style={{ backgroundColor: "#2E1F17", padding: "14px 32px" }}
-            >
-              Book Your Session <span>→</span>
-            </Link>
-
-            {/* Trust bar */}
-            <div className="mt-14 pt-8" style={{ borderTop: "1px solid #D9D0C5" }}>
-              <div className="flex items-start gap-8 flex-wrap">
-                <div>
-                  <div style={{ color: "#C4A56B", fontSize: "1rem", letterSpacing: "3px" }}>★★★★★</div>
-                  <p className="text-sm mt-1" style={{ color: "#6B5F54" }}>Loved by 500+ DFW clients</p>
-                </div>
-                <div className="hidden sm:block w-px self-stretch" style={{ backgroundColor: "#D9D0C5" }} />
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: "#2E1F17" }}>Award-Winning</p>
-                  <p className="text-sm mt-1" style={{ color: "#6B5F54" }}>Wax Specialist</p>
-                </div>
-                <div className="hidden sm:block w-px self-stretch" style={{ backgroundColor: "#D9D0C5" }} />
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: "#2E1F17" }}>Clean</p>
-                  <p className="text-sm mt-1" style={{ color: "#6B5F54" }}>Organic products only</p>
-                </div>
+          {/* Trust bar */}
+          <div className="mt-14" style={{ paddingTop: 30, borderTop: "1px solid rgba(154,106,78,0.20)" }}>
+            <div className="trust-row" style={{ display: "flex", gap: 26, flexWrap: "wrap" }}>
+              <div>
+                <div style={{ color: "#C8A56B", fontSize: 15, letterSpacing: "2px" }}>★★★★★</div>
+                <p className="text-sm mt-1" style={{ fontSize: 12.5, fontWeight: 300, color: "#5A463A" }}>
+                  Loved by 500+ DFW clients
+                </p>
+              </div>
+              <div className="trust-divider" style={{ width: 1, height: 38, background: "rgba(154,106,78,0.22)" }} />
+              <div>
+                <p style={{ fontFamily: "var(--home-font-serif), serif", fontSize: 22, fontWeight: 600, color: "#2E1F17" }}>
+                  Award-Winning
+                </p>
+                <p className="text-sm mt-1" style={{ fontSize: 12.5, fontWeight: 300, color: "#5A463A" }}>
+                  Wax Specialist
+                </p>
+              </div>
+              <div className="trust-divider" style={{ width: 1, height: 38, background: "rgba(154,106,78,0.22)" }} />
+              <div>
+                <p style={{ fontFamily: "var(--home-font-serif), serif", fontSize: 22, fontWeight: 600, color: "#2E1F17" }}>
+                  Clean
+                </p>
+                <p className="text-sm mt-1" style={{ fontSize: 12.5, fontWeight: 300, color: "#5A463A" }}>
+                  Organic products only
+                </p>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Right — Image composition */}
+        {/* Right — Image composition */}
+        <div
+          className="relative flex hero-right"
+          style={{ justifyContent: "center", alignItems: "flex-end" }}
+        >
+          {/* Main arch image */}
           <div
-            className="relative hidden lg:block"
-            style={{ height: "calc(100vh - 90px)", minHeight: "620px" }}
+            className="relative z-10 overflow-hidden"
+            style={{
+              width: "100%",
+              maxWidth: 440,
+              aspectRatio: "44 / 58",
+              borderRadius: "50% 50% 26px 26px / 38% 38% 4% 4%",
+              boxShadow: "0 40px 80px -30px rgba(58,40,30,0.45)",
+              border: "1px solid rgba(255,255,255,0.5)",
+            }}
           >
-            {/* Pink circle bg */}
+            <Image
+              src="/images/hero-brow-arch.png"
+              alt="Precision brow waxing at Smoove Skin Studio"
+              fill
+              sizes="440px"
+              className="object-cover"
+              style={{ objectPosition: "50% 35%" }}
+              priority
+            />
+            {/* Inner gold arch frame */}
             <div
-              className="absolute"
               style={{
-                width: "520px",
-                height: "520px",
-                borderRadius: "50%",
-                backgroundColor: "#F2B8C0",
-                top: "20px",
-                right: "-80px",
+                position: "absolute",
+                inset: 12,
+                border: "1px solid rgba(244,237,226,0.55)",
+                borderRadius: "50% 50% 14px 14px / 36% 36% 3% 3%",
+                pointerEvents: "none",
               }}
             />
-
-            {/* Main arch image */}
-            <div
-              className="absolute z-10 overflow-hidden"
-              style={{
-                width: "460px",
-                height: "100%",
-                top: 0,
-                right: 0,
-                borderRadius: "9999px 9999px 0 0",
-              }}
-            >
-              <Image
-                src="/images/cat-brow-services.jpg"
-                alt="Precision brow waxing at Smoove Skin Studio"
-                fill
-                className="object-cover object-center"
-                priority
-              />
-            </div>
-
-            {/* Floating secondary photo */}
-            <div
-              className="absolute z-20 overflow-hidden rounded-2xl shadow-xl"
-              style={{
-                width: "185px",
-                height: "235px",
-                bottom: "130px",
-                left: "20px",
-              }}
-            >
-              <Image
-                src="/images/hero-waxing.png"
-                alt="Anisha at Smoove Skin Studio"
-                fill
-                className="object-cover object-top"
-              />
-            </div>
           </div>
 
+          {/* Floating secondary photo */}
+          <div
+            className="absolute z-20 overflow-hidden"
+            style={{
+              width: 196,
+              height: 244,
+              left: -6,
+              bottom: -10,
+              borderRadius: 18,
+              boxShadow: "0 24px 44px -20px rgba(58,40,30,0.5)",
+              border: "5px solid #F4EDE2",
+            }}
+          >
+            <Image
+              src="/images/treatment-oil.png"
+              alt="Aftercare oil application at Smoove Skin Studio"
+              fill
+              sizes="196px"
+              className="object-cover"
+              style={{ objectPosition: "56% 20%" }}
+            />
+          </div>
         </div>
+
       </div>
+
+      <style>{`
+        .smoove-hero-cta:hover { background: #2E1F17 !important; }
+        @media (max-width: 900px) {
+          .hero-grid {
+            grid-template-columns: 1fr !important;
+            gap: 44px !important;
+            padding-left: 26px !important;
+            padding-right: 26px !important;
+            padding-top: 14px !important;
+            padding-bottom: 64px !important;
+          }
+          .hero-right { justify-content: flex-start !important; }
+        }
+        @media (max-width: 600px) {
+          .trust-row { flex-wrap: wrap; gap: 18px 22px; }
+          .trust-divider { display: none; }
+        }
+      `}</style>
     </section>
   );
 }

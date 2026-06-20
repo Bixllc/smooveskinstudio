@@ -538,14 +538,77 @@ It does not affect the booking flow, admin portal, or any other pages.
 These tokens must be used consistently across all homepage sections.
 Do not invent new colors or fonts.
 
-```
-Primary color:    [use existing brand primary from codebase]
-Accent color:     [use existing brand accent from codebase]
-Font:             [use existing font stack from codebase]
-Border radius:    rounded-2xl (cards), rounded-full (buttons/pills)
-Transition:       all 0.4s ease
-Shadow (hover):   0 12px 32px rgba(0,0,0,0.10)
-```
+Current homepage components (`Hero.tsx`, etc.) mostly hardcode these as literal
+hex values rather than CSS custom properties — unlike the admin/booking surfaces,
+which were folded onto `--color-*` tokens in `src/app/globals.css`. The table below
+is the canonical source of truth either way; wiring the homepage onto actual CSS
+vars is a separate follow-up, not done yet.
+
+#### Colors
+
+##### Surfaces
+| Token | Value | Usage |
+|---|---|---|
+| `surface/page` | `#F4EDE2` | page background |
+| `surface/raised` | `#FBF7F0` | navbar (@ 82% opacity), cards |
+| `surface/sunken-band` | `#E5D9C8` | about band, testimonial section |
+| `surface/inverse` | `#2E1F17` | TikTok + contact-form panels |
+
+##### Brand
+| Token | Value | Usage |
+|---|---|---|
+| `brand/espresso` | `#3A281E` | primary buttons |
+| `brand/espresso-deep` | `#2E1F17` | button hover, darkest text, dark surfaces |
+| `brand/gold` | `#C8A56B` | stars, accents, submit button |
+| `brand/gold-hover` | `#B8945A` | — |
+
+##### Text
+| Token | Value | Usage |
+|---|---|---|
+| `text/heading` | `#2E1F17` | — |
+| `text/body` | `#5A463A` | — |
+| `text/body-alt` | `#6A5447` | card/secondary copy |
+| `text/muted` | `#8A7363` | — |
+| `text/on-dark` | `#F4EDE2` | — |
+| `text/on-dark-muted` | `rgba(244,237,226,0.72)` | — |
+
+##### Accents
+| Token | Value | Usage |
+|---|---|---|
+| `accent/mauve` | `#9A6A4E` | "refined", links hover, eyebrows |
+| `accent/pink-blob` | `#F4C9D0` | radial glow, ~0.55 alpha |
+
+##### Borders / dividers
+| Token | Value | Usage |
+|---|---|---|
+| `border/hairline` | `rgba(154,106,78,0.18)` | — |
+| `divider` | `rgba(154,106,78,0.22)` | — |
+| `border/on-dark` | `rgba(244,237,226,0.22)` | — |
+
+#### Typography
+
+| Token | Family | Usage |
+|---|---|---|
+| `family/serif` | Cormorant Garamond | display headlines (500) and bold serif labels/titles (600) — same family, weight-differentiated |
+| `family/sans` | DM Sans | body, nav, eyebrows, form |
+| `family/mono` | Courier New | placeholder tags only (`LOGO 01` / `VIDEO 01`) |
+
+Weights: serif 400, 500, 600 (+ italic 400/500); sans 300, 400, 500.
+
+There's no separate third serif — headline and label share Cormorant Garamond.
+Jost is preloaded in the font link but unused; Courier New is the only other
+family, for placeholder chips.
+
+##### Type scale
+| Role | Spec |
+|---|---|
+| headline | Cormorant Garamond 500, `clamp(44px,4vw,60px)`, lh 1.02, ls -0.5px |
+| subhead | Cormorant Garamond 500, `clamp(38px,3.6vw,54px)`, lh 1.04, ls -0.5px |
+| label | Cormorant Garamond 600, 27px (card titles), 22px (stats), lh 1.1 |
+| eyebrow | DM Sans 500, 11px, lh 1, ls 2px (uppercase) |
+| body | DM Sans 300, 16.5px, lh 1.65 |
+| body-lg | DM Sans 300, 17.5px, lh 1.65 (hero intro) |
+| nav/small | DM Sans 300, 14px, ls 0.5px |
 
 ---
 

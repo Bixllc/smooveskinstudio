@@ -32,6 +32,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Homepage-only typography (Cormorant Garamond + DM Sans), scoped to the
+   .smoove-home subtree via the font variables set in src/app/page.tsx.
+   Deliberately separate from --font-heading / --font-body, which stay on
+   Averes Title / Montserrat for admin + the booking flow. */
+.smoove-home {
+  font-family: var(--home-font-sans), sans-serif;
+}
+
 @keyframes scroll {
   0% {
     transform: translateX(0);
