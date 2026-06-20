@@ -37,13 +37,22 @@ export default function About() {
         <div className="max-w-[1320px] mx-auto px-6 md:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-            {/* Image — white card container matches reference design */}
-            <div ref={imageRef} className="about-img">
+            {/* Image — white card floating over a thin gold outline frame */}
+            <div ref={imageRef} className="about-img relative">
+              {/* Outline frame, offset behind the card */}
               <div
-                className="rounded-2xl overflow-hidden"
+                className="absolute rounded-[28px]"
+                style={{
+                  inset: "-14px",
+                  border: "1px solid rgba(200,165,107,0.5)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                className="relative rounded-2xl overflow-hidden"
                 style={{
                   backgroundColor: "#fff",
-                  padding: "16px 16px 0 16px",
+                  padding: 16,
                   boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
                 }}
               >
@@ -52,8 +61,8 @@ export default function About() {
                   alt="Anisha, licensed esthetician at Smoove Skin Studio"
                   width={600}
                   height={750}
-                  className="w-full object-cover object-top rounded-xl"
-                  style={{ height: "clamp(420px, 65vh, 720px)" }}
+                  className="w-full object-cover rounded-xl"
+                  style={{ height: "clamp(420px, 65vh, 720px)", objectPosition: "50% 25%" }}
                 />
               </div>
             </div>
@@ -62,7 +71,7 @@ export default function About() {
             <div ref={textRef} className="about-text">
               <p
                 style={{
-                  fontFamily: "var(--font-heading)",
+                  fontFamily: "var(--home-font-serif), serif",
                   fontSize: "1.05rem",
                   fontStyle: "italic",
                   color: "#9A6A4E",
@@ -74,7 +83,7 @@ export default function About() {
               <h2
                 className="mt-3 tracking-tight"
                 style={{
-                  fontFamily: "var(--font-heading)",
+                  fontFamily: "var(--home-font-serif), serif",
                   fontSize: "clamp(2.2rem, 4vw, 3.4rem)",
                   lineHeight: 1.1,
                   fontWeight: 300,
@@ -104,7 +113,7 @@ export default function About() {
                   <div key={stat.num}>
                     <p
                       style={{
-                        fontFamily: "var(--font-heading)",
+                        fontFamily: "var(--home-font-serif), serif",
                         fontSize: "1.4rem",
                         color: "#C4A56B",
                         fontWeight: 400,
