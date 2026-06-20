@@ -44,7 +44,7 @@ export default function Services({ clientSlug }: ServicesProps) {
         <div className="text-center mb-14">
           <h2
             style={{
-              fontFamily: "var(--font-heading)",
+              fontFamily: "var(--home-font-serif), serif",
               fontSize: "clamp(2rem, 4vw, 3.2rem)",
               lineHeight: 1.1,
               fontWeight: 300,
@@ -99,7 +99,7 @@ export default function Services({ clientSlug }: ServicesProps) {
                 <div className="p-8 flex flex-col flex-1">
                   <h3
                     style={{
-                      fontFamily: "var(--font-heading)",
+                      fontFamily: "var(--home-font-serif), serif",
                       fontSize: "1.7rem",
                       fontWeight: 300,
                       color: "#2E1F17",
