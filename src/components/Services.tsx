@@ -10,13 +10,13 @@ type ServicesProps = {
 
 const CATEGORY_META: Record<string, { image: string; shortName: string; description: string }> = {
   "Body & Face Waxing": {
-    image: "/images/cat-brow-services.jpg",
+    image: "/images/cat-body-waxing.png",
     shortName: "Body & Face Waxing",
     description:
       "Smooth, precise waxing from head to toe — Brazilians, legs, arms, underarms, and the full-body Smoove finish.",
   },
   "Brow Services": {
-    image: "/images/service-brows.avif",
+    image: "/images/cat-brow-waxing.png",
     shortName: "Brow Services",
     description:
       "Defined, sculpted brows done right — precision wax, tint, and the brow wax & tint combo for a polished finish.",
