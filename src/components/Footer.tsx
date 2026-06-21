@@ -14,6 +14,15 @@ const CONTACT = {
   phoneHref: "tel:+16822412984",
 };
 
+const columnHeadingStyle: React.CSSProperties = {
+  fontFamily: "var(--home-font-sans), sans-serif",
+  fontWeight: 500,
+  fontSize: 11,
+  letterSpacing: "2px",
+  color: "#9A6A4E",
+  marginBottom: 18,
+};
+
 export default function Footer({
   categories = [],
   clientSlug = "smooveskinstudio",
@@ -22,119 +31,178 @@ export default function Footer({
   clientSlug?: string;
 }) {
   const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Footer email signup:", email);
     setEmail("");
+    setSubscribed(true);
   };
 
   return (
-    <footer style={{ backgroundColor: "var(--color-bg-light)", paddingTop: "64px", paddingBottom: "32px" }}>
-      <div className="max-w-[1320px] mx-auto px-6 md:px-10">
+    <footer style={{ backgroundColor: "#F4EDE2", padding: "80px 48px 40px" }}>
+      <div style={{ maxWidth: 1340, margin: "0 auto" }}>
         <div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-14"
-          style={{ borderBottom: "1px solid var(--color-border)" }}
+          className="footer-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.3fr 0.8fr 1fr 1.5fr",
+            gap: 48,
+            paddingBottom: 56,
+            borderBottom: "1px solid rgba(154,106,78,0.22)",
+          }}
         >
-          {/* Zone 1 — Brand */}
+          {/* Column 1 — Brand */}
           <div>
             <Image
-              src="/images/logo.svg"
+              src="/images/logo.avif"
               alt="Smoove Skin Studio"
-              width={80}
-              height={90}
-              className="h-16 w-auto"
+              width={220}
+              height={88}
+              style={{ height: 88, width: "auto", mixBlendMode: "multiply", margin: "0 0 20px -6px" }}
             />
-            <p className="mt-4 text-sm leading-relaxed" style={{ color: "#6B5F54" }}>
+            <p
+              style={{
+                maxWidth: 260,
+                fontFamily: "var(--home-font-sans), sans-serif",
+                fontWeight: 300,
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: "#6A5447",
+              }}
+            >
               Private. Intentional. Yours. Award-winning waxing &amp; skin care in the DFW metroplex.
             </p>
           </div>
 
-          {/* Zone 2 — Navigate */}
+          {/* Column 2 — Navigate */}
           <div>
-            <h4
-              className="text-xs font-medium tracking-widest uppercase mb-5"
-              style={{ color: "#9A6A4E" }}
-            >
-              Navigate
-            </h4>
-            <ul className="flex flex-col gap-3">
+            <h4 style={columnHeadingStyle}>NAVIGATE</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {["Home", "About", "Services", "Contact"].map((link) => (
-                <li key={link}>
-                  <a
-                    href={link === "Home" ? "/" : `#${link.toLowerCase()}`}
-                    className="text-sm transition-opacity hover:opacity-70"
-                    style={{ color: "#6B5F54" }}
-                  >
-                    {link}
-                  </a>
-                </li>
+                <a
+                  key={link}
+                  href={link === "Home" ? "/" : `#${link.toLowerCase()}`}
+                  className="footer-link"
+                  style={{
+                    fontFamily: "var(--home-font-sans), sans-serif",
+                    fontWeight: 300,
+                    fontSize: 14,
+                    color: "#6A5447",
+                    textDecoration: "none",
+                    transition: "color 150ms ease",
+                  }}
+                >
+                  {link}
+                </a>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* Zone 3 — Visit */}
+          {/* Column 3 — Visit */}
           <div>
-            <h4
-              className="text-xs font-medium tracking-widest uppercase mb-5"
-              style={{ color: "#9A6A4E" }}
+            <h4 style={columnHeadingStyle}>VISIT</h4>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                fontFamily: "var(--home-font-sans), sans-serif",
+                fontWeight: 300,
+                fontSize: 14,
+                lineHeight: 1.55,
+                color: "#6A5447",
+              }}
             >
-              Visit
-            </h4>
-            <div className="flex flex-col gap-3 text-sm" style={{ color: "#6B5F54" }}>
-              <div>
-                <p>{CONTACT.address}</p>
-                <p>{CONTACT.city}</p>
-                <p className="mt-1 text-xs" style={{ color: "#9A6A4E" }}>{CONTACT.addressNote}</p>
-              </div>
-              <p>{CONTACT.hours}</p>
+              <p style={{ margin: 0 }}>{CONTACT.address}</p>
+              <p style={{ margin: 0 }}>{CONTACT.city}</p>
+              <p style={{ margin: 0, color: "#9A6A4E" }}>{CONTACT.addressNote}</p>
+              <p style={{ margin: 0 }}>{CONTACT.hours}</p>
               <a
                 href={CONTACT.phoneHref}
-                className="font-medium transition-opacity hover:opacity-70"
-                style={{ color: "#2E1F17" }}
+                className="footer-link"
+                style={{ color: "#2E1F17", fontWeight: 500, textDecoration: "none", transition: "color 150ms ease" }}
               >
                 {CONTACT.phone}
               </a>
             </div>
           </div>
 
-          {/* Zone 4 — Email signup card */}
+          {/* Column 4 — Newsletter card */}
           <div>
             <div
-              className="bg-white rounded-2xl p-6"
-              style={{ boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}
+              style={{
+                backgroundColor: "#FBF7F0",
+                border: "1px solid rgba(154,106,78,0.18)",
+                borderRadius: 20,
+                padding: "28px 28px 30px",
+              }}
             >
-              <h3
+              <h4
                 style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "1.15rem",
-                  fontWeight: 300,
+                  fontFamily: "var(--home-font-serif), serif",
+                  fontWeight: 600,
+                  fontSize: 23,
+                  lineHeight: 1.15,
                   color: "#2E1F17",
-                  lineHeight: 1.3,
                 }}
               >
                 Skin Tips, Studio Updates &amp; Exclusive Deals.
-              </h3>
-              <p className="mt-2 text-xs leading-relaxed" style={{ color: "#6B5F54" }}>
+              </h4>
+              <p
+                style={{
+                  marginTop: 10,
+                  fontFamily: "var(--home-font-sans), sans-serif",
+                  fontWeight: 300,
+                  fontSize: 13.5,
+                  lineHeight: 1.55,
+                  color: "#6A5447",
+                }}
+              >
                 Join 500+ clients who get early access to new services, seasonal offers, and
                 Anisha&apos;s personal skin care advice.
               </p>
-              <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+              <form onSubmit={handleSubmit} style={{ marginTop: 18, display: "flex", gap: 10 }}>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email"
                   required
-                  className="flex-1 px-3 py-2.5 rounded-full text-xs border outline-none"
-                  style={{ borderColor: "var(--color-border)", color: "var(--color-text)" }}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    backgroundColor: "#fff",
+                    border: "1px solid rgba(154,106,78,0.3)",
+                    borderRadius: 40,
+                    padding: "12px 18px",
+                    fontFamily: "var(--home-font-sans), sans-serif",
+                    fontWeight: 300,
+                    fontSize: 13.5,
+                    color: "#2E1F17",
+                    outline: "none",
+                  }}
                 />
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-full text-xs font-medium text-white transition-all hover:opacity-90"
-                  style={{ backgroundColor: "#2E1F17" }}
+                  className="footer-join-btn"
+                  style={{
+                    flexShrink: 0,
+                    backgroundColor: "#2E1F17",
+                    color: "#F4EDE2",
+                    border: "none",
+                    borderRadius: 40,
+                    padding: "12px 24px",
+                    fontFamily: "var(--home-font-sans), sans-serif",
+                    fontWeight: 300,
+                    fontSize: 13,
+                    letterSpacing: "0.5px",
+                    cursor: "pointer",
+                    transition: "background 150ms ease",
+                  }}
                 >
-                  Join
+                  {subscribed ? "✓" : "Join"}
                 </button>
               </form>
             </div>
@@ -142,20 +210,69 @@ export default function Footer({
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs" style={{ color: "#9A6A4E" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 20,
+            paddingTop: 26,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "var(--home-font-sans), sans-serif",
+              fontWeight: 300,
+              fontSize: 12.5,
+              color: "#8A7363",
+              margin: 0,
+            }}
+          >
             © 2026 Smoove Skin Studio. All rights reserved.
           </p>
-          <div className="flex gap-6">
-            <a href="#" className="text-xs transition-opacity hover:opacity-70" style={{ color: "#9A6A4E" }}>
+          <div style={{ display: "flex", gap: 26 }}>
+            <a
+              href="#"
+              className="footer-link"
+              style={{
+                fontFamily: "var(--home-font-sans), sans-serif",
+                fontWeight: 300,
+                fontSize: 12.5,
+                color: "#8A7363",
+                textDecoration: "none",
+                transition: "color 150ms ease",
+              }}
+            >
               Privacy Policy
             </a>
-            <a href="#" className="text-xs transition-opacity hover:opacity-70" style={{ color: "#9A6A4E" }}>
+            <a
+              href="#"
+              className="footer-link"
+              style={{
+                fontFamily: "var(--home-font-sans), sans-serif",
+                fontWeight: 300,
+                fontSize: 12.5,
+                color: "#8A7363",
+                textDecoration: "none",
+                transition: "color 150ms ease",
+              }}
+            >
               Terms &amp; Conditions
             </a>
           </div>
         </div>
       </div>
+
+      <style>{`
+        .footer-link:hover { color: #2E1F17 !important; }
+        .footer-join-btn:hover { background-color: #4A372C !important; }
+        @media (max-width: 900px) {
+          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 36px !important; }
+        }
+        @media (max-width: 600px) {
+          .footer-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
+        }
+      `}</style>
     </footer>
   );
 }
