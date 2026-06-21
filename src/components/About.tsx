@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
+const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
+
 export default function About() {
   const imageRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -131,7 +133,9 @@ export default function About() {
               <hr className="my-8" style={{ borderColor: "rgba(196,165,107,0.35)" }} />
 
               <a
-                href="#services"
+                href={BOOKING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full text-sm font-medium text-white transition-all hover:opacity-90"
                 style={{ backgroundColor: "#2E1F17", padding: "14px 28px" }}
               >

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const CLIENT_SLUG = process.env.NEXT_PUBLIC_CLIENT_SLUG ?? "smooveskinstudio";
+const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -84,7 +84,9 @@ export default function HomeNavbar() {
 
           {/* CTA — desktop only */}
           <a
-            href={`/${CLIENT_SLUG}/book`}
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="smoove-nav-cta"
             style={{
               fontSize: 13,
@@ -178,7 +180,9 @@ export default function HomeNavbar() {
               </a>
             ))}
             <a
-              href={`/${CLIENT_SLUG}/book`}
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setMenuOpen(false)}
               style={{
                 fontSize: 13,

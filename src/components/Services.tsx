@@ -35,7 +35,9 @@ const DISPLAY_CATEGORIES = [
   "Vajacial & Hydrojelly Masks",
 ];
 
-export default function Services({ clientSlug }: ServicesProps) {
+const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
+
+export default function Services({}: ServicesProps) {
   return (
     <section id="services" className="py-24" style={{ backgroundColor: "#F4EDE2" }}>
       <div className="max-w-[1320px] mx-auto px-6 md:px-10">
@@ -112,7 +114,9 @@ export default function Services({ clientSlug }: ServicesProps) {
                     {meta?.description}
                   </p>
                   <a
-                    href={`/${clientSlug}/book`}
+                    href={BOOKING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium self-start transition-all duration-300"
                     style={{ border: "1.5px solid #2E1F17", color: "#2E1F17" }}
                     onMouseEnter={(e) => {
@@ -137,7 +141,9 @@ export default function Services({ clientSlug }: ServicesProps) {
         {/* CTA */}
         <div className="mt-14 text-center">
           <a
-            href={`/${clientSlug}/book`}
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-medium text-white transition-all hover:opacity-90"
             style={{ backgroundColor: "#2E1F17" }}
           >

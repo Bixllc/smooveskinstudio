@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const CLIENT_SLUG = process.env.NEXT_PUBLIC_CLIENT_SLUG ?? "smooveskinstudio";
+const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
 
 export default function Hero() {
   return (
@@ -86,7 +86,9 @@ export default function Hero() {
           </p>
 
           <Link
-            href={`/${CLIENT_SLUG}/book`}
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="smoove-hero-cta inline-flex items-center"
             style={{
               gap: 12,
