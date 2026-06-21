@@ -1,72 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import Script from "next/script";
 
 const TIKTOK_URL = "https://www.tiktok.com/@smooveskinstudio";
-const VIDEOS = [1, 2, 3, 4];
 
-function VideoCard({ index }: { index: number }) {
-  const ref = useRef<HTMLAnchorElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.style.opacity = "1";
-          el.style.transform = "translateY(0)";
-          observer.unobserve(el);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <a
-      ref={ref}
-      href={TIKTOK_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="relative rounded-2xl overflow-hidden block group"
-      style={{
-        opacity: 0,
-        transform: "translateY(20px)",
-        transition: `opacity 0.5s ease-out ${(index - 1) * 0.08}s, transform 0.5s ease-out ${(index - 1) * 0.08}s`,
-        aspectRatio: "9/14",
-        background: `repeating-linear-gradient(
-          -45deg,
-          #2E1A0E,
-          #2E1A0E 10px,
-          #3a220f 10px,
-          #3a220f 20px
-        )`,
-      }}
-    >
-      {/* Play button */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-[1.1]"
-          style={{ backgroundColor: "rgba(255,255,255,0.88)" }}
-        >
-          <svg width="18" height="20" viewBox="0 0 20 22" fill="#2E1A0E">
-            <path d="M2 2l16 9-16 9V2z" />
-          </svg>
-        </div>
-      </div>
-
-      {/* Label */}
-      <div className="absolute bottom-4 left-4">
-        <span className="text-xs tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>
-          VIDEO 0{index}
-        </span>
-      </div>
-    </a>
-  );
-}
+// Most recent 3 posts, pulled live from the account on 2026-06-21.
+const VIDEO_IDS = [
+  "7652781243171458335",
+  "7650601733856529694",
+  "7647682881732578591",
+];
 
 export default function TikTokSection() {
   return (
@@ -99,13 +42,23 @@ export default function TikTokSection() {
           </svg>
         </a>
 
-        {/* 4-col grid — TODO: Replace with live TikTok embeds */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {VIDEOS.map((v) => (
-            <VideoCard key={v} index={v} />
+        {/* Live TikTok embeds — official widget, not re-hosted video files */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {VIDEO_IDS.map((id) => (
+            <blockquote
+              key={id}
+              className="tiktok-embed"
+              cite={`${TIKTOK_URL}/video/${id}`}
+              data-video-id={id}
+              style={{ maxWidth: "100%", minWidth: 0, margin: 0 }}
+            >
+              <section></section>
+            </blockquote>
           ))}
         </div>
       </div>
+
+      <Script src="https://www.tiktok.com/embed.js" strategy="lazyOnload" />
     </section>
   );
 }
