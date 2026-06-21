@@ -74,6 +74,7 @@ export default function TikTokSection() {
                 borderRadius: 20,
                 overflow: "hidden",
                 background: "repeating-linear-gradient(135deg, #3A2A20 0 14px, #34251C 14px 28px)",
+                scrollSnapAlign: "start",
               }}
             >
               <blockquote
@@ -97,8 +98,19 @@ export default function TikTokSection() {
           .tiktok-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 600px) {
-          .tiktok-section { padding: 64px 20px !important; }
-          .tiktok-grid { grid-template-columns: 1fr !important; gap: 18px !important; }
+          .tiktok-section { padding: 64px 0 64px 20px !important; }
+          .tiktok-grid {
+            display: flex !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory !important;
+            -webkit-overflow-scrolling: touch !important;
+            gap: 14px !important;
+            padding-right: 20px !important;
+            margin-right: -20px !important;
+            scrollbar-width: none !important;
+          }
+          .tiktok-grid::-webkit-scrollbar { display: none; }
+          .tiktok-card { flex: 0 0 78vw !important; }
         }
       `}</style>
     </section>
