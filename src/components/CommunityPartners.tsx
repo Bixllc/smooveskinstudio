@@ -20,62 +20,115 @@ const brands = [
 
 export default function CommunityPartners() {
   return (
-    <section className="py-24" style={{ backgroundColor: "var(--color-bg)" }}>
-      <div className="max-w-[1320px] mx-auto px-6 md:px-10">
+    <section style={{ backgroundColor: "#F4EDE2", padding: "100px 48px" }}>
+      <div style={{ maxWidth: 1340, margin: "0 auto" }}>
         <h2
-          className="text-center mb-14"
           style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "clamp(2rem, 4vw, 3.2rem)",
-            fontWeight: 300,
+            textAlign: "center",
+            maxWidth: 640,
+            margin: "0 auto 60px",
+            fontFamily: "var(--home-font-serif), serif",
+            fontWeight: 500,
+            fontSize: "clamp(38px, 3.6vw, 54px)",
+            lineHeight: 1.04,
+            letterSpacing: "-0.5px",
             color: "#2E1F17",
-            lineHeight: 1.2,
           }}
         >
           Brands we trust. Deals just for you.
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="deals-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 26 }}>
           {brands.map((brand) => (
             <div
               key={brand.badge}
-              className="bg-white rounded-2xl p-8 flex flex-col"
-              style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.05)" }}
+              style={{
+                backgroundColor: "#FBF7F0",
+                borderRadius: 24,
+                padding: "38px 32px",
+                border: "1px solid rgba(154,106,78,0.16)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+              }}
             >
+              {/* Logo placeholder — swap for real brand logos when available */}
               <div
-                className="inline-flex items-center px-4 py-1.5 rounded-full self-start text-xs font-medium tracking-widest uppercase mb-6"
-                style={{ border: "1.5px dashed #C4A882", color: "#9A6A4E" }}
+                style={{
+                  height: 48,
+                  width: 130,
+                  alignSelf: "center",
+                  border: "1.5px dashed rgba(110,78,59,0.4)",
+                  borderRadius: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "'Courier New', monospace",
+                  fontSize: 11,
+                  letterSpacing: "2px",
+                  color: "#9A6A4E",
+                }}
               >
                 {brand.badge}
               </div>
 
               <h3
                 style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "1.5rem",
-                  fontWeight: 300,
-                  color: "#2E1F17",
+                  fontFamily: "var(--home-font-serif), serif",
+                  fontWeight: 600,
+                  fontSize: 25,
                   lineHeight: 1.2,
+                  color: "#2E1F17",
                 }}
               >
                 {brand.offer}
               </h3>
 
-              <p className="mt-3 text-sm leading-relaxed flex-1" style={{ color: "#6B5F54" }}>
+              <p
+                style={{
+                  flex: 1,
+                  fontFamily: "var(--home-font-sans), sans-serif",
+                  fontWeight: 300,
+                  fontSize: 14.5,
+                  lineHeight: 1.6,
+                  color: "#6A5447",
+                }}
+              >
                 {brand.description}
               </p>
 
               <a
                 href="#"
-                className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium transition-opacity hover:opacity-70"
-                style={{ color: "#9A6A4E" }}
+                className="deal-claim-link"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontFamily: "var(--home-font-sans), sans-serif",
+                  fontWeight: 300,
+                  fontSize: 13.5,
+                  letterSpacing: "0.4px",
+                  color: "#2E1F17",
+                  textDecoration: "none",
+                  transition: "color 150ms ease",
+                }}
               >
-                Claim offer <span>→</span>
+                Claim offer <span style={{ fontSize: 15 }}>→</span>
               </a>
             </div>
           ))}
         </div>
       </div>
+
+      <style>{`
+        .deal-claim-link:hover { color: #9A6A4E !important; }
+        @media (max-width: 900px) {
+          .deals-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 600px) {
+          .deals-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }
