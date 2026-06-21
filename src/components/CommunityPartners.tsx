@@ -2,27 +2,46 @@
 
 import Image from "next/image";
 
-const brands = [
+type Brand = {
+  badge: string;
+  logo?: string;
+  offer: string;
+  description?: string;
+  code?: string;
+  href: string;
+  secondaryLink?: { label: string; href: string };
+};
+
+const brands: Brand[] = [
   {
     badge: "BUSHBALM",
     logo: "/images/brand-bushbalm.png",
     offer: "15% off your first order",
     description: "Ingrown-hair serums & aftercare oils, exclusive to Smoove clients.",
     code: "SMOOVE15",
+    href: "https://bushbalm.superfiliate.com/SMOOVESKIN",
+    secondaryLink: { label: "For Estheticians", href: "https://pros.bushbalm.com/?ll_ref_id=5ogyvV0SO" },
   },
   {
-    badge: "GIGI WAX",
-    offer: "Free wax warmer",
-    description: "With any product purchase of $50 or more. While supplies last.",
-    code: "SMOOVEGIGI",
+    badge: "HONEYCOMB WAX CO",
+    offer: "10% off",
+    description: "Professional hard wax, soft wax, roll-on wax & warmers for waxing services.",
+    code: "SSS10",
+    href: "https://honeycombwaxco.com/?ref=AnishaD&utm_source=affiliate",
   },
   {
     badge: "FINIPIL",
     offer: "Buy 2, get 1 free",
     description: "Antiseptic aftercare lotions — exclusive to Smoove clients.",
     code: "SMOOVEFINI",
+    href: "#",
   },
-] as { badge: string; logo?: string; offer: string; description: string; code: string }[];
+  {
+    badge: "AMAZON",
+    offer: "Shop my Amazon storefront",
+    href: "https://www.amazon.com/shop/smooveskinstudio?ref_=cm_sw_r_cp_ud_aipsfshop_aipsfsmooveskinstudio_HTP46TANJXPEVDHMT6A0&ccs_id=6c015a63-a867-43c0-bbdb-f8d84a4d74d2",
+  },
+];
 
 export default function CommunityPartners() {
   return (
@@ -44,7 +63,7 @@ export default function CommunityPartners() {
           Brands we trust. Deals just for you.
         </h2>
 
-        <div className="deals-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 26 }}>
+        <div className="deals-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 26 }}>
           {brands.map((brand) => (
             <div
               key={brand.badge}
@@ -118,30 +137,34 @@ export default function CommunityPartners() {
                 {brand.description}
               </p>
 
-              <p
-                style={{
-                  fontFamily: "var(--home-font-sans), sans-serif",
-                  fontWeight: 300,
-                  fontSize: 13,
-                  letterSpacing: "0.3px",
-                  color: "#6A5447",
-                }}
-              >
-                Code:{" "}
-                <span
+              {brand.code && (
+                <p
                   style={{
-                    fontFamily: "'Courier New', monospace",
-                    fontSize: 12.5,
-                    letterSpacing: "1px",
-                    color: "#9A6A4E",
+                    fontFamily: "var(--home-font-sans), sans-serif",
+                    fontWeight: 300,
+                    fontSize: 13,
+                    letterSpacing: "0.3px",
+                    color: "#6A5447",
                   }}
                 >
-                  {brand.code}
-                </span>
-              </p>
+                  Code:{" "}
+                  <span
+                    style={{
+                      fontFamily: "'Courier New', monospace",
+                      fontSize: 12.5,
+                      letterSpacing: "1px",
+                      color: "#9A6A4E",
+                    }}
+                  >
+                    {brand.code}
+                  </span>
+                </p>
+              )}
 
               <a
-                href="#"
+                href={brand.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="deal-claim-link"
                 style={{
                   display: "inline-flex",
@@ -158,6 +181,30 @@ export default function CommunityPartners() {
               >
                 Claim offer <span style={{ fontSize: 15 }}>→</span>
               </a>
+
+              {brand.secondaryLink && (
+                <a
+                  href={brand.secondaryLink.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="deal-claim-link"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    marginTop: -8,
+                    fontFamily: "var(--home-font-sans), sans-serif",
+                    fontWeight: 300,
+                    fontSize: 12,
+                    letterSpacing: "0.4px",
+                    color: "#6A5447",
+                    textDecoration: "none",
+                    transition: "color 150ms ease",
+                  }}
+                >
+                  {brand.secondaryLink.label} <span style={{ fontSize: 13 }}>→</span>
+                </a>
+              )}
             </div>
           ))}
         </div>
