@@ -29,9 +29,10 @@ export default function Contact() {
           {/* Left — Studio image */}
           <div className="relative hidden lg:block" style={{ minHeight: "620px" }}>
             <Image
-              src="/images/studio.jpg"
-              alt="Smoove Skin Studio"
+              src="/images/contact-studio.png"
+              alt="Smoove Skin Studio neon sign and waxing station"
               fill
+              sizes="(max-width: 1024px) 0px, 50vw"
               className="object-cover"
             />
             <div
