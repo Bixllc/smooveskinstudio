@@ -246,6 +246,22 @@ export default function Footer({
               Privacy Policy
             </a>
             <a
+              href="https://www.bixllc.net/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+              style={{
+                fontFamily: "var(--home-font-sans), sans-serif",
+                fontWeight: 300,
+                fontSize: 12.5,
+                color: "#8A7363",
+                textDecoration: "none",
+                transition: "color 150ms ease",
+              }}
+            >
+              Website by Bix
+            </a>
+            <a
               href="#"
               className="footer-link"
               style={{

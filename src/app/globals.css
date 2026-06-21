@@ -38,6 +38,7 @@ body {
    Averes Title / Montserrat for admin + the booking flow. */
 .smoove-home {
   font-family: var(--home-font-sans), sans-serif;
+  background-color: #F4EDE2;
 }
 
 @keyframes scroll {
