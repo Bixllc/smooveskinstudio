@@ -5,16 +5,19 @@ const brands = [
     badge: "BUSHBALM",
     offer: "15% off your first order",
     description: "Ingrown-hair serums & aftercare oils, exclusive to Smoove clients.",
+    code: "SMOOVE15",
   },
   {
     badge: "GIGI WAX",
     offer: "Free wax warmer",
     description: "With any product purchase of $50 or more. While supplies last.",
+    code: "SMOOVEGIGI",
   },
   {
     badge: "FINIPIL",
     offer: "Buy 2, get 1 free",
     description: "Antiseptic aftercare lotions — exclusive to Smoove clients.",
+    code: "SMOOVEFINI",
   },
 ];
 
@@ -95,6 +98,28 @@ export default function CommunityPartners() {
                 }}
               >
                 {brand.description}
+              </p>
+
+              <p
+                style={{
+                  fontFamily: "var(--home-font-sans), sans-serif",
+                  fontWeight: 300,
+                  fontSize: 13,
+                  letterSpacing: "0.3px",
+                  color: "#6A5447",
+                }}
+              >
+                Code:{" "}
+                <span
+                  style={{
+                    fontFamily: "'Courier New', monospace",
+                    fontSize: 12.5,
+                    letterSpacing: "1px",
+                    color: "#9A6A4E",
+                  }}
+                >
+                  {brand.code}
+                </span>
               </p>
 
               <a
