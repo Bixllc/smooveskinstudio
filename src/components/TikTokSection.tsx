@@ -1,7 +1,16 @@
 "use client";
 
+import Script from "next/script";
+
 const TIKTOK_URL = "https://www.tiktok.com/@smooveskinstudio";
-const VIDEO_COUNT = 4;
+
+// 4 latest posts, provided via TikTok's official embed codes on 2026-06-21.
+const VIDEO_IDS = [
+  "7652781243171458335",
+  "7650601733856529694",
+  "7647682881732578591",
+  "7646051814009326878",
+];
 
 export default function TikTokSection() {
   return (
@@ -55,64 +64,32 @@ export default function TikTokSection() {
           </a>
         </div>
 
-        {/* TODO: Replace placeholder cards with real video/thumbnail content */}
+        {/* Live TikTok embeds — official widget, not re-hosted video files */}
         <div className="tiktok-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 22 }}>
-          {Array.from({ length: VIDEO_COUNT }, (_, i) => i + 1).map((n) => (
+          {VIDEO_IDS.map((id) => (
             <div
-              key={n}
-              className="relative"
+              key={id}
+              className="tiktok-card"
               style={{
-                aspectRatio: "9 / 16",
                 borderRadius: 20,
                 overflow: "hidden",
-                background:
-                  "repeating-linear-gradient(135deg, #3A2A20 0 14px, #34251C 14px 28px)",
+                background: "repeating-linear-gradient(135deg, #3A2A20 0 14px, #34251C 14px 28px)",
               }}
             >
-              <div
-                className="absolute"
-                style={{
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: 52,
-                  height: 52,
-                  borderRadius: "50%",
-                  backgroundColor: "rgba(244,237,226,0.92)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+              <blockquote
+                className="tiktok-embed"
+                cite={`${TIKTOK_URL}/video/${id}`}
+                data-video-id={id}
+                style={{ maxWidth: "100%", minWidth: 0, margin: 0 }}
               >
-                <div
-                  style={{
-                    width: 0,
-                    height: 0,
-                    marginLeft: 4,
-                    borderTop: "9px solid transparent",
-                    borderBottom: "9px solid transparent",
-                    borderLeft: "14px solid #2E1F17",
-                  }}
-                />
-              </div>
-
-              <span
-                className="absolute"
-                style={{
-                  left: 14,
-                  bottom: 14,
-                  fontFamily: "'Courier New', monospace",
-                  fontSize: 10.5,
-                  letterSpacing: "1px",
-                  color: "#C8B7A8",
-                }}
-              >
-                VIDEO 0{n}
-              </span>
+                <section></section>
+              </blockquote>
             </div>
           ))}
         </div>
       </div>
+
+      <Script src="https://www.tiktok.com/embed.js" strategy="lazyOnload" />
 
       <style>{`
         .tiktok-icon-link:hover { background-color: rgba(244,237,226,0.2) !important; }
