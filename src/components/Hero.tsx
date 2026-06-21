@@ -143,7 +143,7 @@ export default function Hero() {
         >
           {/* Main arch image */}
           <div
-            className="relative z-10 overflow-hidden"
+            className="relative z-10 overflow-hidden hero-arch-image"
             style={{
               width: "100%",
               maxWidth: 440,
@@ -176,7 +176,7 @@ export default function Hero() {
 
           {/* Floating secondary photo */}
           <div
-            className="absolute z-20 overflow-hidden"
+            className="absolute z-20 overflow-hidden hero-secondary-photo"
             style={{
               width: 196,
               height: 244,
@@ -211,7 +211,19 @@ export default function Hero() {
             padding-top: 14px !important;
             padding-bottom: 64px !important;
           }
-          .hero-right { justify-content: flex-start !important; }
+          .hero-right {
+            order: -1;
+            width: 100% !important;
+            max-width: 300px !important;
+            margin: 0 auto 16px !important;
+            justify-content: center !important;
+          }
+          .hero-secondary-photo {
+            width: 140px !important;
+            height: 174px !important;
+            left: -4px !important;
+            bottom: -8px !important;
+          }
         }
         @media (max-width: 600px) {
           .trust-row { flex-wrap: nowrap; gap: 14px; }
