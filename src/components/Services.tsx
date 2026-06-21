@@ -37,7 +37,7 @@ const DISPLAY_CATEGORIES = [
 
 export default function Services({ clientSlug }: ServicesProps) {
   return (
-    <section id="services" className="py-24" style={{ backgroundColor: "var(--color-bg)" }}>
+    <section id="services" className="py-24" style={{ backgroundColor: "#F4EDE2" }}>
       <div className="max-w-[1320px] mx-auto px-6 md:px-10">
 
         {/* Header */}
