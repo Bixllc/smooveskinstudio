@@ -5,6 +5,7 @@ import Image from "next/image";
 type Brand = {
   badge: string;
   logo?: string;
+  noLogo?: boolean;
   offer: string;
   description?: string;
   code?: string;
@@ -16,29 +17,25 @@ const brands: Brand[] = [
   {
     badge: "BUSHBALM",
     logo: "/images/brand-bushbalm.png",
-    offer: "15% off your first order",
-    description: "Ingrown-hair serums & aftercare oils, exclusive to Smoove clients.",
-    code: "SMOOVE15",
+    offer: "20% off ingrown-free wax aftercare",
+    description: "Client favorite — exclusive to Smoove clients.",
     href: "https://bushbalm.superfiliate.com/SMOOVESKIN",
-    secondaryLink: { label: "For Estheticians", href: "https://pros.bushbalm.com/?ll_ref_id=5ogyvV0SO" },
+    secondaryLink: { label: "For Estheticians ($50 off Bushbalm Pro)", href: "https://pros.bushbalm.com/?ll_ref_id=5ogyvV0SO" },
   },
   {
     badge: "HONEYCOMB WAX CO",
+    logo: "/images/brand-honeycomb.webp",
     offer: "10% off",
     description: "Professional hard wax, soft wax, roll-on wax & warmers for waxing services.",
     code: "SSS10",
     href: "https://honeycombwaxco.com/?ref=AnishaD&utm_source=affiliate",
   },
   {
-    badge: "FINIPIL",
-    offer: "Buy 2, get 1 free",
-    description: "Antiseptic aftercare lotions — exclusive to Smoove clients.",
-    code: "SMOOVEFINI",
-    href: "#",
-  },
-  {
     badge: "AMAZON",
+    noLogo: true,
     offer: "Shop my Amazon storefront",
+    description:
+      "Sharing with you products that I personally love to use in my Salon or at home. My store is designed with you in mind, sharing with you some great essentials. My goal as an esthetician to help everyone I can. Whether virtually or in person, it's all love over here.",
     href: "https://www.amazon.com/shop/smooveskinstudio?ref_=cm_sw_r_cp_ud_aipsfshop_aipsfsmooveskinstudio_HTP46TANJXPEVDHMT6A0&ccs_id=6c015a63-a867-43c0-bbdb-f8d84a4d74d2",
   },
 ];
@@ -63,7 +60,7 @@ export default function CommunityPartners() {
           Brands we trust. Deals just for you.
         </h2>
 
-        <div className="deals-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 26 }}>
+        <div className="deals-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 26 }}>
           {brands.map((brand) => (
             <div
               key={brand.badge}
@@ -77,7 +74,7 @@ export default function CommunityPartners() {
                 gap: 16,
               }}
             >
-              {/* Real logo when available, dashed placeholder otherwise */}
+              {/* Real logo when available; no slot at all when noLogo is set */}
               {brand.logo ? (
                 <div
                   className="relative"
@@ -91,7 +88,7 @@ export default function CommunityPartners() {
                     className="object-contain"
                   />
                 </div>
-              ) : (
+              ) : !brand.noLogo ? (
                 <div
                   style={{
                     height: 48,
@@ -110,7 +107,7 @@ export default function CommunityPartners() {
                 >
                   {brand.badge}
                 </div>
-              )}
+              ) : null}
 
               <h3
                 style={{
