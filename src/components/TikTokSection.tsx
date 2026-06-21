@@ -110,7 +110,7 @@ export default function TikTokSection() {
             scrollbar-width: none !important;
           }
           .tiktok-grid::-webkit-scrollbar { display: none; }
-          .tiktok-card { flex: 0 0 78vw !important; }
+          .tiktok-card { flex: 0 0 58vw !important; }
         }
       `}</style>
     </section>

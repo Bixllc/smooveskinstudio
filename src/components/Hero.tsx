@@ -108,14 +108,14 @@ export default function Hero() {
           {/* Trust bar */}
           <div className="mt-14" style={{ paddingTop: 30, borderTop: "1px solid rgba(154,106,78,0.20)" }}>
             <div className="trust-row" style={{ display: "flex", gap: 26, flexWrap: "wrap" }}>
-              <div>
+              <div className="trust-item">
                 <div style={{ color: "#C8A56B", fontSize: 15, letterSpacing: "2px" }}>★★★★★</div>
                 <p className="text-sm mt-1" style={{ fontSize: 12.5, fontWeight: 300, color: "#5A463A" }}>
                   Loved by 500+ DFW clients
                 </p>
               </div>
               <div className="trust-divider" style={{ width: 1, height: 38, background: "rgba(154,106,78,0.22)" }} />
-              <div>
+              <div className="trust-item">
                 <p style={{ fontFamily: "var(--home-font-serif), serif", fontSize: 22, fontWeight: 600, color: "#2E1F17" }}>
                   Award-Winning
                 </p>
@@ -124,7 +124,7 @@ export default function Hero() {
                 </p>
               </div>
               <div className="trust-divider" style={{ width: 1, height: 38, background: "rgba(154,106,78,0.22)" }} />
-              <div>
+              <div className="trust-item">
                 <p style={{ fontFamily: "var(--home-font-serif), serif", fontSize: 22, fontWeight: 600, color: "#2E1F17" }}>
                   Clean
                 </p>
@@ -214,8 +214,9 @@ export default function Hero() {
           .hero-right { justify-content: flex-start !important; }
         }
         @media (max-width: 600px) {
-          .trust-row { flex-wrap: wrap; gap: 18px 22px; }
-          .trust-divider { display: none; }
+          .trust-row { flex-wrap: nowrap; gap: 14px; }
+          .trust-item { flex: 1 1 auto; min-width: 0; }
+          .trust-divider { flex-shrink: 0; height: 30px !important; }
         }
       `}</style>
     </section>
