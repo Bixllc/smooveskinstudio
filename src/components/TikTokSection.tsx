@@ -14,7 +14,7 @@ const VIDEO_IDS = [
 
 export default function TikTokSection() {
   return (
-    <section style={{ backgroundColor: "#2E1F17", padding: "100px 48px" }}>
+    <section className="tiktok-section" style={{ backgroundColor: "#2E1F17", padding: "100px 48px", overflow: "hidden" }}>
       <div style={{ maxWidth: 1340, margin: "0 auto" }}>
         <div
           style={{
@@ -80,7 +80,7 @@ export default function TikTokSection() {
                 className="tiktok-embed"
                 cite={`${TIKTOK_URL}/video/${id}`}
                 data-video-id={id}
-                style={{ maxWidth: "100%", minWidth: 0, margin: 0 }}
+                style={{ maxWidth: "100%", minWidth: 0, width: "100%", margin: 0 }}
               >
                 <section></section>
               </blockquote>
@@ -95,6 +95,10 @@ export default function TikTokSection() {
         .tiktok-icon-link:hover { background-color: rgba(244,237,226,0.2) !important; }
         @media (max-width: 900px) {
           .tiktok-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 600px) {
+          .tiktok-section { padding: 64px 20px !important; }
+          .tiktok-grid { grid-template-columns: 1fr !important; gap: 18px !important; }
         }
       `}</style>
     </section>

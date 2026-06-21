@@ -15,7 +15,7 @@ export default function RevealMarquee() {
       className="relative z-10 overflow-hidden"
       style={{
         borderRadius: "64px 64px 0 0",
-        marginTop: "-60px",
+        marginTop: "40px",
         paddingTop: "36px",
         paddingBottom: "36px",
         backgroundColor: "#E8DDD1",

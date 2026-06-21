@@ -7,7 +7,6 @@ import Link from "next/link";
 const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
 
 const NAV_LINKS = [
-  { label: "Home", href: "/" },
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Contact", href: "#contact" },
