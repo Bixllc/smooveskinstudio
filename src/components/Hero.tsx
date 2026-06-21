@@ -8,7 +8,7 @@ const CLIENT_SLUG = process.env.NEXT_PUBLIC_CLIENT_SLUG ?? "smooveskinstudio";
 export default function Hero() {
   return (
     <section
-      style={{ backgroundColor: "var(--color-bg)", minHeight: "100vh", paddingTop: "90px" }}
+      style={{ backgroundColor: "#F4EDE2", minHeight: "100vh", paddingTop: "90px" }}
       className="relative overflow-hidden"
     >
       {/* Pink ambient glow, top-right — pure CSS, no asset */}
