@@ -1,8 +1,11 @@
 "use client";
 
+import Image from "next/image";
+
 const brands = [
   {
     badge: "BUSHBALM",
+    logo: "/images/brand-bushbalm.png",
     offer: "15% off your first order",
     description: "Ingrown-hair serums & aftercare oils, exclusive to Smoove clients.",
     code: "SMOOVE15",
@@ -19,7 +22,7 @@ const brands = [
     description: "Antiseptic aftercare lotions — exclusive to Smoove clients.",
     code: "SMOOVEFINI",
   },
-];
+] as { badge: string; logo?: string; offer: string; description: string; code: string }[];
 
 export default function CommunityPartners() {
   return (
@@ -55,25 +58,40 @@ export default function CommunityPartners() {
                 gap: 16,
               }}
             >
-              {/* Logo placeholder — swap for real brand logos when available */}
-              <div
-                style={{
-                  height: 48,
-                  width: 130,
-                  alignSelf: "center",
-                  border: "1.5px dashed rgba(110,78,59,0.4)",
-                  borderRadius: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontFamily: "'Courier New', monospace",
-                  fontSize: 11,
-                  letterSpacing: "2px",
-                  color: "#9A6A4E",
-                }}
-              >
-                {brand.badge}
-              </div>
+              {/* Real logo when available, dashed placeholder otherwise */}
+              {brand.logo ? (
+                <div
+                  className="relative"
+                  style={{ height: 48, width: 130, alignSelf: "center" }}
+                >
+                  <Image
+                    src={brand.logo}
+                    alt={brand.badge}
+                    fill
+                    sizes="130px"
+                    className="object-contain"
+                  />
+                </div>
+              ) : (
+                <div
+                  style={{
+                    height: 48,
+                    width: 130,
+                    alignSelf: "center",
+                    border: "1.5px dashed rgba(110,78,59,0.4)",
+                    borderRadius: 10,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "'Courier New', monospace",
+                    fontSize: 11,
+                    letterSpacing: "2px",
+                    color: "#9A6A4E",
+                  }}
+                >
+                  {brand.badge}
+                </div>
+              )}
 
               <h3
                 style={{
