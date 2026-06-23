@@ -171,6 +171,7 @@ export default function Footer({
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email"
                   required
+                  className="footer-email-input"
                   style={{
                     flex: 1,
                     minWidth: 0,
@@ -302,6 +303,7 @@ export default function Footer({
         @media (max-width: 600px) {
           .footer-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
           .smoove-footer { padding: 64px 24px 32px !important; }
+          .footer-email-input { font-size: 16px !important; }
         }
       `}</style>
     </footer>

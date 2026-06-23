@@ -281,6 +281,7 @@ export default function Contact() {
         @media (max-width: 600px) {
           .contact-form-row { grid-template-columns: 1fr !important; }
           .contact-section { padding: 64px 24px !important; }
+          .contact-input { font-size: 16px !important; }
         }
       `}</style>
     </section>
