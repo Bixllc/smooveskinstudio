@@ -41,6 +41,13 @@ interface ReminderEmailData {
   manageUrl?: string;
 }
 
+export async function subscribeToNewsletter(email: string): Promise<void> {
+  const audienceId = process.env.RESEND_NEWSLETTER_AUDIENCE_ID;
+  if (!process.env.RESEND_API_KEY || !audienceId) return;
+
+  await getResend().contacts.create({ email, audienceId, unsubscribed: false });
+}
+
 export async function sendConfirmationEmail(data: BookingEmailData): Promise<void> {
   if (!process.env.RESEND_API_KEY) return;
   const from = process.env.RESEND_FROM_EMAIL || "bookings@smooveskinstudio.com";

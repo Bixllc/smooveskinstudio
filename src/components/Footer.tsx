@@ -32,12 +32,23 @@ export default function Footer({
 }) {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [error, setError] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Footer email signup:", email);
-    setEmail("");
-    setSubscribed(true);
+    setError(false);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error("Subscribe failed");
+      setEmail("");
+      setSubscribed(true);
+    } catch {
+      setError(true);
+    }
   };
 
   return (
@@ -218,6 +229,19 @@ export default function Footer({
                   }}
                 >
                   Successfully subscribed — thank you for joining!
+                </p>
+              )}
+              {error && (
+                <p
+                  style={{
+                    marginTop: 10,
+                    fontFamily: "var(--home-font-sans), sans-serif",
+                    fontWeight: 300,
+                    fontSize: 12.5,
+                    color: "#B3261E",
+                  }}
+                >
+                  Something went wrong — please try again.
                 </p>
               )}
             </div>
