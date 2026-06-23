@@ -9,7 +9,7 @@ const CONTACT = {
   address: "7600 Denton Hwy, Suite #139",
   city: "Watauga, Texas",
   addressNote: "Inside Mattison Avenue Salon Suites",
-  hours: "Tue–Sat · 10am–6pm",
+  availabilityNote: "Walk-ins welcomed. Call ahead to check availability.",
   phone: "(682) 241-2984",
   phoneHref: "tel:+16822412984",
 };
@@ -118,7 +118,7 @@ export default function Footer({
               <p style={{ margin: 0 }}>{CONTACT.address}</p>
               <p style={{ margin: 0 }}>{CONTACT.city}</p>
               <p style={{ margin: 0, color: "#9A6A4E" }}>{CONTACT.addressNote}</p>
-              <p style={{ margin: 0 }}>{CONTACT.hours}</p>
+              <p style={{ margin: 0 }}>{CONTACT.availabilityNote}</p>
               <a
                 href={CONTACT.phoneHref}
                 className="footer-link"
