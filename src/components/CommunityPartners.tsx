@@ -42,7 +42,7 @@ const brands: Brand[] = [
 
 export default function CommunityPartners() {
   return (
-    <section style={{ backgroundColor: "#F4EDE2", padding: "100px 48px" }}>
+    <section className="community-partners-section" style={{ backgroundColor: "#F4EDE2", padding: "100px 48px" }}>
       <div style={{ maxWidth: 1340, margin: "0 auto" }}>
         <h2
           style={{
@@ -214,6 +214,7 @@ export default function CommunityPartners() {
         }
         @media (max-width: 600px) {
           .deals-grid { grid-template-columns: 1fr !important; }
+          .community-partners-section { padding: 64px 24px !important; }
         }
       `}</style>
     </section>

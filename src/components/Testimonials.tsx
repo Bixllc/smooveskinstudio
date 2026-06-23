@@ -206,6 +206,9 @@ export default function Testimonials() {
             color: #F4EDE2 !important;
           }
         }
+        @media (max-width: 600px) {
+          .testimonials-section { padding: 64px 24px !important; }
+        }
       `}</style>
     </section>
   );

@@ -41,8 +41,8 @@ export default function Footer({
   };
 
   return (
-    <footer style={{ backgroundColor: "#F4EDE2", padding: "80px 48px 40px" }}>
-      <div style={{ maxWidth: 1340, margin: "0 auto" }}>
+    <footer className="smoove-footer" style={{ backgroundColor: "#F4EDE2", padding: "80px 48px 40px" }}>
+      <div style={{ maxWidth: 1340, margin: "0 auto", minWidth: 0 }}>
         <div
           className="footer-grid"
           style={{
@@ -54,7 +54,7 @@ export default function Footer({
           }}
         >
           {/* Column 1 — Brand */}
-          <div>
+          <div style={{ minWidth: 0 }}>
             <Image
               src="/images/logo.avif"
               alt="Smoove Skin Studio"
@@ -77,7 +77,7 @@ export default function Footer({
           </div>
 
           {/* Column 2 — Navigate */}
-          <div>
+          <div style={{ minWidth: 0 }}>
             <h4 style={columnHeadingStyle}>NAVIGATE</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {["Home", "About", "Services", "Contact"].map((link) => (
@@ -101,7 +101,7 @@ export default function Footer({
           </div>
 
           {/* Column 3 — Visit */}
-          <div>
+          <div style={{ minWidth: 0 }}>
             <h4 style={columnHeadingStyle}>VISIT</h4>
             <div
               style={{
@@ -130,13 +130,14 @@ export default function Footer({
           </div>
 
           {/* Column 4 — Newsletter card */}
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div
               style={{
                 backgroundColor: "#FBF7F0",
                 border: "1px solid rgba(154,106,78,0.18)",
                 borderRadius: 20,
                 padding: "28px 28px 30px",
+                minWidth: 0,
               }}
             >
               <h4
@@ -205,6 +206,19 @@ export default function Footer({
                   {subscribed ? "✓" : "Join"}
                 </button>
               </form>
+              {subscribed && (
+                <p
+                  style={{
+                    marginTop: 10,
+                    fontFamily: "var(--home-font-sans), sans-serif",
+                    fontWeight: 300,
+                    fontSize: 12.5,
+                    color: "#9A6A4E",
+                  }}
+                >
+                  Successfully subscribed — thank you for joining!
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -287,6 +301,7 @@ export default function Footer({
         }
         @media (max-width: 600px) {
           .footer-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
+          .smoove-footer { padding: 64px 24px 32px !important; }
         }
       `}</style>
     </footer>

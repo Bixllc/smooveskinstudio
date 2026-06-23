@@ -31,6 +31,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
+      className="contact-section"
       style={{ backgroundColor: "#F4EDE2", padding: "100px 48px" }}
     >
       <div
@@ -279,6 +280,7 @@ export default function Contact() {
         }
         @media (max-width: 600px) {
           .contact-form-row { grid-template-columns: 1fr !important; }
+          .contact-section { padding: 64px 24px !important; }
         }
       `}</style>
     </section>
