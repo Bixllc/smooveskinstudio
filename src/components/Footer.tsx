@@ -12,6 +12,7 @@ const CONTACT = {
   availabilityNote: "Walk-ins welcomed. Call ahead to check availability.",
   phone: "(682) 241-2984",
   phoneHref: "tel:+16822412984",
+  email: "info@smooveskinstudio.com",
 };
 
 const columnHeadingStyle: React.CSSProperties = {
@@ -136,6 +137,13 @@ export default function Footer({
                 style={{ color: "#2E1F17", fontWeight: 500, textDecoration: "none", transition: "color 150ms ease" }}
               >
                 {CONTACT.phone}
+              </a>
+              <a
+                href={`mailto:${CONTACT.email}`}
+                className="footer-link"
+                style={{ textDecoration: "none", transition: "color 150ms ease" }}
+              >
+                {CONTACT.email}
               </a>
             </div>
           </div>

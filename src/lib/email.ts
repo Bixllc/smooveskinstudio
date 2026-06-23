@@ -41,11 +41,33 @@ interface ReminderEmailData {
   manageUrl?: string;
 }
 
+interface ContactFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  message: string;
+}
+
 export async function subscribeToNewsletter(email: string): Promise<void> {
   const audienceId = process.env.RESEND_NEWSLETTER_AUDIENCE_ID;
   if (!process.env.RESEND_API_KEY || !audienceId) return;
 
   await getResend().contacts.create({ email, audienceId, unsubscribed: false });
+}
+
+export async function sendContactFormEmail(data: ContactFormData): Promise<void> {
+  if (!process.env.RESEND_API_KEY) return;
+  const from = process.env.RESEND_FROM_EMAIL || "bookings@smooveskinstudio.com";
+  const to = process.env.CONTACT_FORM_TO_EMAIL || "info@smooveskinstudio.com";
+
+  await getResend().emails.send({
+    from,
+    to,
+    replyTo: data.email,
+    subject: `New website inquiry — ${data.firstName} ${data.lastName}`,
+    html: buildContactFormHtml(data),
+  });
 }
 
 export async function sendConfirmationEmail(data: BookingEmailData): Promise<void> {
@@ -279,5 +301,30 @@ function buildReminderHtml(data: ReminderEmailData): string {
         Need to Cancel or Reschedule?
       </a>
     </div>` : ""}
+  `);
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function buildContactFormHtml(data: ContactFormData): string {
+  return wrapper(`
+    <h2 style="margin:0 0 4px;font-size:22px;font-weight:700;color:${BRAND.dark};">New Website Inquiry</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:${BRAND.text};">Someone submitted the contact form on the website.</p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      ${detailRow("Name", escapeHtml(`${data.firstName} ${data.lastName}`))}
+      ${detailRow("Email", escapeHtml(data.email))}
+      ${data.phone ? detailRow("Phone", escapeHtml(data.phone)) : ""}
+    </table>
+
+    <div style="background:${BRAND.bg};border-radius:10px;padding:16px;">
+      <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.text};">Message</p>
+      <p style="margin:0;font-size:13px;color:${BRAND.dark};white-space:pre-wrap;">${escapeHtml(data.message)}</p>
+    </div>
   `);
 }

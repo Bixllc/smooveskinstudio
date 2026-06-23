@@ -20,12 +20,23 @@ export default function Contact() {
     message: "",
   });
   const [contactSent, setContactSent] = useState(false);
+  const [contactError, setContactError] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Contact form submitted:", form);
-    setForm({ firstName: "", lastName: "", email: "", phone: "", message: "" });
-    setContactSent(true);
+    setContactError(false);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Send failed");
+      setForm({ firstName: "", lastName: "", email: "", phone: "", message: "" });
+      setContactSent(true);
+    } catch {
+      setContactError(true);
+    }
   };
 
   return (
@@ -73,7 +84,10 @@ export default function Contact() {
             }}
           >
             {/* Phone row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+            <a
+              href="tel:+16822412984"
+              style={{ display: "flex", alignItems: "center", gap: 18, textDecoration: "none" }}
+            >
               <div
                 style={{
                   width: 60,
@@ -104,7 +118,7 @@ export default function Contact() {
                   (682) 241-2984
                 </p>
               </div>
-            </div>
+            </a>
 
             <div style={{ height: 1, background: "rgba(244,237,226,0.2)", margin: "26px 0" }} />
 
@@ -253,6 +267,11 @@ export default function Contact() {
             >
               {contactSent ? "Thank you — we'll be in touch ✓" : "Get In Touch →"}
             </button>
+            {contactError && (
+              <p style={{ margin: 0, fontSize: 12.5, color: "#E8A0A0", fontFamily: "var(--home-font-sans), sans-serif", fontWeight: 300 }}>
+                Something went wrong — please try again or call us directly.
+              </p>
+            )}
           </form>
         </div>
       </div>
