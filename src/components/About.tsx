@@ -105,29 +105,37 @@ export default function About() {
 
               <hr className="my-8" style={{ borderColor: "rgba(196,165,107,0.35)" }} />
 
-              {/* Numbered stats */}
-              <div className="grid grid-cols-3 gap-6">
-                {[
-                  { num: "01", text: "Licensed & certified esthetician" },
-                  { num: "02", text: "Organic & clean products only" },
-                  { num: "03", text: "Private studio, no distractions" },
-                ].map((stat) => (
-                  <div key={stat.num}>
-                    <p
-                      style={{
-                        fontFamily: "var(--home-font-serif), serif",
-                        fontSize: "1.4rem",
-                        color: "#C4A56B",
-                        fontWeight: 400,
-                      }}
+              {/* 2x2 stat blocks */}
+              <div className="rounded-2xl p-3 sm:p-4" style={{ backgroundColor: "#FBF7F0" }}>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  {[
+                    { value: "3+", label: "Years of Experience" },
+                    { value: "100%", label: "Licensed Esthetician" },
+                    { value: "Premium", label: "Quality Products" },
+                    { value: "Award Winning", label: "Brazilian & Full Body Wax Specialist" },
+                  ].map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="rounded-xl text-center flex flex-col items-center justify-center"
+                      style={{ backgroundColor: "#F0E6D8", padding: "26px 16px", minHeight: 116 }}
                     >
-                      {stat.num}
-                    </p>
-                    <p className="mt-2 text-sm leading-snug" style={{ color: "#6B5F54" }}>
-                      {stat.text}
-                    </p>
-                  </div>
-                ))}
+                      <p
+                        style={{
+                          fontFamily: "var(--home-font-serif), serif",
+                          fontSize: "1.45rem",
+                          color: "#C8A56B",
+                          fontWeight: 500,
+                          lineHeight: 1.15,
+                        }}
+                      >
+                        {stat.value}
+                      </p>
+                      <p className="mt-1.5 text-sm leading-snug" style={{ color: "#6B5F54" }}>
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <hr className="my-8" style={{ borderColor: "rgba(196,165,107,0.35)" }} />

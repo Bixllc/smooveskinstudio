@@ -80,11 +80,27 @@ export default function Hero() {
               lineHeight: 1.65,
               color: "#5A463A",
               maxWidth: 460,
+              marginBottom: 22,
+            }}
+          >
+            Get waxed by an award winning specialist with precision, care, and results you love.
+            At Smoove Skin Studio, every service is designed to leave your skin smoother, cleaner,
+            and more confident than ever.
+          </p>
+
+          <p
+            className="hero-tagline"
+            style={{
+              fontFamily: "var(--home-font-sans), sans-serif",
+              fontWeight: 700,
+              fontSize: "clamp(11px, 3vw, 15px)",
+              letterSpacing: "0.5px",
+              color: "#2E1F17",
+              whiteSpace: "nowrap",
               marginBottom: 38,
             }}
           >
-            Precision waxing and skin care in the DFW area — built on comfort, hygiene, and results
-            that leave you smoother, cleaner, and more confident in your skin.
+            FULL BODY BRAZILIAN WAXING IN THE DFW AREA
           </p>
 
           <Link
@@ -106,36 +122,6 @@ export default function Hero() {
           >
             Book Your Session <span style={{ fontSize: 17, lineHeight: 1 }}>→</span>
           </Link>
-
-          {/* Trust bar */}
-          <div className="mt-14 hero-trust-wrapper" style={{ paddingTop: 30, borderTop: "1px solid rgba(154,106,78,0.20)" }}>
-            <div className="trust-row" style={{ display: "flex", gap: 26, flexWrap: "wrap" }}>
-              <div className="trust-item">
-                <div style={{ color: "#C8A56B", fontSize: 15, letterSpacing: "2px" }}>★★★★★</div>
-                <p className="text-sm mt-1" style={{ fontSize: 12.5, fontWeight: 300, color: "#5A463A" }}>
-                  Loved by 500+ DFW clients
-                </p>
-              </div>
-              <div className="trust-divider" style={{ width: 1, height: 38, background: "rgba(154,106,78,0.22)" }} />
-              <div className="trust-item">
-                <p style={{ fontFamily: "var(--home-font-serif), serif", fontSize: 22, fontWeight: 600, color: "#2E1F17" }}>
-                  Award-Winning
-                </p>
-                <p className="text-sm mt-1" style={{ fontSize: 12.5, fontWeight: 300, color: "#5A463A" }}>
-                  Wax Specialist
-                </p>
-              </div>
-              <div className="trust-divider" style={{ width: 1, height: 38, background: "rgba(154,106,78,0.22)" }} />
-              <div className="trust-item">
-                <p style={{ fontFamily: "var(--home-font-serif), serif", fontSize: 22, fontWeight: 600, color: "#2E1F17" }}>
-                  Clean
-                </p>
-                <p className="text-sm mt-1" style={{ fontSize: 12.5, fontWeight: 300, color: "#5A463A" }}>
-                  Organic products only
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Right — Image composition */}
@@ -215,31 +201,26 @@ export default function Hero() {
             padding-top: 14px !important;
             padding-bottom: 64px !important;
           }
-          /* Lets heading/paragraph/CTA/trust-bar reorder alongside the image
+          /* Lets heading/paragraph/tagline/CTA reorder alongside the image
              as if they were direct siblings, without changing desktop markup */
           .hero-text-wrapper { display: contents; }
           .hero-heading { order: 1; text-align: center; }
           .hero-paragraph { order: 2; text-align: center; margin-left: auto !important; margin-right: auto !important; }
+          .hero-tagline { order: 3; text-align: center; }
           .hero-right {
-            order: 3;
+            order: 4;
             width: 100% !important;
             max-width: 300px !important;
             margin: 0 auto !important;
             justify-content: center !important;
           }
-          .smoove-hero-cta { order: 4; }
-          .hero-trust-wrapper { order: 5; width: 100%; margin-top: 0 !important; }
+          .smoove-hero-cta { order: 5; }
           .hero-secondary-photo {
             width: 140px !important;
             height: 174px !important;
             left: -4px !important;
             bottom: -8px !important;
           }
-        }
-        @media (max-width: 600px) {
-          .trust-row { flex-wrap: nowrap !important; gap: 14px !important; justify-content: center !important; }
-          .trust-item { flex: 1 1 auto; min-width: 0; }
-          .trust-divider { flex-shrink: 0; height: 30px !important; }
         }
       `}</style>
     </section>

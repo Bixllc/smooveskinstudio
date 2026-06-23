@@ -9,11 +9,17 @@ type ServicesProps = {
 };
 
 const CATEGORY_META: Record<string, { image: string; shortName: string; description: string }> = {
-  "Body & Face Waxing": {
+  "Body Waxing": {
     image: "/images/cat-body-waxing.png",
-    shortName: "Body & Face Waxing",
+    shortName: "Body Waxing",
     description:
       "Smooth, precise waxing from head to toe — Brazilians, legs, arms, underarms, and the full-body Smoove finish.",
+  },
+  "Face Waxing": {
+    image: "/images/cat-face-waxing.png",
+    shortName: "Face Waxing",
+    description:
+      "Precision waxing for the face — lip, chin, and sideburns for clean, smooth, camera-ready results.",
   },
   "Brow Services": {
     image: "/images/cat-brow-waxing.png",
@@ -21,18 +27,12 @@ const CATEGORY_META: Record<string, { image: string; shortName: string; descript
     description:
       "Defined, sculpted brows done right — precision wax, tint, and the brow wax & tint combo for a polished finish.",
   },
-  "Vajacial & Hydrojelly Masks": {
-    image: "/images/vajacial-services.jpg",
-    shortName: "Vajacial & Hydrojelly",
-    description:
-      "Targeted skin treatments and masking that soothe, brighten, and care for skin after your wax.",
-  },
 };
 
 const DISPLAY_CATEGORIES = [
-  "Body & Face Waxing",
+  "Body Waxing",
+  "Face Waxing",
   "Brow Services",
-  "Vajacial & Hydrojelly Masks",
 ];
 
 const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
@@ -56,8 +56,8 @@ export default function Services({}: ServicesProps) {
             Every service, tailored to you.
           </h2>
           <p className="mt-4 text-base max-w-xl mx-auto leading-relaxed" style={{ color: "#6B5F54" }}>
-            From precise body and face waxing to sculpted brows and targeted skin treatments —
-            three focused categories, all customized on the day.
+            From precise body and face waxing to sculpted brows — three focused categories,
+            all customized on the day.
           </p>
         </div>
 
