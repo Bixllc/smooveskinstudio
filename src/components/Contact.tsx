@@ -127,7 +127,7 @@ export default function Contact() {
                 </p>
               </div>
               <div>
-                <p style={labelStyle}>STUDIO HOURS</p>
+                <p style={labelStyle}>AVAILABILITY</p>
                 <p
                   style={{
                     marginTop: 9,
@@ -138,9 +138,7 @@ export default function Contact() {
                     color: "#F4EDE2",
                   }}
                 >
-                  Tue–Sat · 10am – 6pm
-                  <br />
-                  Sun &amp; Mon · Closed
+                  Walk-ins welcomed. Call ahead to check availability.
                 </p>
               </div>
             </div>
