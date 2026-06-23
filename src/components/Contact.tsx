@@ -152,6 +152,8 @@ export default function Contact() {
                     color: "#F4EDE2",
                   }}
                 >
+                  Thurs–Sat · 11am – 5:30pm
+                  <br />
                   Walk-ins welcomed. Call ahead to check availability.
                 </p>
               </div>
