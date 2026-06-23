@@ -72,12 +72,12 @@ export default function Testimonials() {
             }}
           >
             <Image
-              src="/images/testimonials-treatment.png"
-              alt="Esthetician performing a treatment at Smoove Skin Studio"
+              src="/images/testimonials-treatment-2.jpg"
+              alt="Esthetician applying treatment oil at Smoove Skin Studio"
               fill
               sizes="(max-width: 900px) 100vw, 40vw"
               className="object-cover"
-              style={{ objectPosition: "50% 22%" }}
+              style={{ objectPosition: "50% 30%" }}
             />
           </div>
 
@@ -141,7 +141,7 @@ export default function Testimonials() {
             <div style={{ display: "flex", gap: 14 }}>
               <button
                 onClick={prev}
-                className="testimonial-nav-btn"
+                className="testimonial-nav-btn testimonial-prev-btn"
                 aria-label="Previous testimonial"
                 style={{
                   width: 50,
@@ -162,7 +162,7 @@ export default function Testimonials() {
               </button>
               <button
                 onClick={next}
-                className="testimonial-nav-btn"
+                className="testimonial-nav-btn testimonial-next-btn"
                 aria-label="Next testimonial"
                 style={{
                   width: 50,
@@ -195,6 +195,15 @@ export default function Testimonials() {
         @media (max-width: 900px) {
           .testimonials-grid {
             grid-template-columns: 1fr !important;
+          }
+          .testimonial-next-btn {
+            background: #2E1F17 !important;
+            color: #F4EDE2 !important;
+            border-color: #2E1F17 !important;
+          }
+          .testimonial-next-btn:hover {
+            background: #3A281E !important;
+            color: #F4EDE2 !important;
           }
         }
       `}</style>

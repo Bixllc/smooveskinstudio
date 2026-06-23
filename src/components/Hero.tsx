@@ -53,8 +53,9 @@ export default function Hero() {
         }}
       >
         {/* Left — Text */}
-        <div style={{ maxWidth: 560 }}>
+        <div className="hero-text-wrapper" style={{ maxWidth: 560 }}>
           <h1
+            className="hero-heading"
             style={{
               fontFamily: "var(--home-font-serif), serif",
               fontSize: "clamp(44px, 4vw, 60px)",
@@ -72,6 +73,7 @@ export default function Hero() {
           </h1>
 
           <p
+            className="hero-paragraph"
             style={{
               fontSize: 17.5,
               fontWeight: 300,
@@ -106,7 +108,7 @@ export default function Hero() {
           </Link>
 
           {/* Trust bar */}
-          <div className="mt-14" style={{ paddingTop: 30, borderTop: "1px solid rgba(154,106,78,0.20)" }}>
+          <div className="mt-14 hero-trust-wrapper" style={{ paddingTop: 30, borderTop: "1px solid rgba(154,106,78,0.20)" }}>
             <div className="trust-row" style={{ display: "flex", gap: 26, flexWrap: "wrap" }}>
               <div className="trust-item">
                 <div style={{ color: "#C8A56B", fontSize: 15, letterSpacing: "2px" }}>★★★★★</div>
@@ -188,12 +190,12 @@ export default function Hero() {
             }}
           >
             <Image
-              src="/images/treatment-oil.png"
-              alt="Aftercare oil application at Smoove Skin Studio"
+              src="/images/anisha-hero-secondary.jpg"
+              alt="Anisha at Smoove Skin Studio"
               fill
               sizes="196px"
               className="object-cover"
-              style={{ objectPosition: "56% 20%" }}
+              style={{ objectPosition: "50% 15%" }}
             />
           </div>
         </div>
@@ -204,20 +206,29 @@ export default function Hero() {
         .smoove-hero-cta:hover { background: #2E1F17 !important; }
         @media (max-width: 900px) {
           .hero-grid {
-            grid-template-columns: 1fr !important;
-            gap: 44px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 24px !important;
             padding-left: 26px !important;
             padding-right: 26px !important;
             padding-top: 14px !important;
             padding-bottom: 64px !important;
           }
+          /* Lets heading/paragraph/CTA/trust-bar reorder alongside the image
+             as if they were direct siblings, without changing desktop markup */
+          .hero-text-wrapper { display: contents; }
+          .hero-heading { order: 1; text-align: center; }
+          .hero-paragraph { order: 2; text-align: center; margin-left: auto !important; margin-right: auto !important; }
           .hero-right {
-            order: -1;
+            order: 3;
             width: 100% !important;
             max-width: 300px !important;
-            margin: 0 auto 16px !important;
+            margin: 0 auto !important;
             justify-content: center !important;
           }
+          .smoove-hero-cta { order: 4; }
+          .hero-trust-wrapper { order: 5; width: 100%; margin-top: 0 !important; }
           .hero-secondary-photo {
             width: 140px !important;
             height: 174px !important;
@@ -226,7 +237,7 @@ export default function Hero() {
           }
         }
         @media (max-width: 600px) {
-          .trust-row { flex-wrap: nowrap; gap: 14px; }
+          .trust-row { flex-wrap: nowrap !important; gap: 14px !important; justify-content: center !important; }
           .trust-item { flex: 1 1 auto; min-width: 0; }
           .trust-divider { flex-shrink: 0; height: 30px !important; }
         }

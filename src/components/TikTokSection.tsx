@@ -1,15 +1,13 @@
 "use client";
 
-import Script from "next/script";
-
 const TIKTOK_URL = "https://www.tiktok.com/@smooveskinstudio";
 
-// 4 latest posts, provided via TikTok's official embed codes on 2026-06-21.
-const VIDEO_IDS = [
-  "7652781243171458335",
-  "7650601733856529694",
-  "7647682881732578591",
-  "7646051814009326878",
+// 4 latest posts, downloaded and self-hosted on 2026-06-23.
+const VIDEOS = [
+  { src: "/videos/life-at-smoove-1.mp4", poster: "/videos/life-at-smoove-1-poster.jpg" },
+  { src: "/videos/life-at-smoove-2.mp4", poster: "/videos/life-at-smoove-2-poster.jpg" },
+  { src: "/videos/life-at-smoove-3.mp4", poster: "/videos/life-at-smoove-3-poster.jpg" },
+  { src: "/videos/life-at-smoove-4.mp4", poster: "/videos/life-at-smoove-4-poster.jpg" },
 ];
 
 export default function TikTokSection() {
@@ -64,33 +62,32 @@ export default function TikTokSection() {
           </a>
         </div>
 
-        {/* Live TikTok embeds — official widget, not re-hosted video files */}
+        {/* Self-hosted clips from @smooveskinstudio's TikTok */}
         <div className="tiktok-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 22 }}>
-          {VIDEO_IDS.map((id) => (
+          {VIDEOS.map((video) => (
             <div
-              key={id}
+              key={video.src}
               className="tiktok-card"
               style={{
                 borderRadius: 20,
                 overflow: "hidden",
-                background: "repeating-linear-gradient(135deg, #3A2A20 0 14px, #34251C 14px 28px)",
+                aspectRatio: "9 / 16",
+                background: "#2E1F17",
                 scrollSnapAlign: "start",
               }}
             >
-              <blockquote
-                className="tiktok-embed"
-                cite={`${TIKTOK_URL}/video/${id}`}
-                data-video-id={id}
-                style={{ maxWidth: "100%", minWidth: 0, width: "100%", margin: 0 }}
-              >
-                <section></section>
-              </blockquote>
+              <video
+                src={video.src}
+                poster={video.poster}
+                controls
+                playsInline
+                preload="metadata"
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
             </div>
           ))}
         </div>
       </div>
-
-      <Script src="https://www.tiktok.com/embed.js" strategy="lazyOnload" />
 
       <style>{`
         .tiktok-icon-link:hover { background-color: rgba(244,237,226,0.2) !important; }
@@ -98,19 +95,8 @@ export default function TikTokSection() {
           .tiktok-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 600px) {
-          .tiktok-section { padding: 64px 0 64px 20px !important; }
-          .tiktok-grid {
-            display: flex !important;
-            overflow-x: auto !important;
-            scroll-snap-type: x mandatory !important;
-            -webkit-overflow-scrolling: touch !important;
-            gap: 14px !important;
-            padding-right: 20px !important;
-            margin-right: -20px !important;
-            scrollbar-width: none !important;
-          }
-          .tiktok-grid::-webkit-scrollbar { display: none; }
-          .tiktok-card { flex: 0 0 58vw !important; }
+          .tiktok-section { padding: 64px 20px !important; }
+          .tiktok-grid { gap: 12px !important; }
         }
       `}</style>
     </section>
