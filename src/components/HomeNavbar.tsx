@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useBookingGate } from "@/components/BookingPolicyGate";
 
 const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
 
@@ -14,6 +15,7 @@ const NAV_LINKS = [
 
 export default function HomeNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { requestBooking } = useBookingGate();
 
   return (
     <>
@@ -82,10 +84,8 @@ export default function HomeNavbar() {
           </ul>
 
           {/* CTA — desktop only */}
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => requestBooking(BOOKING_URL)}
             className="smoove-nav-cta"
             style={{
               fontSize: 13,
@@ -95,13 +95,14 @@ export default function HomeNavbar() {
               background: "#3A281E",
               padding: "13px 26px",
               borderRadius: 999,
-              textDecoration: "none",
+              border: "none",
+              cursor: "pointer",
               whiteSpace: "nowrap",
               transition: "background 150ms ease",
             }}
           >
             Book Your Session
-          </a>
+          </button>
 
           {/* Hamburger — mobile only */}
           <button
@@ -178,11 +179,11 @@ export default function HomeNavbar() {
                 {item.label}
               </a>
             ))}
-            <a
-              href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMenuOpen(false)}
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                requestBooking(BOOKING_URL);
+              }}
               style={{
                 fontSize: 13,
                 fontWeight: 300,
@@ -191,13 +192,14 @@ export default function HomeNavbar() {
                 background: "#3A281E",
                 padding: "13px 26px",
                 borderRadius: 999,
-                textDecoration: "none",
+                border: "none",
+                cursor: "pointer",
                 textAlign: "center",
                 marginTop: 8,
               }}
             >
               Book Your Session
-            </a>
+            </button>
           </div>
         )}
       </header>

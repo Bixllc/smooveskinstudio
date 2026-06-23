@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useBookingGate } from "@/components/BookingPolicyGate";
 
 type ServicesProps = {
   services: { id: string; name: string; categoryId: string }[];
@@ -38,6 +39,8 @@ const DISPLAY_CATEGORIES = [
 const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
 
 export default function Services({}: ServicesProps) {
+  const { requestBooking } = useBookingGate();
+
   return (
     <section id="services" className="py-24" style={{ backgroundColor: "#F4EDE2" }}>
       <div className="max-w-[1320px] mx-auto px-6 md:px-10">
@@ -113,25 +116,23 @@ export default function Services({}: ServicesProps) {
                   <p className="mt-3 text-sm leading-relaxed flex-1" style={{ color: "#6B5F54" }}>
                     {meta?.description}
                   </p>
-                  <a
-                    href={BOOKING_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => requestBooking(BOOKING_URL)}
                     className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium self-start transition-all duration-300"
-                    style={{ border: "1.5px solid #2E1F17", color: "#2E1F17" }}
+                    style={{ border: "1.5px solid #2E1F17", color: "#2E1F17", background: "transparent", cursor: "pointer" }}
                     onMouseEnter={(e) => {
-                      const el = e.currentTarget as HTMLAnchorElement;
+                      const el = e.currentTarget as HTMLButtonElement;
                       el.style.backgroundColor = "#2E1F17";
                       el.style.color = "white";
                     }}
                     onMouseLeave={(e) => {
-                      const el = e.currentTarget as HTMLAnchorElement;
+                      const el = e.currentTarget as HTMLButtonElement;
                       el.style.backgroundColor = "transparent";
                       el.style.color = "#2E1F17";
                     }}
                   >
                     Book Now <span>→</span>
-                  </a>
+                  </button>
                 </div>
               </div>
             );
@@ -140,15 +141,13 @@ export default function Services({}: ServicesProps) {
 
         {/* CTA */}
         <div className="mt-14 text-center">
-          <a
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => requestBooking(BOOKING_URL)}
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-sm font-medium text-white transition-all hover:opacity-90"
-            style={{ backgroundColor: "#2E1F17" }}
+            style={{ backgroundColor: "#2E1F17", border: "none", cursor: "pointer" }}
           >
             View All Services <span>→</span>
-          </a>
+          </button>
         </div>
       </div>
     </section>

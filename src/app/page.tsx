@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { cormorantGaramond, dmSans } from "@/lib/homeFonts";
+import { BookingPolicyProvider } from "@/components/BookingPolicyGate";
 import HomeNavbar from "@/components/HomeNavbar";
 import Hero from "@/components/Hero";
 import RevealMarquee from "@/components/RevealMarquee";
@@ -49,16 +50,18 @@ export default async function Home() {
 
   return (
     <div className={`smoove-home ${cormorantGaramond.variable} ${dmSans.variable}`}>
-      <HomeNavbar />
-      <Hero />
-      <RevealMarquee />
-      <About />
-      <Services services={services} categories={categories} clientSlug={CLIENT_SLUG} />
-      <Testimonials />
-      <CommunityPartners />
-      <TikTokSection />
-      <Contact />
-      <Footer categories={categories} clientSlug={CLIENT_SLUG} />
+      <BookingPolicyProvider>
+        <HomeNavbar />
+        <Hero />
+        <RevealMarquee />
+        <About />
+        <Services services={services} categories={categories} clientSlug={CLIENT_SLUG} />
+        <Testimonials />
+        <CommunityPartners />
+        <TikTokSection />
+        <Contact />
+        <Footer categories={categories} clientSlug={CLIENT_SLUG} />
+      </BookingPolicyProvider>
     </div>
   );
 }

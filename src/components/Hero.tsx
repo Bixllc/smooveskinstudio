@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useBookingGate } from "@/components/BookingPolicyGate";
 
 const BOOKING_URL = "https://smooveskin.as.me/schedule/64a2c692";
 
 export default function Hero() {
+  const { requestBooking } = useBookingGate();
+
   return (
     <section
       style={{ backgroundColor: "#F4EDE2", minHeight: "100vh", paddingTop: "90px" }}
@@ -103,10 +105,8 @@ export default function Hero() {
             FULL BODY BRAZILIAN WAXING IN THE DFW AREA
           </p>
 
-          <Link
-            href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={() => requestBooking(BOOKING_URL)}
             className="smoove-hero-cta inline-flex items-center"
             style={{
               gap: 12,
@@ -116,12 +116,13 @@ export default function Hero() {
               backgroundColor: "#3A281E",
               padding: "18px 32px",
               borderRadius: 44,
-              textDecoration: "none",
+              border: "none",
+              cursor: "pointer",
               transition: "background 150ms ease",
             }}
           >
             Book Your Session <span style={{ fontSize: 17, lineHeight: 1 }}>→</span>
-          </Link>
+          </button>
         </div>
 
         {/* Right — Image composition */}
